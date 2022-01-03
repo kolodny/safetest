@@ -1,7 +1,7 @@
 {
   "name": "safetest",
   "version": "0.0.0-super-alpha",
-  "description": "",
+  "description": "Run test in a browser",
   "main": "dist/index.js",
   "scripts": {
     "lint": "eslint src/",
@@ -76,5 +76,13 @@
     "glob": "^7.2.0",
     "v8-to-istanbul": "^8.1.0",
     "yargs": "^17.3.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kolodny/safetest.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kolodny/safetest/issues"
+  },
+  "homepage": "https://github.com/kolodny/safetest#readme"
 }
