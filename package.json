@@ -1,12 +1,13 @@
 {
   "name": "safetest",
-  "version": "0.0.0-super-alpha",
+  "version": "0.0.0-super-alpha-2",
   "description": "Run test in a browser",
   "main": "dist/index.js",
   "scripts": {
     "lint": "eslint src/",
     "lint:fix": "npm run lint -- --fix",
     "build": "tsc",
+    "prepublishOnly": "npm run build",
     "develop": "node develop.mjs",
     "ci": "npm run build && bash installsafetest.sh && node ci.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
