@@ -1,0 +1,40 @@
+name: CI
+on: [push]
+jobs:
+  build:
+    name: Build, lint, and test on Node ${{ matrix.node }} and ${{ matrix.os }}
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node: ['14.x']
+        os: [ubuntu-latest]
+
+    env:
+      NG_CLI_ANALYTICS: ci
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Use Node ${{ matrix.node }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install deps and build (with cache)
+        uses: bahmutov/npm-install@v1
+
+      - name: Install example deps
+        run: bash installexampledeps.sh
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run ci
+
+      - name: artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: code-coverage-report
+          path: examples/artifacts/

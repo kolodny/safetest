@@ -1,0 +1,22 @@
+{
+  "name": "esbuild",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "esbuild --bundle --minify --sourcemap  src/index.tsx --outfile=public/index.js --servedir=public --serve=3000",
+    "safetest": "jest --runInBand --testMatch '**/*.safetest.{j,t}s{,x}'",
+    "safetest:debug": "node --inspect-brk node_modules/.bin/jest --runInBand --testMatch '**/*.safetest.{j,t}s{,x}'",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Moshe Kolodny",
+  "license": "ISC",
+  "dependencies": {
+    "esbuild": "^0.14.1",
+    "esbuild-jest": "^0.5.0",
+    "jest": "^27.4.3",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  }
+}

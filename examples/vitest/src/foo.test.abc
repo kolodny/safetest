@@ -1,0 +1,10 @@
+import { describe, it, expect } from 'vitest';
+
+describe('foo', () => {
+  console.log(1);
+  it('bar', () => {
+    console.log(2);
+    expect(true).toBe(true);
+  });
+  console.log(3);
+});

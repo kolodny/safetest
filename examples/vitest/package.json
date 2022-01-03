@@ -1,0 +1,27 @@
+{
+  "name": "vitest-example",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "safetest": "jest --runInBand --testMatch '**/*.safetest.{j,t}s{,x}'",
+    "safetest:debug": "node --inspect-brk node_modules/.bin/jest --runInBand --testMatch '**/*.safetest.{j,t}s{,x}'",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.3",
+    "@types/node": "^16.11.11",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@vitejs/plugin-react": "^1.0.0",
+    "jest": "^27.4.3",
+    "ts-jest": "^27.0.7",
+    "typescript": "^4.3.2",
+    "vite": "^2.6.4",
+    "vitest": "0.0.107"
+  }
+}

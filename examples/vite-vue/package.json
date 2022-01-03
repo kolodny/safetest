@@ -1,0 +1,26 @@
+{
+  "name": "vite-vue",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "safetest": "jest --runInBand --testMatch '**/*.safetest.{j,t}s{,x}'",
+    "safetest:debug": "node --inspect-brk node_modules/.bin/jest --runInBand --testMatch '**/*.safetest.{j,t}s{,x}'",
+    "build": "vue-tsc --noEmit && vite build",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.2.16"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.3",
+    "@vitejs/plugin-vue": "^1.9.3",
+    "@vue/test-utils": "^2.0.0-rc.17",
+    "@vue/vue3-jest": "^27.0.0-alpha.4",
+    "jest": "^27.4.5",
+    "ts-jest": "^27.1.2",
+    "typescript": "^4.4.3",
+    "vite": "^2.6.4",
+    "vue-jest": "^3.0.7",
+    "vue-tsc": "^0.3.0"
+  }
+}

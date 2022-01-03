@@ -1,0 +1,80 @@
+{
+  "name": "safetest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "lint": "eslint src/",
+    "lint:fix": "npm run lint -- --fix",
+    "build": "tsc",
+    "develop": "node develop.mjs",
+    "ci": "npm run build && bash installsafetest.sh && node ci.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./": "./dist/index.js",
+    "./react": "./react/index.js",
+    "./jest": "./jest/index.js",
+    "./mocha": "./mocha/index.js",
+    "./vitest": "./vitest/index.js",
+    "./vue3": "./vue3/index.js",
+    "./svelte": "./svelte/index.js",
+    "./ng": "./ng/index.js"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": "npm run lint -- --fix"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npx lint-staged"
+    }
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "keywords": [],
+  "author": "Moshe Kolodny",
+  "license": "ISC",
+  "devDependencies": {
+    "@angular/core": "^13.0.3",
+    "@angular/platform-browser-dynamic": "^13.1.0",
+    "@types/jest": "^27.0.3",
+    "@types/lodash.merge": "^4.6.6",
+    "@types/mocha": "^9.0.0",
+    "@types/react": "^17.0.36",
+    "@types/react-dom": "^17.0.11",
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
+    "chokidar": "^3.5.2",
+    "chokidar-cli": "^3.0.0",
+    "concurrently": "^6.4.0",
+    "eslint": "^8.3.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react": "^7.27.1",
+    "expect": "^27.3.1",
+    "get-port": "^6.0.0",
+    "get-port-cli": "^3.0.0",
+    "husky": "^4.3.8",
+    "lint-staged": "^12.1.1",
+    "playwright": "^1.16.3",
+    "prettier": "^2.5.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "svelte": "^3.44.2",
+    "typescript": "^4.5.2",
+    "vitest": "0.0.103",
+    "vue": "^3.2.26",
+    "wait-on": "^6.0.0"
+  },
+  "dependencies": {
+    "deepmerge": "^4.2.2",
+    "glob": "^7.2.0",
+    "v8-to-istanbul": "^8.1.0",
+    "yargs": "^17.3.0"
+  }
+}
