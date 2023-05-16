@@ -5,7 +5,7 @@ env:
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on:
   push:
-    branches-ignore:
+    branches:
       - main
 jobs:
   Explore-GitHub-Actions:
