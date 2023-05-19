@@ -8,10 +8,10 @@ import { useTheme } from '@mui/material/styles';
 import { Avatar, Chip, ListItemButton, ListItemIcon, ListItemText, Typography, useMediaQuery } from '@mui/material';
 
 // project imports
-import { MENU_OPEN, SET_MENU } from 'store/actions';
 
 // assets
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import { MENU_OPEN, SET_MENU } from '../../../../../store/actions';
 
 // ==============================|| SIDEBAR MENU LIST ITEMS ||============================== //
 

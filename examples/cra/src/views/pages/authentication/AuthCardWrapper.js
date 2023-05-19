@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Box } from '@mui/material';
 
 // project import
-import MainCard from 'ui-component/cards/MainCard';
+import MainCard from '../../../ui-component/cards/MainCard';
 
 // ==============================|| AUTHENTICATION CARD WRAPPER ||============================== //
 

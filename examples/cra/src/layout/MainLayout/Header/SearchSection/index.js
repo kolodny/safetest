@@ -9,11 +9,11 @@ import { Avatar, Box, ButtonBase, Card, Grid, InputAdornment, OutlinedInput, Pop
 import PopupState, { bindPopper, bindToggle } from 'material-ui-popup-state';
 
 // project imports
-import Transitions from 'ui-component/extended/Transitions';
 
 // assets
 import { IconAdjustmentsHorizontal, IconSearch, IconX } from '@tabler/icons';
 import { shouldForwardProp } from '@mui/system';
+import Transitions from '../../../../ui-component/extended/Transitions';
 
 // styles
 const PopperStyle = styled(Popper, { shouldForwardProp })(({ theme }) => ({

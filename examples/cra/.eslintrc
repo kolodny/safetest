@@ -32,6 +32,7 @@
     "plugins": ["prettier", "react", "react-hooks"],
     "rules": {
         "react/jsx-filename-extension": 0,
+        "react/display-name": 0,
         "no-param-reassign": 0,
         "react/prop-types": 1,
         "react/require-default-props": 0,

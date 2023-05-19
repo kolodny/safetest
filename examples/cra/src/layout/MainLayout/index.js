@@ -6,16 +6,16 @@ import { styled, useTheme } from '@mui/material/styles';
 import { AppBar, Box, CssBaseline, Toolbar, useMediaQuery } from '@mui/material';
 
 // project imports
-import Breadcrumbs from 'ui-component/extended/Breadcrumbs';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Customization from '../Customization';
-import navigation from 'menu-items';
-import { drawerWidth } from 'store/constant';
-import { SET_MENU } from 'store/actions';
+import navigation from '../../menu-items';
 
 // assets
 import { IconChevronRight } from '@tabler/icons';
+import { SET_MENU } from '../../store/actions';
+import Breadcrumbs from '../../ui-component/extended/Breadcrumbs';
+import { drawerWidth } from '../../store/constant';
 
 // styles
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({

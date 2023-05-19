@@ -8,14 +8,14 @@ import { Box, Card, Divider, Grid, Typography } from '@mui/material';
 import MuiBreadcrumbs from '@mui/material/Breadcrumbs';
 
 // project imports
-import config from 'config';
-import { gridSpacing } from 'store/constant';
 
 // assets
 import { IconTallymark1 } from '@tabler/icons';
 import AccountTreeTwoToneIcon from '@mui/icons-material/AccountTreeTwoTone';
 import HomeIcon from '@mui/icons-material/Home';
 import HomeTwoToneIcon from '@mui/icons-material/HomeTwoTone';
+import config from '../../config';
+import { gridSpacing } from '../../store/constant';
 
 const linkSX = {
     display: 'flex',

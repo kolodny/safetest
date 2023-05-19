@@ -5,7 +5,9 @@
   "exports": {
     ".": "./lib/index.js",
     "./jest": "./lib/jest.js",
+    "./lib/jest": "./lib/jest.js",
     "./react": "./lib/react.js",
+    "./lib/react": "./lib/react.js",
     "./vitest": "./lib/vitest.js"
   },
   "scripts": {
@@ -22,6 +24,10 @@
   "dependencies": {
     "@playwright/test": "^1.33.0",
     "@types/jest-image-snapshot": "^6.1.0",
+    "@types/lodash": "^4.14.194",
+    "@types/node": "^20.2.1",
+    "@types/react": "^18.2.6",
+    "@types/ws": "^8.5.4",
     "jest-image-snapshot": "^6.1.0",
     "lodash": "^4.17.21",
     "playwright": "^1.33.0",

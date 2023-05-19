@@ -34,7 +34,7 @@
     "scripts": {
         "start": "react-scripts start",
         "build": "(rm ../../build/cra || true) && react-scripts build && mv build ../../build/cra",
-        "test": "react-scripts test",
+        "test": "react-scripts test --runInBand --url=http://localhost:3000/ --testMatch '**/*.safetest.{j,t}s{,x}' --setupFilesAfterEnv ./setup-safetest.js",
         "eject": "react-scripts eject"
     },
     "eslintConfig": {

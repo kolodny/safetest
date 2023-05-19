@@ -5,10 +5,10 @@ import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, StyledEngineProvider } from '@mui/material';
 
 // defaultTheme
-import themes from 'themes';
+import themes from './themes';
 
 // project imports
-import NavigationScroll from 'layout/NavigationScroll';
+import NavigationScroll from './layout/NavigationScroll';
 
 // ==============================|| APP ||============================== //
 

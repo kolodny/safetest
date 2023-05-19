@@ -3,11 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 
 // material-ui
 import { ButtonBase } from '@mui/material';
+import Logo from '../../../ui-component/Logo';
+import config from '../../../config';
+import { MENU_OPEN } from '../../../store/actions';
 
 // project imports
-import config from 'config';
-import Logo from 'ui-component/Logo';
-import { MENU_OPEN } from 'store/actions';
 
 // ==============================|| MAIN LOGO ||============================== //
 
