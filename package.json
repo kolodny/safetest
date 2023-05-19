@@ -1,15 +1,32 @@
 {
   "name": "safetest",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "",
-  "main": "index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./jest": "./lib/jest.js",
+    "./react": "./lib/react.js",
+    "./vitest": "./lib/vitest.js"
+  },
   "scripts": {
+    "prepublish": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "typescript": "^5.0.4",
     "vercel": "^29.3.0"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.33.0",
+    "@types/jest-image-snapshot": "^6.1.0",
+    "jest-image-snapshot": "^6.1.0",
+    "lodash": "^4.17.21",
+    "playwright": "^1.33.0",
+    "react-override": "^0.0.10",
+    "setimmediate": "^1.0.5",
+    "ws": "^8.13.0"
   }
 }

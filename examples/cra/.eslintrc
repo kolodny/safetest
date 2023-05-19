@@ -4,7 +4,13 @@
         "browser": true,
         "es2021": true
     },
-    "extends": ["prettier", "plugin:react/jsx-runtime", "plugin:jsx-a11y/recommended", "plugin:react-hooks/recommended"],
+    "extends": [
+        "prettier",
+        "plugin:react/recommended",
+        "plugin:react/jsx-runtime",
+        "plugin:jsx-a11y/recommended",
+        "plugin:react-hooks/recommended"
+    ],
     "settings": {
         "import/resolver": {
             "node": {
@@ -14,6 +20,9 @@
     },
     "parser": "@babel/eslint-parser",
     "parserOptions": {
+        "babelOptions": {
+            "presets": ["@babel/preset-react"]
+        },
         "ecmaFeatures": {
             "experimentalObjectRestSpread": true,
             "impliedStrict": true
