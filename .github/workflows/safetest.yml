@@ -16,14 +16,14 @@ jobs:
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
       - name: Check out repository code
         uses: actions/checkout@v3
+      - name: npm install
+        run: npm install
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
       - name: Build
         run: npm run build
       - name: Build artifacts
         run: node build.js
-      - name: npm install
-        run: npm install
       - name: Deploy Project Artifacts to Vercel
         run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
       - name: Deploy Project Artifacts to Vercel
