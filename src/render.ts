@@ -376,6 +376,7 @@ export async function render(
     };
 
     page._safetest_internal.renderIsReadyDeferred = deferred();
+    console.log('url is', url);
     await gotoTestUrl();
 
     const debugUrl = await page.evaluate(
