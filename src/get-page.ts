@@ -1,5 +1,8 @@
 import merge from 'deepmerge';
 
+// @ts-ignore
+import r2 from 'r2';
+
 import { state } from './state';
 import { isInNode } from './is-in-node';
 import { safeRequire } from './safe-require';
@@ -92,7 +95,7 @@ export async function getPage(
     const logDebugTabs = async () => {
       const debugPort = state.debugPort;
       const console = safeRequire('console');
-      const r2 = safeRequire('r2').default;
+      // const r2 = safeRequire('r2').default;
       const redirectServer = safeRequire('./redirect-server');
 
       let list = [];
@@ -110,6 +113,7 @@ export async function getPage(
       for (const url of newItems) {
         const remoteUrl = url.replace('127.0.0.1', MY_IP);
         const debugUrl = `http://${MY_IP}:${debugPort}${remoteUrl}`;
+        console.log('r2', r2);
         console.log(redirectServer);
         console.log(redirectServer.notify);
         console.log(debugUrl);
