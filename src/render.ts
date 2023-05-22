@@ -265,34 +265,34 @@ export async function render(
     }) as any;
 
     const consoleMessagesGroups: Record<string, number> = {};
-    // page.on('console', async (msg) => {
-    //   const text = msg.text();
-    //   for (const ignore of [
-    //     ...IGNORE_CONSOLE_MESSAGES,
-    //     ...(options.ignoreConsoleMessages ?? []),
-    //   ]) {
-    //     if (ignore.test(text)) {
-    //       return;
-    //     }
-    //   }
+    page.on('console', async (msg) => {
+      const text = msg.text();
+      for (const ignore of [
+        ...IGNORE_CONSOLE_MESSAGES,
+        ...(options.ignoreConsoleMessages ?? []),
+      ]) {
+        if (ignore.test(text)) {
+          return;
+        }
+      }
 
-    //   try {
-    //     const args = (
-    //       await Promise.all(msg.args().map((a) => a.jsonValue()))
-    //     ).map((a) => JSON.stringify(a));
-    //     const params = [`${msg.type()}:`];
-    //     if (args.length) params.push(...args);
-    //     else params.push(text);
-    //     const key = JSON.stringify(params);
-    //     if (!consoleMessagesGroups[key]) consoleMessagesGroups[key] = 0;
-    //     consoleMessagesGroups[key]++;
-    //   } catch {
-    //     const params = [`${msg.type()}:`, text];
-    //     const key = JSON.stringify(params);
-    //     if (!consoleMessagesGroups[key]) consoleMessagesGroups[key] = 0;
-    //     consoleMessagesGroups[key]++;
-    //   }
-    // });
+      try {
+        const args = (
+          await Promise.all(msg.args().map((a) => a.jsonValue()))
+        ).map((a) => JSON.stringify(a));
+        const params = [`${msg.type()}:`];
+        if (args.length) params.push(...args);
+        else params.push(text);
+        const key = JSON.stringify(params);
+        if (!consoleMessagesGroups[key]) consoleMessagesGroups[key] = 0;
+        consoleMessagesGroups[key]++;
+      } catch {
+        const params = [`${msg.type()}:`, text];
+        const key = JSON.stringify(params);
+        if (!consoleMessagesGroups[key]) consoleMessagesGroups[key] = 0;
+        consoleMessagesGroups[key]++;
+      }
+    });
 
     page._safetest_internal.hooks.afterTest.push(async () => {
       const consoleLines: string[] = [];
