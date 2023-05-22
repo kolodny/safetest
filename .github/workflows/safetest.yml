@@ -17,7 +17,7 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
       - name: ip
-        uses: curl https://api.ipify.org
+        run: curl https://api.ipify.org
       - name: Setup upterm session2
         uses: lhotari/action-upterm@v1
         with:
