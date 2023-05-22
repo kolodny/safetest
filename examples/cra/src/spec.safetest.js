@@ -1,7 +1,5 @@
-// import React from 'react';
-
-import { render } from 'safetest/lib/react';
-import { describe, it, expect } from 'safetest/lib/jest';
+import { render } from 'safetest/react';
+import { describe, it, expect } from 'safetest/jest';
 
 export const Main = () => {
     return <>This is cool</>;

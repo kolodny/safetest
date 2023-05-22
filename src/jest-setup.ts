@@ -1,10 +1,10 @@
 import { setOptions } from '.';
-import { beforeAll } from './jest';
+import { beforeAll, setTimeout } from './jest';
 import { startDocker, stopDocker } from './docker';
 import { RenderOptions } from './render';
 import { state } from './state';
 import { camelCase } from 'lodash';
-import { startServer } from './redirect-server';
+import { getViewUrl, openLocalBrowser, startServer } from './redirect-server';
 
 export const parsed = Object.fromEntries(
   process.argv
@@ -30,6 +30,8 @@ const headless = useDocker ? false : !parsed['headed'];
 state.isCi = !!parsed['ci'] || !!process.env['CI'];
 
 const localUrl = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+
+setTimeout(30000);
 
 setOptions({
   url: `${url}`,
@@ -62,6 +64,14 @@ export const setup = (
         browserServer,
         afterAllDone: stopDocker,
       });
-    });
+      const isCi = !!parsed['ci'] || !!process.env['CI'];
+      if (parsed['headed'] && !isCi) {
+        await openLocalBrowser('http://localhost:8844');
+      } else {
+        const viewUrl = getViewUrl();
+        const msg = `\n\nGo to ${viewUrl} to view the remote tests\n\n`;
+        if (viewUrl) console.log(msg);
+      }
+    }, 30000);
   }
 };

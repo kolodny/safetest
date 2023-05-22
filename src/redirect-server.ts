@@ -12,6 +12,7 @@ import { state } from './state';
 import { setOptions } from './set-options';
 import { Deferred, deferred } from './defer';
 import { parsed } from './jest-setup';
+import { safeRequire } from './safe-require';
 
 const myIp = process.env['MY_IP'];
 
@@ -50,7 +51,7 @@ const debugInfo = async () => {
   const inspectorUrl = inspector.url();
   if (!inspectorUrl) return;
   const port = new URL(inspectorUrl).port;
-  const r2 = {} as any;
+  const r2 = safeRequire('r2');
   const response = await r2(`http://127.0.0.1:${port}/json/list`);
   const list = await response.json;
   const rawUrl = list[0].devtoolsFrontendUrl;

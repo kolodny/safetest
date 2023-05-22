@@ -2,7 +2,7 @@ name: GitHub Actions Demo
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+run-name: Safetest
 on:
   push:
     branches:
@@ -22,9 +22,10 @@ jobs:
         run: node build.js
       - name: Deploy Project Artifacts to Vercel
         run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
-        run: |
-          ls ${{ github.workspace }}
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: 'Cache docker build for Safetest'
+        run: node -e 'require("safetest/docker").buildDocker()'
+      - name: 'Run Safetest tests'
+        run: npm run safetest -- --watchAll=false --ci=1 --docker=1 --url=https://safetest-two.vercel.app/cra
       - run: echo "🍏 This job's status is ${{ job.status }}."

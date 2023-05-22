@@ -5,9 +5,8 @@
   "exports": {
     ".": "./lib/index.js",
     "./jest": "./lib/jest.js",
-    "./lib/jest": "./lib/jest.js",
     "./react": "./lib/react.js",
-    "./lib/react": "./lib/react.js",
+    "./docker": "./lib/docker.js",
     "./vitest": "./lib/vitest.js"
   },
   "scripts": {
@@ -31,6 +30,7 @@
     "jest-image-snapshot": "^6.1.0",
     "lodash": "^4.17.21",
     "playwright": "^1.33.0",
+    "r2": "^2.0.1",
     "react-override": "^0.0.10",
     "setimmediate": "^1.0.5",
     "ws": "^8.13.0"

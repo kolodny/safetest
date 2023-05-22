@@ -37,7 +37,7 @@ export const stopDocker = async () => {
   spawn('docker', ['stop', containerName]);
 };
 
-export const startDocker = async () => {
+export const buildDocker = async () => {
   const { exitCode } = await spawn('docker', [
     'ps',
     '--format',
@@ -89,6 +89,10 @@ export const startDocker = async () => {
   `
   );
   await spawn('docker', ['build', '--progress=plain', '-t', imageName, dir]);
+};
+
+export const startDocker = async () => {
+  await buildDocker();
   await spawn(
     'docker',
     ['run', '--rm', '--name', containerName, '--publish-all=true', imageName],

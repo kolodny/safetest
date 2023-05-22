@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 // third party
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { bootstrap } from 'safetest/lib/react';
+import { bootstrap } from 'safetest/react';
 
 // project imports
 import App from './App';
