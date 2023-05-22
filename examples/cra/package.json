@@ -36,7 +36,7 @@
         "build": "(rm -rf ../../build/cra || true) && react-scripts build && mv build ../../build/cra",
         "test": "react-scripts test",
         "safetest": "react-scripts --inspect=127.0.0.1:9999 test --runInBand --url=http://localhost:3000/ --testMatch '**/*.safetest.{j,t}s{,x}' --setupFilesAfterEnv ./setup-safetest.js",
-        "safetest:ci": "npm run safetest -- --watchAll=false --ci=1 --docker=1 --url=https://safetest-two.vercel.app/cra",
+        "safetest:ci": "npm run safetest -- --watchAll=false --ci=1 --docker=1 --url=https://safetest-two.vercel.app/cra --json --outputFile=../../build/cra/results.json",
         "eject": "react-scripts eject"
     },
     "eslintConfig": {
