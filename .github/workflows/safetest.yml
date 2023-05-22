@@ -2,7 +2,6 @@ name: GitHub Actions Demo
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-  MY_IP: ${{ steps.ip-address.outputs.ipv4 }}
 run-name: Safetest
 on:
   push:
@@ -12,9 +11,6 @@ jobs:
   Safetest-Action:
     runs-on: ubuntu-latest
     steps:
-      - name: Public IP
-        id: ip-address
-        uses: haythem/public-ip@v1.3
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
