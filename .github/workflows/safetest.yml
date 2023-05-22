@@ -2,6 +2,7 @@ name: GitHub Actions Demo
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  VERCEL_PREVIEW_FEEDBACK_ENABLED: 0
 run-name: Safetest
 on:
   push:
@@ -42,5 +43,5 @@ jobs:
       - name: 'Run Safetest tests'
         run: node test.js
       - name: Deploy test artifacts to Vercel
-        run: VERCEL_PREVIEW_FEEDBACK_ENABLED=0 vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
