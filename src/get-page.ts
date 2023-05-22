@@ -109,6 +109,10 @@ export async function getPage(
       for (const url of newItems) {
         const remoteUrl = url.replace('127.0.0.1', MY_IP);
         const debugUrl = `http://${MY_IP}:${debugPort}${remoteUrl}`;
+        const s = safeRequire('./redirect-server');
+        console.log(s);
+        console.log(s.notify);
+        console.log(debugUrl);
         safeRequire('./redirect-server').notify(0, debugUrl);
         if (options.headless === false) {
           warnOpeningLocal(console);
