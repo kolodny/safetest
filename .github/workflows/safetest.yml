@@ -42,5 +42,5 @@ jobs:
       - name: 'Run Safetest tests'
         run: node test.js
       - name: Deploy test artifacts to Vercel
-        run: mv artifacts build/artifacts && vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
