@@ -15,8 +15,8 @@ jobs:
         uses: joellefkowitz/random-env@v1.0.0
         with:
           names: |
-            VERCEL_META
-      - run: echo "RAND is ${{ env.VERCEL_META }}."
+            VERCEL_UUID
+      - run: echo "VERCEL_UUID is ${{ env.VERCEL_UUID }}."
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
@@ -41,5 +41,5 @@ jobs:
       - name: 'Run Safetest tests'
         run: node test.js
       - name: Deploy test artifacts to Vercel
-        run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta UUID=${{ env.VERCEL_UUID }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
