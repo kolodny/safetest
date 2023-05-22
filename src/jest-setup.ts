@@ -25,7 +25,7 @@ const targetUrl = parsed['url'] || process.env['TARGET_URL'];
 if (!targetUrl) throw new Error('Target URL is required');
 const url = new URL(targetUrl);
 let useDocker = !!parsed['docker'];
-const headless = useDocker ? false : !parsed['headed'];
+const headless = useDocker ? true : !parsed['headed'];
 
 state.isCi = !!parsed['ci'] || !!process.env['CI'];
 
