@@ -33,7 +33,7 @@
     },
     "scripts": {
         "start": "react-scripts start",
-        "build": "(rm ../../build/cra || true) && react-scripts build && mv build ../../build/cra",
+        "build": "(rm -rf ../../build/cra || true) && react-scripts build && mv build ../../build/cra",
         "test": "react-scripts test",
         "safetest": "react-scripts --inspect=127.0.0.1:9999 test --runInBand --url=http://localhost:3000/ --testMatch '**/*.safetest.{j,t}s{,x}' --setupFilesAfterEnv ./setup-safetest.js",
         "eject": "react-scripts eject"
