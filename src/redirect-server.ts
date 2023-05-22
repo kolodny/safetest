@@ -52,6 +52,7 @@ const debugInfo = async () => {
   if (!inspectorUrl) return;
   const port = new URL(inspectorUrl).port;
   const r2 = safeRequire('r2');
+  console.log('r2', r2);
   const response = await r2(`http://127.0.0.1:${port}/json/list`);
   const list = await response.json;
   const rawUrl = list[0].devtoolsFrontendUrl;
