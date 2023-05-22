@@ -26,10 +26,8 @@ jobs:
         run: node build.js
       - name: Deploy Project Artifacts to Vercel
         run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
-      - name: Deploy Project Artifacts to Vercel
-        run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
       - name: 'Cache docker build for Safetest'
         run: node -e 'require("safetest/docker").buildDocker()'
       - name: 'Run Safetest tests'
-        run: npm run safetest -- --watchAll=false --ci=1 --docker=1 --url=https://safetest-two.vercel.app/cra
+        run: node test.js
       - run: echo "🍏 This job's status is ${{ job.status }}."
