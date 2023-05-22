@@ -1,3 +1,7 @@
-import { setup } from 'safetest/lib/jest-setup';
+import { setup } from 'safetest/jest-setup';
 
-setup();
+setup({
+    ciOptions: {
+        usingArtifactsDir: '../../artifacts'
+    }
+});

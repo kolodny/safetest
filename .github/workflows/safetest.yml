@@ -31,12 +31,19 @@ jobs:
         run: npm install --global vercel@latest
       - name: Build
         run: npm run build
-      - name: Build artifacts
+      - name: Build deploy artifacts
         run: node build.js
-      - name: Deploy Project Artifacts to Vercel
+      - name: Deploy Project deploy artifacts to Vercel
         run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
       - name: 'Cache docker build for Safetest'
         run: node -e 'require("safetest/docker").buildDocker()'
+      - name: 'Create test artifacts folder'
+        run: (rm -rf artifacts|| true) && mkdir artifacts
       - name: 'Run Safetest tests'
         run: node test.js
+      - name: Archive test artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-artifacts
+          path: artifacts
       - run: echo "🍏 This job's status is ${{ job.status }}."
