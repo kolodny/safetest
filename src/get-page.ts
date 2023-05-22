@@ -1,7 +1,7 @@
 import merge from 'deepmerge';
 
 // @ts-ignore
-import r2 from 'r2';
+// import r2 from 'r2';
 
 import { state } from './state';
 import { isInNode } from './is-in-node';
@@ -95,7 +95,7 @@ export async function getPage(
     const logDebugTabs = async () => {
       const debugPort = state.debugPort;
       const console = safeRequire('console');
-      // const r2 = safeRequire('r2').default;
+      const r2 = safeRequire('r2').default;
       const redirectServer = safeRequire('./redirect-server');
 
       let list = [];
