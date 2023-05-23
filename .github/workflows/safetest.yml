@@ -42,5 +42,5 @@ jobs:
         run: node test.js
       - name: Deploy test artifacts to Vercel
         run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta UUID=${{ env.VERCEL_UUID }}
-      - run: node -e 'require("safetest/process-action")' -- --results=../../build/cra/results.json --artifacts=../../build/cra/artifacts --url=https://safetest-two.vercel.app/cra --build-url=$(node -p 'process.argv.find(a => a.startsWith("http"))' $(npx vercel list --token=${{ secrets.VERCEL_TOKEN }} --meta UUID=${{ env.VERCEL_UUID }} 2>&1))
+      - run: node -e 'require("safetest/process-action")' -- --results=build/cra/results.json --artifacts=build/cra/artifacts --url=https://safetest-two.vercel.app/cra --build-url=$(node -p 'process.argv.find(a => a.startsWith("http"))' $(npx vercel list --token=${{ secrets.VERCEL_TOKEN }} --meta UUID=${{ env.VERCEL_UUID }} 2>&1))
       - run: echo "🍏 This job's status is ${{ job.status }}."
