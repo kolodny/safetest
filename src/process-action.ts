@@ -27,7 +27,9 @@ if (
   !parsed['buildUrl'] ||
   !parsed['url']
 ) {
-  throw new Error('results, artifacts, and buildUrl arguments are required');
+  throw new Error(
+    'results, artifacts, url, and buildUrl arguments are required'
+  );
 }
 
 const { artifacts, buildUrl, url } = parsed;
