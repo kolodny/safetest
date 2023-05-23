@@ -40,7 +40,9 @@ jobs:
         run: (rm -rf artifacts|| true) && mkdir artifacts
       - name: 'Run Safetest tests'
         run: node test.js
-      - run: node -e 'require("safetest/process-action")' -- --results=build/cra/results.json --artifacts=build/cra/artifacts --url=https://safetest-two.vercel.app/cra --build-url=$(node -p 'process.argv.find(a => a.startsWith("http"))' $(npx vercel list --token=${{ secrets.VERCEL_TOKEN }} --meta UUID=${{ env.VERCEL_UUID }} 2>&1))
       - name: Deploy test artifacts to Vercel
+        run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta UUID=${{ env.VERCEL_UUID }}
+      - run: node -e 'require("safetest/process-action")' -- --results=build/cra/results.json --artifacts=build/cra/artifacts --url=https://safetest-two.vercel.app/cra --build-url=$(node -p 'process.argv.find(a => a.startsWith("http"))' $(npx vercel list --token=${{ secrets.VERCEL_TOKEN }} --meta UUID=${{ env.VERCEL_UUID }} 2>&1))
+      - name: Deploy test artifacts to Vercel again
         run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta UUID=${{ env.VERCEL_UUID }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
