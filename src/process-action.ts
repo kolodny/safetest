@@ -245,7 +245,7 @@ function collect() {
             </script>
           `;
           // const traceFile = encodeURIComponent(`${TRACE_BASE_URL}/traces/${t}`);
-          const a = doccument.createElement('a');
+          const a = document.createElement('a');
           a.href = rawTraceFile;
           const traceFile = a.href;
           const traceUrl = `${traceHomepage}?trace=${traceFile}`;
