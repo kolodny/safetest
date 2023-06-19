@@ -231,11 +231,27 @@ function collect() {
         for (const t of trace) {
           const attempt = t.match(/attempt-(\d+)/)?.[1];
           const traceHomepage = `${TRACE_BASE_URL}/index.html`;
-          const traceFile = encodeURIComponent(`${TRACE_BASE_URL}/traces/${t}`);
+          const rawTraceFile = `${TRACE_BASE_URL}/traces/${t}`;
+          summary += `
+            <script>
+              (() => {
+                const a = document.createElement('a');
+                a.href = '${rawTraceFile}';
+                const traceFile = a.href;
+                document.write('<a href="${traceHomepage}?trace=' + traceFile + '">[Trace${
+            +attempt! ? ` - Attempt ${+attempt! + 1}` : ''
+          }]</a>');
+              })();
+            </script>
+          `;
+          // const traceFile = encodeURIComponent(`${TRACE_BASE_URL}/traces/${t}`);
+          const a = doccument.createElement('a');
+          a.href = rawTraceFile;
+          const traceFile = a.href;
           const traceUrl = `${traceHomepage}?trace=${traceFile}`;
           const traceUrlEncoded = traceUrl.replace(/ /g, '%20');
           const suffix = +attempt! ? ` - Attempt ${+attempt! + 1}` : '';
-          summary += `<a href="${traceUrlEncoded}">[Trace${suffix}]</a>`;
+          // summary += `<a href="${traceUrlEncoded}">[Trace${suffix}]</a>`;
         }
 
         const debugUrl = new URL(url);
