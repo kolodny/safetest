@@ -245,7 +245,7 @@ function collect() {
             </script>
           `;
           // const traceFile = encodeURIComponent(`${TRACE_BASE_URL}/traces/${t}`);
-          const traceFile = a.href;
+          const traceFile = '';
           const traceUrl = `${traceHomepage}?trace=${traceFile}`;
           const traceUrlEncoded = traceUrl.replace(/ /g, '%20');
           const suffix = +attempt! ? ` - Attempt ${+attempt! + 1}` : '';
