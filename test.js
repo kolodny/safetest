@@ -19,10 +19,10 @@ for (const example of examples) {
     spawnSync('npm', ['run', 'safetest:ci', '--if-present'], {
       cwd,
       stdio: 'inherit',
-      env: {
-        ...process.env,
-        MY_IP: ip,
-      },
+    });
+    spawnSync('npm', ['run', 'process:ci', '--if-present'], {
+      cwd,
+      stdio: 'inherit',
     });
   }
 }
