@@ -19,7 +19,7 @@ describe('Main', () => {
     });
 
     for (let i = 0; i < 50; i++) {
-        it(`stress test ${i}`, async () => {
+        it(`stress test ${i} run`, async () => {
             const Counter = () => {
                 const [count, setCount] = React.useState(0);
                 return (

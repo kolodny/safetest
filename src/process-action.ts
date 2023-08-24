@@ -204,7 +204,18 @@ for (const result of results.testResults) {
 }
 
 function collect() {
-  let summary = '<ul>';
+  let summary = '';
+  if (diffs.length) {
+    summary += '<details><summary>Screenshot diffs</summary>';
+    summary += diffs
+      .map(
+        (diff) =>
+          `<a href="${diff}"><image src="${DIFF_BASE_URL}/${diff}" /></a>`
+      )
+      .join('<br />');
+    summary += '</details>';
+  }
+  summary += '<ul>';
   recur(tests);
   function recur(map: any, indent = '', filename = '') {
     for (const [key, value] of Object.entries(map)) {
