@@ -13,13 +13,17 @@ import { safeRequire } from './safe-require';
 import { Matchers } from './playwright-types';
 import { configureSnapshot } from './configure-snapshot';
 
-const spyOn: any = () => {};
-const fn: any = () => {};
+let spyOn: any = (o: any) => o;
+let fn: any = () => () => {};
 
 type Mock<R, A extends any[]> = JestMock<(...args: A) => R>;
 
 if (isInNode)
   try {
+    const jestMock = eval('require')('jest-mock');
+    spyOn = jestMock.spyOn;
+    fn = jestMock.fn;
+
     safeRequire('@playwright/test/lib/matchers/matchers');
   } catch {}
 

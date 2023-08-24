@@ -19,6 +19,41 @@ describe('Main', () => {
         expect(await page.screenshot()).toMatchImageSnapshot({ failureThreshold: 10 });
     });
 
+    // it('can check that a spy was called', async () => {
+    //     const spy = browserMock.fn();
+    //     const { page } = await render(
+    //         // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+    //         <div
+    //             onClick={() => {
+    //                 debugger;
+    //                 spy('foo');
+    //             }}
+    //         >
+    //             Click me
+    //         </div>
+    //     );
+    //     expect(await spy).not.toHaveBeenCalled();
+    //     await page.locator('text=Click me').click();
+    //     expect(await spy).toHaveBeenCalled();
+    // });
+
+    it('can do many interactions fast', async () => {
+        const Counter = () => {
+            const [count, setCount] = React.useState(0);
+            return (
+                <div>
+                    <button onClick={() => setCount(count + 1)}>Count is {count}</button>
+                </div>
+            );
+        };
+        const { page } = await render(<Counter />);
+        await expect(page.locator('text=Count is 0')).toBeVisible();
+        for (let i = 1; i <= 1000; i++) {
+            await page.locator('button:not(a)').click();
+            await expect(page.locator(`text=Count is ${i}`)).toBeVisible();
+        }
+    });
+
     for (let i = 0; i < 50; i++) {
         it(`stress test ${i} run`, async () => {
             const Counter = () => {
