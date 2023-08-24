@@ -19,6 +19,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@jest/test-result": "^29.6.4",
     "jest-mock": "^29.6.3",
     "typescript": "^5.0.4",
     "vercel": "^29.3.0"
