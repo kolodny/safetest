@@ -14,7 +14,7 @@ describe('Main', () => {
 
     it('can do a screenshot test', async () => {
         const { page } = await render((app) => app);
-        await page.waitForTimeout(1000);
+        await page.waitForTimeout(3000);
         expect(await page.screenshot()).toMatchImageSnapshot();
     });
 
