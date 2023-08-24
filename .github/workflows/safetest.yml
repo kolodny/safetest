@@ -22,8 +22,6 @@ jobs:
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
       - name: Check out repository code
         uses: actions/checkout@v3
-      - name: ip
-        run: curl https://api.ipify.org
       - name: npm install
         run: npm install
       - name: Install Vercel CLI
