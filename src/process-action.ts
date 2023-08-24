@@ -210,7 +210,7 @@ function collect() {
     summary += diffs
       .map(
         (diff) =>
-          `<a href="${diff}"><image src="${DIFF_BASE_URL}/${diff}" /></a>`
+          `<a style="width:80%;display:flex;margin:auto;outline:1px solid" href="${DIFF_BASE_URL}/${diff}"><img style="maxWidth:100%" src="${DIFF_BASE_URL}/${diff}" /></a>`
       )
       .join('<br />');
     summary += '</details>';
