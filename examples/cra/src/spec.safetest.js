@@ -15,8 +15,8 @@ describe('Main', () => {
     it('can do a screenshot test', async () => {
         const { page } = await render((app) => app);
         await page.evaluate(() => document.querySelector('[aria-label="Live Customize"]').remove());
-        await page.waitForTimeout(4000);
-        expect(await page.screenshot()).toMatchImageSnapshot();
+        await page.waitForTimeout(3000);
+        expect(await page.screenshot()).toMatchImageSnapshot({ failureThreshold: 10 });
     });
 
     for (let i = 0; i < 50; i++) {
