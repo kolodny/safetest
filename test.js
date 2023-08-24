@@ -5,10 +5,6 @@ try {
   fs.mkdirSync('build');
 } catch (e) {}
 
-const ip = spawnSync('curl', ['https://api.ipify.org'])
-  .stdout.toString()
-  .trim();
-
 const examples = fs.readdirSync('examples');
 for (const example of examples) {
   const cwd = `examples/${example}`;

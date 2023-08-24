@@ -376,12 +376,7 @@ export async function render(
     };
 
     page._safetest_internal.renderIsReadyDeferred = deferred();
-    console.log('url is', url);
     await gotoTestUrl();
-    const body = await page.innerHTML('body');
-    console.log('body', body);
-    const b = await page.evaluate(() => document.body.innerText);
-    console.log('b', b);
 
     const debugUrl = await page.evaluate(
       ({ testName, testPath }) => {
