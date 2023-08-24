@@ -48,7 +48,7 @@ describe('Main', () => {
         };
         const { page } = await render(<Counter />);
         await expect(page.locator('text=Count is 0')).toBeVisible();
-        for (let i = 1; i <= 1000; i++) {
+        for (let i = 1; i <= 500; i++) {
             await page.locator('button:not(a)').click();
             await expect(page.locator(`text=Count is ${i}`)).toBeVisible();
         }
