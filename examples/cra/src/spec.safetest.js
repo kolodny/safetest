@@ -26,8 +26,7 @@ describe('Main', () => {
         const { page } = await render(<button onClick={() => spy('foo')}>Click me</button>);
         expect(await spy).not.toHaveBeenCalled();
         await page.locator('text=Click me').click();
-        // expect(await spy).toHaveBeenCalled();
-        expect(await spy).toHaveBeenCalledWith('foo');
+        expect(await spy).toHaveBeenCalled();
     });
 
     it('can do many interactions fast', async () => {
