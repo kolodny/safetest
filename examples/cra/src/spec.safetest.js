@@ -27,6 +27,7 @@ describe('Main', () => {
         expect(await spy).not.toHaveBeenCalled();
         await page.locator('text=Click me').click();
         expect(await spy).toHaveBeenCalled();
+        expect(await spy).toHaveBeenCalledWith('foo');
     });
 
     it('can do many interactions fast', async () => {
