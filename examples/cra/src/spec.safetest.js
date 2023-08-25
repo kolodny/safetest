@@ -1,6 +1,8 @@
 import React from 'react';
 import { render } from 'safetest/react';
-import { describe, it, expect } from 'safetest/jest';
+import { describe, it, expect, retryTimes, browserMock } from 'safetest/jest';
+
+retryTimes(3);
 
 export const Main = () => {
     return <>This is cool</>;
@@ -19,23 +21,14 @@ describe('Main', () => {
         expect(await page.screenshot()).toMatchImageSnapshot({ failureThreshold: 10 });
     });
 
-    // it('can check that a spy was called', async () => {
-    //     const spy = browserMock.fn();
-    //     const { page } = await render(
-    //         // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-    //         <div
-    //             onClick={() => {
-    //                 debugger;
-    //                 spy('foo');
-    //             }}
-    //         >
-    //             Click me
-    //         </div>
-    //     );
-    //     expect(await spy).not.toHaveBeenCalled();
-    //     await page.locator('text=Click me').click();
-    //     expect(await spy).toHaveBeenCalled();
-    // });
+    it('can check that a spy was called', async () => {
+        const spy = browserMock.fn();
+        const { page } = await render(<button onClick={() => spy('foo')}>Click me</button>);
+        expect(await spy).not.toHaveBeenCalled();
+        await page.locator('text=Click me').click();
+        expect(await spy).toHaveBeenCalled();
+        expect(await spy).toHaveBeenCalledWith('foo');
+    });
 
     it('can do many interactions fast', async () => {
         const Counter = () => {

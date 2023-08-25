@@ -1,7 +1,6 @@
 import 'setimmediate';
 
-// import { spyOn, fn, Mock as JestMock } from 'jest-mock';
-import type { Mock as JestMock } from 'jest-mock';
+import { spyOn, fn, Mock as JestMock } from 'jest-mock';
 import { createBlockFn } from './blocks';
 import { state } from './state';
 import { isInNode } from './is-in-node';
@@ -13,17 +12,10 @@ import { safeRequire } from './safe-require';
 import { Matchers } from './playwright-types';
 import { configureSnapshot } from './configure-snapshot';
 
-let spyOn: any = (o: any) => o;
-let fn: any = () => () => {};
-
 type Mock<R, A extends any[]> = JestMock<(...args: A) => R>;
 
 if (isInNode)
   try {
-    const jestMock = eval('require')('jest-mock');
-    spyOn = jestMock.spyOn;
-    fn = jestMock.fn;
-
     safeRequire('@playwright/test/lib/matchers/matchers');
   } catch {}
 
@@ -44,8 +36,6 @@ const beforeEach = ensureImported<jest.Lifecycle>('beforeEach', 'beforeEach');
 const beforeAll = ensureImported<jest.Lifecycle>('beforeAll', 'beforeAll');
 const afterEach = ensureImported<jest.Lifecycle>('afterEach', 'afterEach');
 const afterAll = ensureImported<jest.Lifecycle>('afterAll', 'afterAll');
-
-state.exposeGlobals['expect'] = expect;
 
 const setTimeout = (timeout: number) => {
   if (isInNode) {
