@@ -19,7 +19,6 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "expect": "^29.6.4",
     "typescript": "^5.0.4",
     "vercel": "^29.4.0"
   },
