@@ -6,7 +6,7 @@ import { state } from './state';
 import { afterAllFn, afterEachFn } from './teardown';
 
 // @ts-ignore
-import * as Vitest from 'vitest';
+import type * as Vitest from 'vitest';
 
 interface MakeViteParamters {
   /**
