@@ -9,6 +9,7 @@ import { rmdir, mkdir, cp } from 'fs/promises';
 const root = path.resolve(__dirname, '../..');
 const lib = `node_modules/safetest`;
 const link = async () => {
+  if (env === 'test') return;
   try {
     await rmdir(lib, { recursive: true });
   } catch {}
@@ -33,6 +34,9 @@ export default defineConfig({
     react(),
   ],
   test: {
+    // globalSetup: ['setup-safetest'],
+    // globalSetup: ['setup-safetest'],
+    setupFiles: ['setup-safetest'],
     include: ['**/*.safetest.?(c|m)[jt]s?(x)'],
   },
 });

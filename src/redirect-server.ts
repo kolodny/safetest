@@ -11,7 +11,6 @@ import { overrideEvents } from './override-events';
 import { state } from './state';
 import { setOptions } from './set-options';
 import { Deferred, deferred } from './defer';
-import { parsed } from './jest-setup';
 import { safeRequire } from './safe-require';
 
 const myIp = process.env['MY_IP'];
@@ -100,7 +99,7 @@ export const openLocalBrowser = async (url: string) => {
   setOptions({ afterAllDone: () => localBrowser.close() });
 };
 
-export const startServer = once(async () => {
+export const startServer = once(async (parsed: any) => {
   const indexHTML = `
     <style>
       html, body { height: 100%; width: 100%; padding: 0; margin: 0; }

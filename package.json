@@ -5,6 +5,7 @@
   "exports": {
     ".": "./lib/index.js",
     "./jest": "./lib/jest.js",
+    "./jest-setup": "./lib/jest-setup.js",
     "./react": "./lib/react.js",
     "./docker": "./lib/docker.js",
     "./vitest": "./lib/vitest.js",

@@ -5,58 +5,75 @@ import { RenderOptions } from './render';
 import { state } from './state';
 import { camelCase } from 'lodash';
 import { getViewUrl, openLocalBrowser, startServer } from './redirect-server';
+import { getTree } from './ps';
 
-export const parsed = Object.fromEntries(
-  process.argv
-    .map((arg) => arg.match(/(?<=--)([^=]*)(?:=(.*))?/)?.slice(1))
-    .map((item) => {
-      let value: any = item?.[1];
-      if (value === 'false') value = false;
-      else if (value === 'true') value = true;
-      else if (value === undefined) value = true;
-      else if (value === 'undefined') value = undefined;
-      else if (!isNaN(parseFloat(value))) value = +value;
-      return [camelCase(item?.[0]), value];
-    })
-    .filter(Boolean)
-);
+type Options = RenderOptions | ((options: RenderOptions) => RenderOptions);
+type Parameters = {
+  runner: 'jest' | 'vitest';
+  api: { beforeAll: typeof beforeAll; setTimeout: typeof setTimeout };
+  options?: Options;
+};
 
-const targetUrl = parsed['url'] || process.env['TARGET_URL'];
-if (!targetUrl) throw new Error('Target URL is required');
-const url = new URL(targetUrl);
-let useDocker = !!parsed['docker'];
-const headless = useDocker ? true : !parsed['headed'];
+export const setup = ({ runner, api, options }: Parameters) => {
+  const processes = getTree();
+  let argv = process.argv;
+  if (runner === 'vitest') {
+    let current = processes[process.pid];
+    while (current && !current.argv.join(' ').includes('vitest')) {
+      current = processes[current.ppid];
+    }
+    argv = current?.argv!;
+  }
 
-state.isCi = !!parsed['ci'] || !!process.env['CI'];
+  const parsed = Object.fromEntries(
+    argv!
+      .map((arg) => arg.match(/(?<=--)([^=]*)(?:=(.*))?/)?.slice(1))
+      .map((item) => {
+        let value: any = item?.[1];
+        if (!item?.[0]) return undefined as never;
+        if (value === 'false') value = false;
+        else if (value === 'true') value = true;
+        else if (value === undefined) value = true;
+        else if (value === 'undefined') value = undefined;
+        else if (!isNaN(parseFloat(value))) value = +value;
+        return [camelCase(item?.[0]), value];
+      })
+      .filter(Boolean)
+  );
 
-const localUrl = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+  const targetUrl = parsed['url'] || process.env['TARGET_URL'];
+  if (!targetUrl) throw new Error('Target URL is required');
+  const url = new URL(targetUrl);
+  let useDocker = !!parsed['docker'];
+  const headless = useDocker ? true : !parsed['headed'];
 
-setTimeout(30000);
+  state.isCi = !!parsed['ci'] || !!process.env['CI'];
 
-setOptions({
-  url: `${url}`,
-  useDocker,
-  headless,
-  matchImageSnapshotOptions: {
-    failureThreshold: useDocker ? 0 : 1,
-    failureThresholdType: 'percent',
-  },
-});
+  const localUrl = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
 
-export const setup = (
-  options?: RenderOptions | ((options: RenderOptions) => RenderOptions)
-) => {
+  setOptions({
+    url: `${url}`,
+    useDocker,
+    headless,
+    matchImageSnapshotOptions: {
+      failureThreshold: useDocker ? 0 : 1,
+      failureThresholdType: 'percent',
+    },
+  });
+
   if (options) {
     if (typeof options === 'function') options = options(state.options);
     setOptions(options);
   }
   useDocker = !!state.options.useDocker;
 
+  api.setTimeout(30000);
+
   if (useDocker) {
     if (localUrl) url.hostname = 'host.docker.internal';
-    beforeAll(async () => {
+    api.beforeAll(async () => {
       const docker = await startDocker();
-      await startServer();
+      await startServer(parsed);
 
       const browserServer = `http://localhost:${docker?.ports.SERVER_PORT}/`;
       setOptions({
