@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { anythingProxy } from './anythingProxy';
 import { createBlockFn } from './blocks';
+import { configureSnapshot } from './configure-snapshot';
 import { isInNode } from './is-in-node';
 import { state } from './state';
 import { afterAllFn, afterEachFn } from './teardown';
@@ -46,9 +48,7 @@ type SafetestVite = Promise<
 export const makeVitest = async (
   args: () => MakeViteParamters
 ): SafetestVite => {
-  const argItems = isInNode
-    ? args()
-    : ({ __filename: '', vitest: {} as any } as MakeViteParamters);
+  const argItems = isInNode ? args() : (anythingProxy as never);
   const vitest = await argItems.vitest;
   const expect = vitest.expect;
 
@@ -79,6 +79,7 @@ export const makeVitest = async (
             state.isGlobalSetupTeardownRegistered = true;
             afterEach(afterEachFn);
             afterAll(afterAllFn);
+            configureSnapshot(expect);
           }
           return actualThing(...args);
         },
@@ -98,6 +99,7 @@ export const makeVitest = async (
             state.isGlobalSetupTeardownRegistered = true;
             afterEach(afterEachFn);
             afterAll(afterAllFn);
+            configureSnapshot(expect);
           }
           return actualThing(...args);
         },
@@ -164,6 +166,7 @@ export const makeVitest = async (
     describe: exportedDescribe,
     it: exportedIt as typeof Vitest.it & { debug: typeof Vitest.it },
     test: exportedIt,
+    expect,
     beforeEach: wrapperBeforeEach,
     beforeAll: wrapperBeforeAll,
     afterEach: wrapperAfterEach,

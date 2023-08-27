@@ -1,24 +1,22 @@
 import { render } from 'safetest/react';
-// import { setOptions } from 'safetest';
+import { setOptions } from 'safetest';
 import { makeVitest } from 'safetest/vitest';
 
 const { describe, it, expect } = await makeVitest(() => ({
-  vitest: import(/* @vite-ignore */ `${'vitest'}`),
+  vitest: import('vitest'),
   __filename,
 }));
 
-// setOptions({ url: 'http://localhost:5173/' });
+setOptions({ url: 'http://localhost:3000/' });
 
 describe('Main', () => {
   it('loads a simple div', async () => {
-    debugger;
-    const { page } = await render(() => <>Testing123</>, { headless: false });
-    expect(page).toBeTruthy();
+    const { page } = await render(() => <>Testing123</>);
+    expect(await page.screenshot()).toMatchImageSnapshot();
   });
 
   it('Has a landing page', async () => {
-    debugger;
-    const { page } = await render((app) => <>{app}</>, { headless: false });
+    const { page } = await render((app) => <>{app}</>);
     expect(page).toBeTruthy();
   });
 });

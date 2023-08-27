@@ -17,10 +17,13 @@ const link = async () => {
   await new Promise((res) => exec(`cp ${root}/lib/* ${lib}/lib/`, res));
 };
 
-console.log(root);
+const env = process.env.NODE_ENV || 'development';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  server: {
+    port: env === 'test' ? 3001 : 3000,
+  },
   plugins: [
     {
       name: 'safetest linker',
