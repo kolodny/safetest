@@ -22,5 +22,10 @@ for (const example of examples) {
 }
 fs.writeFileSync(
   'build/index.html',
-  dirs.map((dir) => `<a href="${dir}">${dir}</a>`).join('<br>')
+  dirs
+    .map(
+      (dir) =>
+        `<a href="${dir}">${dir} App</a> <a href="${dir}/artifacts/results.html">${dir} Artifacts</a>`
+    )
+    .join('<br>')
 );
