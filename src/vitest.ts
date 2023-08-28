@@ -14,7 +14,7 @@ import type * as Vitest from 'vitest';
  * vitest import promise.
  * We do this since the vite can't bundle vitest for the browser
  */
-type VitestPromise = Promise<typeof Vitest>;
+type ImportVitest = () => Promise<typeof Vitest>;
 
 type SafetestVite = Promise<
   Exclude<typeof Vitest, 'it'> & {
@@ -38,10 +38,8 @@ type SafetestVite = Promise<
  *
  * Please note that '* /' should be connected (but can't in a doc comment).),
  */
-export const makeVitest = async (
-  vitestPromise: VitestPromise
-): SafetestVite => {
-  const vitest = isInNode ? await vitestPromise : (anythingProxy as never);
+export const makeVitest = async (importVitest: ImportVitest): SafetestVite => {
+  const vitest = isInNode ? await importVitest() : (anythingProxy as never);
   const expect = vitest.expect;
 
   if (isInNode) {
