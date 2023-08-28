@@ -9,7 +9,7 @@ setup({
   },
   options: {
     ciOptions: {
-      usingArtifactsDir: '../../build/cra/artifacts',
+      usingArtifactsDir: '../../build/vite-react-ts/artifacts',
     },
   },
 });
