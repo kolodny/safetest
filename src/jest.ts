@@ -11,6 +11,7 @@ import { safeRequire } from './safe-require';
 
 import { Matchers } from './playwright-types';
 import { configureSnapshot } from './configure-snapshot';
+import { makeExpect } from './expect';
 
 type Mock<R, A extends any[]> = JestMock<(...args: A) => R>;
 
@@ -132,43 +133,7 @@ const retryTimes = (numRetries: number) => {
   return undefined;
 };
 
-const expectMatchers = [
-  'anything',
-  'any',
-  'not',
-  'arrayContaining',
-  'closeTo',
-  'objectContaining',
-  'stringContaining',
-  'stringMatching',
-] as const;
-type ExpectMatchers = typeof expectMatchers[number];
-const _exportedExpect = <T>(
-  actual: T
-): 0 extends 1 & T
-  ? Matchers<T>
-  : T extends BrowserSpy<any[], any>
-  ? 'Browser mocks need to be awaited. Try changing `expect(spy)` to `expect(await spy)`'
-  : Matchers<T> => {
-  if ((actual as any)?.__isBrowserSpy) {
-    console.warn(
-      'Browser mocks need to be awaited. Try changing `expect(spy)` to `expect(await spy)`'
-    );
-    return 'Browser mocks need to be awaited. Try changing `expect(spy)` to `expect(await spy)`' as any;
-  }
-  return expect(actual) as any;
-};
-
-const exportedExpect: typeof _exportedExpect &
-  Pick<typeof expect, ExpectMatchers & keyof jest.Expect> = isInNode
-  ? _exportedExpect
-  : anythingProxy;
-
-if (isInNode) {
-  for (const matcher of expectMatchers) {
-    (exportedExpect as any)[matcher] = (expect as any)[matcher];
-  }
-}
+const exportedExpect = makeExpect(expect);
 
 interface OverrideInfo<Args extends unknown[], Return> {
   /** The arguments passed to the function */
