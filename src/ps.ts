@@ -5,7 +5,7 @@ export const getTree = () => {
   const inspectCommand = isWin ? 'wmic.exe' : 'ps';
   const inspectArgs = isWin
     ? ['PROCESS', 'GET', 'Name,ProcessId,ParentProcessId,Status']
-    : ['-A', '-o', 'ppid,pid,stat,comm'];
+    : ['-A', '-o', 'ppid,pid,stat,args'];
   const output = spawnSync(inspectCommand, inspectArgs);
   const lines = output.stdout.toString().split('\n');
   const headers = lines.shift()!.trim().split(/\s+/).map(normalizeHeader);
@@ -28,7 +28,7 @@ export const getTree = () => {
 
 const headerMap: Record<string, string> = {
   Name: 'argv',
-  COMM: 'argv',
+  ARGS: 'argv',
   ParentProcessId: 'ppid',
   ProcessId: 'pid',
   Status: 'stat',

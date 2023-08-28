@@ -19,7 +19,7 @@ export const setup = ({ runner, api, options }: Parameters) => {
   let argv = process.argv;
   if (runner === 'vitest') {
     let current = processes[process.pid];
-    while (current && !current.argv.join(' ').includes('vitest')) {
+    while (current && !current.argv.join(' ').includes('.bin/vitest')) {
       current = processes[current.ppid];
     }
     argv = current?.argv!;

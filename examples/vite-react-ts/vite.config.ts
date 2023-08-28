@@ -22,6 +22,9 @@ const env = process.env.NODE_ENV || 'development';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  build: {
+    target: 'esnext',
+  },
   server: {
     port: env === 'test' ? 3001 : 3000,
   },
@@ -34,8 +37,6 @@ export default defineConfig({
     react(),
   ],
   test: {
-    // globalSetup: ['setup-safetest'],
-    // globalSetup: ['setup-safetest'],
     setupFiles: ['setup-safetest'],
     include: ['**/*.safetest.?(c|m)[jt]s?(x)'],
   },
