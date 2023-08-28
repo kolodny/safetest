@@ -2,8 +2,8 @@ import { setup } from 'safetest/jest-setup';
 
 setup({
     api: {
-        beforeAll: jest.beforeAll,
-        setTimeout: jest.setTimeout
+        beforeAll,
+        setTimeout: (ms) => jest.setTimeout(ms)
     },
     options: {
         ciOptions: {
