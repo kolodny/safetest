@@ -38,6 +38,8 @@ export default defineConfig({
     react(),
   ],
   test: {
+    reporters: ['basic', 'json'],
+    outputFile: 'results.json',
     setupFiles: ['setup-safetest'],
     include: ['**/*.safetest.?(c|m)[jt]s?(x)'],
   },

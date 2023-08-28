@@ -8,7 +8,7 @@
     "build": "(rm -rf node_modules/safetest || true) && mkdir node_modules/safetest && mkdir node_modules/safetest/lib && (cp ../../* node_modules/safetest/ || true) && (cp ../../lib/* node_modules/safetest/lib/ || true) && (rm -rf ../../build/vite-react-ts || true) && tsc && vite build && mv dist ../../build/vite-react-ts",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "safetest": "vitest --inspect --no-threads -- --url=http://localhost:3000/vite-react-ts",
+    "safetest": "vitest --inspect --no-threads -- --url=http://localhost:3000/vite-react-ts/",
     "safetest:ci": "npm run safetest -- --watchAll=false --ci=1 --docker=1 --url=https://safetest-two.vercel.app/vite-react-ts --json --outputFile=../../build/vite-react-ts/results.json",
     "process:ci": "node -e 'require(\"../../lib/process-action\")' -- --results=../../build/vite-react-ts/results.json --artifacts=../../build/vite-react-ts/artifacts --url=https://safetest-two.vercel.app/vite-react-ts --build-url=."
   },
