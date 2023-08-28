@@ -4,7 +4,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { exec } from 'child_process';
-import { rmdir, mkdir, cp } from 'fs/promises';
+import { rmdir, mkdir } from 'fs/promises';
 
 const root = path.resolve(__dirname, '../..');
 const lib = `node_modules/safetest`;
