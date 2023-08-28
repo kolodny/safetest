@@ -167,10 +167,10 @@ if (failedTests.length) {
     }
 
     const debugUrl = new URL(url);
-    debugUrl.searchParams.set('test_name', failedTest.fullName);
+    debugUrl.searchParams.set('test_name', failedTest.fullName.trim());
     debugUrl.searchParams.set(
       'test_path',
-      failedTest.filename.replace(/\.([tj]sx?)$/, '')
+      failedTest.filename.replace(/\.([tj]sx?)$/, '').trim()
     );
     const debugUrlEncoded = debugUrl.toString().replace(/%2F/g, '/');
     commentParts.push(
