@@ -46,9 +46,11 @@ type Module = {
 };
 
 /** Node require function, will return an `anything` proxy in the browser */
-export type SafeRequire = <T extends keyof Module | (string & { _?: 0 })>(
+export type SafeRequire = { resolve: typeof require.resolve } & (<
+  T extends keyof Module | (string & { _?: 0 })
+>(
   t: T
-) => T extends keyof Module ? Module[T] : any;
+) => T extends keyof Module ? Module[T] : any);
 
 /** Node require function, will return an `anything` proxy in the browser */
 export const safeRequire: SafeRequire = isInNode

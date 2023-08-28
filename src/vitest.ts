@@ -4,11 +4,13 @@ import { anythingProxy } from './anythingProxy';
 import { createBlockFn } from './blocks';
 import { configureSnapshot } from './configure-snapshot';
 import { isInNode } from './is-in-node';
+import { safeRequire } from './safe-require';
 import { state } from './state';
 import { afterAllFn, afterEachFn } from './teardown';
 
 // @ts-ignore
 import type * as Vitest from 'vitest';
+import { makeExpect } from './expect';
 
 /**
  * vitest import promise.
@@ -17,8 +19,11 @@ import type * as Vitest from 'vitest';
 type ImportVitest = () => Promise<typeof Vitest>;
 
 type SafetestVite = Promise<
-  Exclude<typeof Vitest, 'it'> & {
-    it: typeof Vitest['it'] & { debug: typeof Vitest.it };
+  Omit<typeof Vitest, 'it' | 'expect'> & {
+    it: typeof Vitest['it'] & {
+      debug: typeof Vitest.it;
+    };
+    expect: ReturnType<typeof makeExpect>;
   }
 >;
 
@@ -30,17 +35,21 @@ type SafetestVite = Promise<
  * ```
  * import { makeVitest } from 'safetest/vitest';
  *
- * const { describe, it, expect } = await makeVitest(() => ({
- *   vitest: import(/* @vite-ignore * / `${'vitest'}`),
- *   __filename,
- * }));
+ * const { describe, it, expect } = await makeVitest(() => import('vitest'));
  * ```
- *
- * Please note that '* /' should be connected (but can't in a doc comment).),
  */
 export const makeVitest = async (importVitest: ImportVitest): SafetestVite => {
   const vitest = isInNode ? await importVitest() : (anythingProxy as never);
-  const expect = vitest.expect;
+  const expect = makeExpect(vitest.expect);
+
+  if (isInNode)
+    try {
+      const pkg = safeRequire.resolve('@playwright/test/package.json');
+      const path = safeRequire('path');
+      const parent = path.dirname(pkg);
+      const matchers = safeRequire(`${parent}/lib/matchers/matchers`);
+      vitest.expect.extend(matchers);
+    } catch {}
 
   if (isInNode) {
     if (!require.main?.filename) {
@@ -68,7 +77,7 @@ export const makeVitest = async (importVitest: ImportVitest): SafetestVite => {
             state.isGlobalSetupTeardownRegistered = true;
             afterEach(afterEachFn);
             afterAll(afterAllFn);
-            configureSnapshot(expect);
+            configureSnapshot(vitest.expect);
           }
           return actualThing(...args);
         },
@@ -88,7 +97,7 @@ export const makeVitest = async (importVitest: ImportVitest): SafetestVite => {
             state.isGlobalSetupTeardownRegistered = true;
             afterEach(afterEachFn);
             afterAll(afterAllFn);
-            configureSnapshot(expect);
+            configureSnapshot(vitest.expect);
           }
           return actualThing(...args);
         },
@@ -146,7 +155,7 @@ export const makeVitest = async (importVitest: ImportVitest): SafetestVite => {
       beforeAll,
       afterEach,
       afterAll,
-      expect,
+      expect: vitest.expect,
     };
   }
 
