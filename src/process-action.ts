@@ -4,7 +4,6 @@ import cp from 'child_process';
 import { camelCase } from 'lodash';
 
 import { FormattedTestResults } from '@jest/test-result';
-import { ensureDir } from './ensure-dir';
 
 const parsed = Object.fromEntries(
   process.argv
@@ -167,10 +166,10 @@ if (failedTests.length) {
     }
 
     const debugUrl = new URL(url);
-    debugUrl.searchParams.set('test_name', failedTest.fullName.trim());
+    debugUrl.searchParams.set('test_name', failedTest.fullName);
     debugUrl.searchParams.set(
       'test_path',
-      failedTest.filename.replace(/\.([tj]sx?)$/, '').trim()
+      failedTest.filename.replace(/\.([tj]sx?)$/, '')
     );
     const debugUrlEncoded = debugUrl.toString().replace(/%2F/g, '/');
     commentParts.push(
@@ -199,7 +198,7 @@ for (const result of results.testResults) {
       todo: '📝',
       disabled: '🚫',
     }[assertionResult.status];
-    map[assertionResult.title] = [status, assertionResult.fullName];
+    map[assertionResult.title] = [status, assertionResult.fullName.trim()];
   }
 }
 

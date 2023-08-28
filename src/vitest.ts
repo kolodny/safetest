@@ -10,18 +10,11 @@ import { afterAllFn, afterEachFn } from './teardown';
 // @ts-ignore
 import type * as Vitest from 'vitest';
 
-interface MakeViteParamters {
-  /**
-   * vitest import promise.
-   * We do this since the vite can't bundle vitest for the browser
-   */
-  vitest: Promise<typeof Vitest>;
-  /**
-   * This should be `__filename` so that vitest can know about which
-   * file is being tested. It can't figure this out any other way.
-   */
-  __filename: string;
-}
+/**
+ * vitest import promise.
+ * We do this since the vite can't bundle vitest for the browser
+ */
+type VitestPromise = Promise<typeof Vitest>;
 
 type SafetestVite = Promise<
   Exclude<typeof Vitest, 'it'> & {
@@ -46,10 +39,9 @@ type SafetestVite = Promise<
  * Please note that '* /' should be connected (but can't in a doc comment).),
  */
 export const makeVitest = async (
-  args: () => MakeViteParamters
+  vitestPromise: VitestPromise
 ): SafetestVite => {
-  const argItems = isInNode ? args() : (anythingProxy as never);
-  const vitest = await argItems.vitest;
+  const vitest = isInNode ? await vitestPromise : (anythingProxy as never);
   const expect = vitest.expect;
 
   if (isInNode) {
@@ -57,7 +49,6 @@ export const makeVitest = async (
       require.main = { ...require.main!, filename: __filename };
     }
   }
-  state.__filename = argItems.__filename;
   const {
     describe = {} as typeof Vitest.describe,
     it = {} as typeof Vitest.it,

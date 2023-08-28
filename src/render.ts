@@ -150,7 +150,10 @@ export async function render(
     const path = safeRequire('path');
     const cp = safeRequire('child_process');
 
-    const filename = require.main?.filename || state.__filename || '';
+    const filename =
+      require.main?.filename ||
+      state.vitestGlobals?.expect.getState().testPath ||
+      '';
     if (!prefixCache[filename]) {
       prefixCache[filename] = await new Promise((resolve, reject) => {
         cp.exec('npm prefix', { cwd: path.dirname(filename) }, (err, out) => {
