@@ -19,9 +19,9 @@ jobs:
       - name: Public IP
         id: ip
         uses: haythem/public-ip@v1.3
-      - name: Set env
-        run: echo "MY_IP=${{ steps.ip.outputs.ipv4 }}" >> $GITHUB_ENV
-      - run: echo "MY_IP is ${{ env.MY_IP }}."
+      # - name: Set env
+      #   run: echo "MY_IP=${{ steps.ip.outputs.ipv4 }}" >> $GITHUB_ENV
+      # - run: echo "MY_IP is ${{ env.MY_IP }}."
       - run: echo "VERCEL_UUID is ${{ env.VERCEL_UUID }}."
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
