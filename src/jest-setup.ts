@@ -6,6 +6,7 @@ import { state } from './state';
 import { camelCase } from 'lodash';
 import { getViewUrl, openLocalBrowser, startServer } from './redirect-server';
 import { getTree } from './ps';
+import { safeRequire } from './safe-require';
 
 type Options = RenderOptions | ((options: RenderOptions) => RenderOptions);
 type Parameters = {
@@ -86,6 +87,7 @@ export const setup = ({ runner, api, options }: Parameters) => {
         await openLocalBrowser('http://localhost:8844');
       } else {
         const viewUrl = getViewUrl();
+        const console = safeRequire('console');
         const msg = `\n\nGo to ${viewUrl} to view the remote tests\n\n`;
         if (viewUrl) console.log(msg);
       }
