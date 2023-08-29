@@ -4,8 +4,7 @@ import playwright from 'playwright';
 import * as WS from 'ws';
 import inspector from 'inspector';
 import console from 'console';
-// @ts-ignore
-// import r2 from 'r2';
+import fetch from 'node-fetch';
 
 import { overrideEvents } from './override-events';
 import { state } from './state';
@@ -50,10 +49,9 @@ const debugInfo = async () => {
   const inspectorUrl = inspector.url();
   if (!inspectorUrl) return;
   const port = new URL(inspectorUrl).port;
-  const r2 = safeRequire('r2');
-  console.log('r2', r2);
-  const response = await r2(`http://127.0.0.1:${port}/json/list`);
-  const list = await response.json;
+  const listUrl = `http://127.0.0.1:${port}/json/list`;
+  const response = await fetch(listUrl);
+  const list = await response.json();
   const rawUrl = list[0].devtoolsFrontendUrl;
   if (!rawUrl) return {};
   const url = new URL(rawUrl);

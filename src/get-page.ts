@@ -1,7 +1,6 @@
 import merge from 'deepmerge';
 
-// @ts-ignore
-// import r2 from 'r2';
+import fetch from 'node-fetch';
 
 import { state } from './state';
 import { isInNode } from './is-in-node';
@@ -100,8 +99,9 @@ export async function getPage(
 
       let list = [];
       try {
-        const response = await r2(`http://127.0.0.1:${debugPort}/json/list`);
-        list = await response.json;
+        const listUrl = `http://127.0.0.1:${debugPort}/json/list`;
+        const response = await fetch(listUrl);
+        list = await response.json();
       } catch {}
       const items: string[] = list.map((l: any) => l.devtoolsFrontendUrl);
       const itemsSet = new Set(items);
@@ -113,10 +113,6 @@ export async function getPage(
       for (const url of newItems) {
         const remoteUrl = url.replace('127.0.0.1', MY_IP);
         const debugUrl = `http://${MY_IP}:${debugPort}${remoteUrl}`;
-        console.log('r2', r2);
-        console.log(redirectServer);
-        console.log(redirectServer.notify);
-        console.log(debugUrl);
         redirectServer.notify(0, debugUrl);
         if (options.headless === false) {
           warnOpeningLocal(console);
