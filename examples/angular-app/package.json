@@ -2,8 +2,8 @@
   "name": "angular-app",
   "version": "0.0.0",
   "scripts": {
-    "safetest": "node --inspect node_modules/.bin/jest --runInBand --url=http://localhost:3000/angular-app --testMatch '**/*.safetest.{j,t}s{,x}' --setupFilesAfterEnv ./setup-safetest.js",
-    "safetest:ci": "jest --runInBand --testMatch '**/*.safetest.{j,t}s{,x}'",
+    "safetest": "node --inspect node_modules/.bin/jest --runInBand --url=http://localhost:4200/angular-app --testMatch '**/*.safetest.{j,t}s{,x}' --setupFilesAfterEnv ./setup-safetest.js",
+    "safetest:ci": "npm run safetest -- --watchAll=false --ci=1 --docker=1 --url=https://safetest-two.vercel.app/angular-app --json --outputFile=../../build/angular-app/results.json",
     "process:ci": "node -e 'require(\"safetest/process-action\")' -- --results=../../build/angular-app/results.json --artifacts=../../build/angular-app/artifacts --url=https://safetest-two.vercel.app/angular-app --build-url=.",
     "ng": "ng",
     "start": "ng serve",

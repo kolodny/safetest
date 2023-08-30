@@ -20,7 +20,7 @@ bootstrap({
   import: (s) =>
     import(`${s.replace(/.*src/, '.').replace(/\.safetest$/, '')}.safetest`),
   // Module: AppModule,
-  Module: HelloWorldModule,
+  Module: AppModule,
 });
 
 // platformBrowserDynamic()
