@@ -5,7 +5,7 @@
     "safetest": "jest --runInBand --testMatch '**/*.safetest.{j,t}s{,x}'",
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "(rm -rf ../../build/angular-app || true) && ng build --base-href 'https://example.com/angular-app' && && mv build ../../build/angular-app",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
