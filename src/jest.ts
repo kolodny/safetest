@@ -1,6 +1,5 @@
 import 'setimmediate';
 
-import { spyOn, fn, Mock as JestMock } from 'jest-mock';
 import { createBlockFn } from './blocks';
 import { state } from './state';
 import { isInNode } from './is-in-node';
@@ -9,9 +8,12 @@ import { global } from './global';
 import { anythingProxy } from './anythingProxy';
 import { safeRequire } from './safe-require';
 
-import { Matchers } from './playwright-types';
 import { configureSnapshot } from './configure-snapshot';
 import { makeExpect } from './expect';
+import type { Mock as JestMock } from 'jest-mock';
+
+const jestMock: typeof import('jest-mock') = safeRequire('jest-mock');
+const { spyOn, fn } = jestMock;
 
 type Mock<R, A extends any[]> = JestMock<(...args: A) => R>;
 
@@ -20,19 +22,25 @@ if (isInNode)
     safeRequire('@playwright/test/lib/matchers/matchers');
   } catch {}
 
-const ensureImported = <T>(globalProp: string, name: string): T => {
+const ensureImported = <T>(
+  globalProp: string,
+  name: string,
+  throwing?: boolean
+): T => {
   const g = global as any;
   const original = g[globalProp] ?? anythingProxy;
   g[globalProp] = () => {
-    throw new Error(`'${name}' must be imported from safetest/jest`);
+    if (throwing)
+      throw new Error(`'${name}' must be imported from safetest/jest`);
+    return original;
   };
 
   return original;
 };
 
-const describe = ensureImported<jest.Describe>('describe', 'describe');
-const it = ensureImported<jest.It>('it', 'test/it');
-const expect = ensureImported<jest.Expect>('expect', 'expect');
+const describe = ensureImported<jest.Describe>('describe', 'describe', true);
+const it = ensureImported<jest.It>('it', 'test/it', true);
+const expect = ensureImported<jest.Expect>('expect', 'expect', true);
 const beforeEach = ensureImported<jest.Lifecycle>('beforeEach', 'beforeEach');
 const beforeAll = ensureImported<jest.Lifecycle>('beforeAll', 'beforeAll');
 const afterEach = ensureImported<jest.Lifecycle>('afterEach', 'afterEach');

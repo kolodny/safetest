@@ -1,0 +1,43 @@
+{
+  "name": "angular-app",
+  "version": "0.0.0",
+  "scripts": {
+    "safetest": "jest --runInBand --testMatch '**/*.safetest.{j,t}s{,x}'",
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "^16.2.0",
+    "@angular/common": "^16.2.0",
+    "@angular/compiler": "^16.2.0",
+    "@angular/core": "^16.2.0",
+    "@angular/forms": "^16.2.0",
+    "@angular/platform-browser-dynamic": "^16.2.0",
+    "@angular/router": "^16.2.0",
+    "rxjs": "~7.8.0",
+    "safetest": "file:../..",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.13.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^16.2.0",
+    "@angular/cli": "~16.2.0",
+    "@angular/compiler-cli": "^16.2.0",
+    "@angular/platform-browser": "^16.2.2",
+    "@types/jasmine": "~4.3.0",
+    "@types/jest": "^29.5.4",
+    "jasmine-core": "~4.6.0",
+    "jest": "^29.6.4",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "~5.1.3"
+  }
+}

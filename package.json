@@ -7,6 +7,7 @@
     "./jest": "./lib/jest.js",
     "./jest-setup": "./lib/jest-setup.js",
     "./react": "./lib/react.js",
+    "./ng": "./lib/ng.js",
     "./docker": "./lib/docker.js",
     "./vitest": "./lib/vitest.js",
     "./process-action": "./lib/process-action.js"
@@ -20,6 +21,9 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@angular/core": "^16.2.2",
+    "@angular/platform-browser": "^16.2.2",
+    "@angular/platform-browser-dynamic": "^16.2.2",
     "react-scripts": "^5.0.1",
     "typescript": "^5.0.4",
     "vercel": "^29.4.0"
