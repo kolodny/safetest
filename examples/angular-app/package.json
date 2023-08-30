@@ -7,7 +7,7 @@
     "process:ci": "node -e 'require(\"safetest/process-action\")' -- --results=../../build/angular-app/results.json --artifacts=../../build/angular-app/artifacts --url=https://safetest-two.vercel.app/angular-app --build-url=.",
     "ng": "ng",
     "start": "ng serve",
-    "build": "(rm -rf ../../build/angular-app || true) && ng build --base-href 'https://safetest-two.vercel.app/angular-app/' && mv dist//angular-app ../../build/angular-app",
+    "build": "(rm -rf ../../build/angular-app || true) && ng build --base-href 'https://safetest-two.vercel.app/angular-app/' && mv dist/angular-app ../../build/angular-app",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
