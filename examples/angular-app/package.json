@@ -2,7 +2,9 @@
   "name": "angular-app",
   "version": "0.0.0",
   "scripts": {
-    "safetest": "jest --runInBand --testMatch '**/*.safetest.{j,t}s{,x}'",
+    "safetest": "node --inspect node_modules/.bin/jest --runInBand --url=http://localhost:3000/angular-app --testMatch '**/*.safetest.{j,t}s{,x}' --setupFilesAfterEnv ./setup-safetest.js",
+    "safetest:ci": "jest --runInBand --testMatch '**/*.safetest.{j,t}s{,x}'",
+    "process:ci": "node -e 'require(\"safetest/process-action\")' -- --results=../../build/angular-app/results.json --artifacts=../../build/angular-app/artifacts --url=https://safetest-two.vercel.app/angular-app --build-url=.",
     "ng": "ng",
     "start": "ng serve",
     "build": "(rm -rf ../../build/angular-app || true) && ng build --base-href 'https://safetest-two.vercel.app/angular-app' && mv dist//angular-app ../../build/angular-app",
