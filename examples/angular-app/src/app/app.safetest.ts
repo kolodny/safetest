@@ -53,6 +53,7 @@ describe('angular-app', () => {
 
   it('works5', async () => {
     const { page } = await render('<my-cool-test></my-cool-test>');
-    console.log(await page.evaluate(() => document.body.innerText));
+    const bodyText = await page.evaluate(() => document.body.innerText.trim());
+    expect(bodyText).toBeTruthy();
   });
 });
