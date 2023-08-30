@@ -17,11 +17,6 @@ const { spyOn, fn } = jestMock;
 
 type Mock<R, A extends any[]> = JestMock<(...args: A) => R>;
 
-if (isInNode)
-  try {
-    safeRequire('@playwright/test/lib/matchers/matchers');
-  } catch {}
-
 const ensureImported = <T>(
   globalProp: string,
   name: string,
@@ -45,6 +40,15 @@ const beforeEach = ensureImported<jest.Lifecycle>('beforeEach', 'beforeEach');
 const beforeAll = ensureImported<jest.Lifecycle>('beforeAll', 'beforeAll');
 const afterEach = ensureImported<jest.Lifecycle>('afterEach', 'afterEach');
 const afterAll = ensureImported<jest.Lifecycle>('afterAll', 'afterAll');
+
+if (isInNode)
+  try {
+    const pkg = safeRequire.resolve('@playwright/test/package.json');
+    const path = safeRequire('path');
+    const parent = path.dirname(pkg);
+    const matchers = safeRequire(`${parent}/lib/matchers/matchers`);
+    expect.extend(matchers);
+  } catch {}
 
 const setTimeout = (timeout: number) => {
   if (isInNode) {

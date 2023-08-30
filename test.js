@@ -11,14 +11,9 @@ for (const example of examples) {
   const stat = fs.statSync(cwd);
   if (stat.isDirectory()) {
     console.log(`running build for examples/${example}`);
-    spawnSync('npm', ['install'], { cwd, stdio: 'inherit' });
-    spawnSync('npm', ['run', 'safetest:ci', '--if-present'], {
-      cwd,
-      stdio: 'inherit',
-    });
-    spawnSync('npm', ['run', 'process:ci', '--if-present'], {
-      cwd,
-      stdio: 'inherit',
-    });
+    const options = { cwd, stdio: 'inherit' };
+    spawnSync('npm', ['install'], options);
+    spawnSync('npm', ['run', 'safetest:ci', '--if-present'], options);
+    spawnSync('npm', ['run', 'process:ci', '--if-present'], options);
   }
 }
