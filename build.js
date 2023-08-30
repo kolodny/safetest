@@ -14,10 +14,7 @@ for (const example of examples) {
     dirs.push(example);
     console.log(`running build for examples/${example}`);
     spawnSync('npm', ['install'], { cwd, stdio: 'inherit' });
-    spawnSync('npm', ['run', 'build', '--if-present'], {
-      cwd,
-      stdio: 'inherit',
-    });
+    spawnSync('npm', ['run', 'build'], { cwd, stdio: 'inherit' });
   }
 }
 fs.writeFileSync(
