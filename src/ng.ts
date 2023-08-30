@@ -15,6 +15,16 @@ import {
 } from './render';
 import { isInNode } from './is-in-node';
 import { anythingProxy } from './anythingProxy';
+import { safeRequire } from './safe-require';
+
+if (isInNode)
+  try {
+    const pkg = safeRequire.resolve('@playwright/test/package.json');
+    const path = safeRequire('path');
+    const parent = path.dirname(pkg);
+    const matchers = safeRequire(`${parent}/lib/matchers/matchers`);
+    expect.extend(matchers);
+  } catch {}
 
 type Ng = typeof import('@angular/core');
 

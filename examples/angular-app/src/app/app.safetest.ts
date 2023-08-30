@@ -1,8 +1,6 @@
-import { describe, it } from 'safetest/jest';
+import { describe, it, setTimeout, expect } from 'safetest/jest';
 import { setOptions } from 'safetest';
 import { makeSafetestBed } from 'safetest/ng';
-
-setOptions({ url: 'http://localhost:4200' });
 
 const { render, ng } = makeSafetestBed(() => ({
   TestBed: import('@angular/core/testing'),
@@ -27,24 +25,30 @@ const { render, ng } = makeSafetestBed(() => ({
 describe('angular-app', () => {
   it('works', async () => {
     const { page } = await render('bar');
-    console.log(await page.evaluate(() => document.body.innerText));
+    await expect(page.locator('text=bar')).toBeVisible();
+    expect(await page.screenshot()).toMatchImageSnapshot({
+      failureThreshold: 10,
+    });
   });
 
   it('works2', async () => {
     const { page } = await render('baz');
-    console.log(await page.evaluate(() => document.body.innerText));
+    const bodyText = await page.evaluate(() => document.body.innerText.trim());
+    expect(bodyText).toBeTruthy();
   });
 
   it('works3', async () => {
     const { page } = await render(() =>
       import('./app.component').then((x) => x.HelloWorldComponent)
     );
-    console.log(await page.evaluate(() => document.body.innerText));
+    const bodyText = await page.evaluate(() => document.body.innerText.trim());
+    expect(bodyText).toBeTruthy();
   });
 
   it('works4', async () => {
     const { page } = await render('<hello-world></hello-world>');
-    console.log(await page.evaluate(() => document.body.innerText));
+    const bodyText = await page.evaluate(() => document.body.innerText.trim());
+    expect(bodyText).toBeTruthy();
   });
 
   it('works5', async () => {
