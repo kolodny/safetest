@@ -2,6 +2,7 @@
   "name": "safetest",
   "version": "0.0.0",
   "description": "",
+  "main": "lib/index.js",
   "exports": {
     ".": "./lib/index.js",
     "./jest": "./lib/jest.js",

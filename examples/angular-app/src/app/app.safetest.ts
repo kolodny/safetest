@@ -1,5 +1,4 @@
 import { describe, it } from 'safetest/jest';
-// @ts-ignore
 import { setOptions } from 'safetest';
 import { makeSafetestBed } from 'safetest/ng';
 
