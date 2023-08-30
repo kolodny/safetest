@@ -2,7 +2,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Page } from 'playwright';
 import type { TestModuleMetadata } from '@angular/core/testing';
-// import type DynamicTesting from '@angular/platform-browser-dynamic/testing';
+import type TestBed from '@angular/core/testing';
+import type DynamicTesting from '@angular/platform-browser-dynamic/testing';
 import type * as PlatformBrowser from '@angular/platform-browser';
 import type { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
@@ -20,7 +21,7 @@ type Ng = typeof import('@angular/core');
 declare interface Type<T> extends Function {
   new (...args: any[]): T;
 }
-type Renderable = () => Promise<Type<any>>;
+type Renderable = ((ng: Ng) => Promise<Type<any>>) | string;
 interface RenderReturn {
   /** The Playwright page object of the rendered component. */
   page: Page;
@@ -32,38 +33,43 @@ type RenderFn = {
   (elementToRender: Renderable, options?: RenderOptions): Promise<RenderReturn>;
 };
 
-interface MakeSafetestBedArguments<Components> {
+interface MakeSafetestBedArguments {
   PlatformBrowser: Promise<typeof PlatformBrowser>;
-  components?: Components;
+  DynamicTesting: Promise<typeof DynamicTesting>;
+  Ng: Promise<typeof import('@angular/core')>;
+  TestBed: Promise<typeof TestBed>;
+  configure?: (ng: Ng) => Promise<TestModuleMetadata>;
 }
-interface SafetestBed<Components> {
+interface SafetestBed {
   render: RenderFn;
-  components: Components;
   ng: typeof import('@angular/core');
-  // makeComponent: <T>(template: string, Class: Type<T>) => Type<T>;
 }
-export const makeSafetestBed = <Imports>(
-  renderArgs: () => MakeSafetestBedArguments<Imports>
-): SafetestBed<Imports> => {
+export const makeSafetestBed = (
+  renderArgs: () => MakeSafetestBedArguments
+): SafetestBed => {
   if (isInNode) {
     return {
       render: render as any,
-      components: {} as any,
       ng: anythingProxy,
-      // makeComponent: () => ({} as any),
     };
   }
 
-  const args = renderArgs();
+  const renderArgsValue = renderArgs();
 
-  const PlatformBrowser = args.PlatformBrowser;
+  const PlatformBrowser = renderArgsValue.PlatformBrowser;
 
   const ngPromise = import('@angular/core');
   let actualNg: Ng | undefined = undefined;
-  ngPromise.then((ng) => {
+  ngPromise.then(async (ng) => {
     actualNg = ng;
+    const { TestBed } = await renderArgsValue.TestBed;
+    const DynamicTesting = await renderArgsValue.DynamicTesting;
+    TestBed.initTestEnvironment(
+      DynamicTesting.BrowserDynamicTestingModule,
+      DynamicTesting.platformBrowserDynamicTesting()
+    );
   });
-  const ng: Ng = new Proxy(
+  const ngProxy: Ng = new Proxy(
     {},
     {
       get: (target, prop) => {
@@ -74,15 +80,8 @@ export const makeSafetestBed = <Imports>(
   ) as any;
 
   return {
-    ng,
+    ng: ngProxy as any,
     render: render as any,
-    components: args.components ?? ({} as any),
-    // makeComponent: (template, Class) => {
-    //   return ng.Component({
-    //     selector: 'dummy-testing-component',
-    //     template: template,
-    //   })(Class);
-    // },
   };
 
   async function render(...args: Parameters<RenderFn>): ReturnType<RenderFn> {
@@ -95,44 +94,12 @@ export const makeSafetestBed = <Imports>(
         (typeof elementToRender === 'function' &&
           !elementToRender?.prototype?.constructor?.name)
       ) {
+        const ng = await renderArgsValue.Ng;
         const rendered =
           typeof elementToRender === 'function'
-            ? (elementToRender as any)(
-                state.browserState?.renderElement.value ?? ({} as any)
-              ) ?? {}
+            ? (elementToRender as any)(ng) ?? {}
             : elementToRender;
         elementToRender = await rendered;
-
-        const Browser = isInNode ? {} : (await PlatformBrowser).BrowserModule;
-
-        const isModule =
-          typeof elementToRender === 'function' && 'ɵmod' in elementToRender;
-
-        if (typeof elementToRender === 'string') {
-          const error = () => {
-            throw new Error('string not supported yet');
-          };
-          error();
-
-          const TestComponent = ng.Component({
-            selector: 'app-root',
-            template: elementToRender,
-          })(class TestComponent {});
-          elementToRender = ng.NgModule({
-            declarations: [TestComponent],
-            imports: [Browser as any],
-            providers: [],
-            bootstrap: [TestComponent],
-          })(class TestModule {}) as any;
-        } else if (!isModule) {
-          elementToRender = ng.NgModule({
-            declarations: [elementToRender as any],
-            imports: [Browser as any],
-            providers: [],
-            bootstrap: [elementToRender as any],
-          })(class TestModule {}) as any;
-        } else {
-        }
       }
     }
 
@@ -140,25 +107,32 @@ export const makeSafetestBed = <Imports>(
       { __isRenderable: true, thing: elementToRender },
       options,
       async (e) => {
-        const ng = await import('@angular/core');
+        const ng = await renderArgsValue.Ng;
+        const { TestBed } = await renderArgsValue.TestBed;
+        const DynamicTesting = await renderArgsValue.DynamicTesting;
+        lastRendered?.destroy();
         if (typeof e.thing === 'string') {
-          e.thing = ng.Component({
-            selector: 'dummy-testing-component',
-            template: e.thing,
-          })(class {});
+          e.thing = ng.Component({ template: e.thing })(class {});
         }
-        // const TestBed = await TestBedPromise;
-        // await TestBed.configureTestingModule({
-        //   declarations: [e.thing],
-        // }).compileComponents();
-        // const fixture = TestBed.createComponent(e.thing);
-        // fixture.autoDetectChanges();
-        // await fixture.whenStable();
+
+        const metadata: TestModuleMetadata = {
+          ...((await renderArgsValue.configure?.(ng)) ?? {}),
+        };
+        if (!metadata.declarations) metadata.declarations = [];
+        metadata.declarations.push(e.thing);
+
+        await TestBed.configureTestingModule(metadata).compileComponents();
+
+        const fixture = TestBed.createComponent(e.thing);
+        fixture.destroy;
+        fixture.autoDetectChanges();
+        await fixture.whenStable();
         state.browserState?.renderFn?.(e.thing);
       }
     );
   }
 };
+let lastRendered: TestBed.ComponentFixture<unknown> | undefined = undefined;
 
 interface BootstrapArgs {
   import: (s: string) => Promise<any>;
@@ -172,11 +146,6 @@ export const bootstrap = async (args: BootstrapArgs): Promise<void> => {
     retryAttempt: 0,
     renderElement: { __type: 'renderElement', value: args.Module },
     renderContainer: { __type: 'renderContainer', value: undefined },
-    renderFn: (Module: Type<any>) =>
-      args
-        .platformBrowserDynamic()
-        .bootstrapModule(Module)
-        .catch((err) => console.error(err)),
   };
 
   try {

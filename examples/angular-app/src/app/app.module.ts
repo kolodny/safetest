@@ -1,7 +1,10 @@
-import { NgModule } from '@angular/core';
+import { NgModule, Component } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { AppComponent, HelloWorldComponent } from './app.component';
+import {
+  AppComponent,
+  // HelloWorldComponent
+} from './app.component';
 
 @NgModule({
   declarations: [AppComponent],
@@ -11,11 +14,17 @@ import { AppComponent, HelloWorldComponent } from './app.component';
 })
 export class AppModule {}
 
+@Component({
+  selector: 'my-hello-world',
+  template: `<div>My Hello World!</div>`,
+})
+class HelloWorldComponent {}
+
 @NgModule({
   declarations: [HelloWorldComponent],
   imports: [BrowserModule],
   providers: [],
-  bootstrap: [HelloWorldComponent],
+  bootstrap: [],
 })
 export class HelloWorldModule {}
 

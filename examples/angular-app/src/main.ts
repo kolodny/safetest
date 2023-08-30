@@ -1,7 +1,6 @@
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { TestBed } from '@angular/core/testing';
 
-import { AppModule } from './app/app.module';
+import { AppModule, HelloWorldModule } from './app/app.module';
 
 import { bootstrap } from 'safetest/ng';
 
@@ -20,7 +19,8 @@ bootstrap({
   platformBrowserDynamic,
   import: (s) =>
     import(`${s.replace(/.*src/, '.').replace(/\.safetest$/, '')}.safetest`),
-  Module: AppModule,
+  // Module: AppModule,
+  Module: HelloWorldModule,
 });
 
 // platformBrowserDynamic()
