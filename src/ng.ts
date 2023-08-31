@@ -15,16 +15,6 @@ import {
 } from './render';
 import { isInNode } from './is-in-node';
 import { anythingProxy } from './anythingProxy';
-import { safeRequire } from './safe-require';
-
-if (isInNode)
-  try {
-    const pkg = safeRequire.resolve('@playwright/test/package.json');
-    const path = safeRequire('path');
-    const parent = path.dirname(pkg);
-    const matchers = safeRequire(`${parent}/lib/matchers/matchers`);
-    expect.extend(matchers);
-  } catch {}
 
 type Ng = typeof import('@angular/core');
 
@@ -68,9 +58,8 @@ export const makeSafetestBed = (
 
   const PlatformBrowser = renderArgsValue.PlatformBrowser;
 
-  const ngPromise = import('@angular/core');
   let actualNg: Ng | undefined = undefined;
-  ngPromise.then(async (ng) => {
+  const ngPromise = import('@angular/core').then(async (ng) => {
     actualNg = ng;
     const { TestBed } = await renderArgsValue.TestBed;
     const DynamicTesting = await renderArgsValue.DynamicTesting;
@@ -117,9 +106,10 @@ export const makeSafetestBed = (
       { __isRenderable: true, thing: elementToRender },
       options,
       async (e) => {
+        await ngPromise;
+        // await new Promise((r) => setTimeout(r, 100));
         const ng = await renderArgsValue.Ng;
         const { TestBed } = await renderArgsValue.TestBed;
-        const DynamicTesting = await renderArgsValue.DynamicTesting;
         lastRendered?.destroy();
         if (typeof e.thing === 'string') {
           e.thing = ng.Component({ template: e.thing })(class {});
@@ -134,10 +124,9 @@ export const makeSafetestBed = (
         await TestBed.configureTestingModule(metadata).compileComponents();
 
         const fixture = TestBed.createComponent(e.thing);
-        fixture.destroy;
+        lastRendered = fixture;
         fixture.autoDetectChanges();
         await fixture.whenStable();
-        state.browserState?.renderFn?.(e.thing);
       }
     );
   }

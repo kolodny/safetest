@@ -33,6 +33,15 @@ const ensureImported = <T>(
   return original;
 };
 
+if (isInNode)
+  try {
+    const pkg = safeRequire.resolve('@playwright/test/package.json');
+    const path = safeRequire('path');
+    const parent = path.dirname(pkg);
+    const matchers = safeRequire(`${parent}/lib/matchers/matchers`);
+    (global as any).expect.extend(matchers);
+  } catch {}
+
 const describe = ensureImported<jest.Describe>('describe', 'describe', true);
 const it = ensureImported<jest.It>('it', 'test/it', true);
 const expect = ensureImported<jest.Expect>('expect', 'expect', true);
@@ -40,15 +49,6 @@ const beforeEach = ensureImported<jest.Lifecycle>('beforeEach', 'beforeEach');
 const beforeAll = ensureImported<jest.Lifecycle>('beforeAll', 'beforeAll');
 const afterEach = ensureImported<jest.Lifecycle>('afterEach', 'afterEach');
 const afterAll = ensureImported<jest.Lifecycle>('afterAll', 'afterAll');
-
-if (isInNode)
-  try {
-    const pkg = safeRequire.resolve('@playwright/test/package.json');
-    const path = safeRequire('path');
-    const parent = path.dirname(pkg);
-    const matchers = safeRequire(`${parent}/lib/matchers/matchers`);
-    expect.extend(matchers);
-  } catch {}
 
 const setTimeout = (timeout: number) => {
   if (isInNode) {
