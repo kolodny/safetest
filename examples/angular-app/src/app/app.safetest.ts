@@ -1,5 +1,4 @@
-import { describe, it, setTimeout, expect } from 'safetest/jest';
-import { setOptions } from 'safetest';
+import { describe, it, expect } from 'safetest/jest';
 import { makeSafetestBed } from 'safetest/ng';
 
 const { render, ng } = makeSafetestBed(() => ({
@@ -54,6 +53,7 @@ describe('angular-app', () => {
   it('works5', async () => {
     const { page } = await render('<my-cool-test></my-cool-test>');
     const bodyText = await page.evaluate(() => document.body.innerText.trim());
+
     expect(bodyText).toBeTruthy();
   });
 });

@@ -59,7 +59,8 @@ export const makeSafetestBed = (
   const PlatformBrowser = renderArgsValue.PlatformBrowser;
 
   let actualNg: Ng | undefined = undefined;
-  const ngPromise = import('@angular/core').then(async (ng) => {
+
+  const ngPromise = renderArgsValue.Ng.then(async (ng) => {
     actualNg = ng;
     const { TestBed } = await renderArgsValue.TestBed;
     const DynamicTesting = await renderArgsValue.DynamicTesting;

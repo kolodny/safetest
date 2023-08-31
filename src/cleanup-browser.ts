@@ -1,7 +1,14 @@
 import { state } from './state';
 
+const tryFn = async (fn: () => any) => {
+  try {
+    return await fn();
+  } catch {}
+};
+
 export const cleanupBrowser = async (): Promise<void> => {
   const context = state.browserContextInstance;
+  const browser = context?.browser();
   if (!context) return;
   let closed = false;
   context.once('close', () => (closed = true));
@@ -9,11 +16,11 @@ export const cleanupBrowser = async (): Promise<void> => {
   for (const page of pages) {
     const hooks = page._safetest_internal?.hooks;
     for (const beforeClose of hooks?.beforeClose ?? []) {
-      await beforeClose(page);
+      await tryFn(() => beforeClose(page));
     }
-    await page.close();
+    await tryFn(() => page.close());
   }
-  if (!closed) await context.close();
-  if (!closed) await context.browser()?.close();
+  await tryFn(() => context?.close());
+  await tryFn(() => browser?.close());
   delete state.browserContextInstance;
 };
