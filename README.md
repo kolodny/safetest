@@ -112,9 +112,7 @@ The following instructions assume you're using `create-react-app`. Look in the e
    describe('App', () => {
      it('renders without crashing', async () => {
        const { page } = await render();
-       await expect(page.locator('text=Welcome to The App'))
-         .toContain('Welcome to React')
-         .toBeVisible();
+       await expect(page.locator('text=Welcome to The App')).toBeVisible();
      });
    });
 
