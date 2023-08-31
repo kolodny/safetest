@@ -19,7 +19,7 @@ export const makeExpect = <T>(expect: T) => {
     actual: T
   ): 0 extends 1 & T
     ? Matchers<T>
-    : T extends BrowserSpy<any[], any>
+    : T extends BrowserSpy<any, any[]>
     ? 'Browser mocks need to be awaited. Try changing `expect(spy)` to `expect(await spy)`'
     : Matchers<T> => {
     if ((actual as any)?.__isBrowserSpy) {
