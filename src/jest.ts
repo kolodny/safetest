@@ -12,7 +12,8 @@ import { configureSnapshot } from './configure-snapshot';
 import { makeExpect } from './expect';
 import type { Mock as JestMock } from 'jest-mock';
 
-const jestMock: typeof import('jest-mock') = safeRequire('jest-mock');
+global.global = global;
+const jestMock: typeof import('jest-mock') = require('jest-mock');
 const { spyOn, fn } = jestMock;
 
 type Mock<R, A extends any[]> = JestMock<(...args: A) => R>;
