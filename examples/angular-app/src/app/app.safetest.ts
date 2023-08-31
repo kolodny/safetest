@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'safetest/jest';
+import { describe, it, expect, browserMock } from 'safetest/jest';
 import { makeSafetestBed } from 'safetest/ng';
 
 const { render, ng } = makeSafetestBed(() => ({
@@ -12,6 +12,7 @@ const { render, ng } = makeSafetestBed(() => ({
       template: `<div>My cool test</div>`,
     })
     class MyTest {}
+
     return {
       declarations: [
         MyTest,
@@ -58,25 +59,40 @@ describe('angular-app', () => {
   });
 
   it('allows custom components', async () => {
-    const { page } = await render(async (ng) =>
-      ng.Component({
-        template: `
-                    <div>
-                      <span>Count is {{ count }}</span>
-                      <button (click)="onIncrement()">Inc</button>
-                    </div>
-                  `,
-      })(
-        class {
-          count = 0;
-          onIncrement = () => (this.count += 1);
-        }
-      )
-    );
+    const { page } = await render(async (ng) => {
+      const template = `<span>Count is {{ count }}</span><button (click)="onIncrement()">Inc</button>`;
+
+      @ng.Component({ template })
+      class TestComponent {
+        count = 0;
+        onIncrement = () => (this.count += 1);
+      }
+
+      return TestComponent;
+    });
 
     for (let i = 0; i < 500; i++) {
       await expect(page.locator(`text=Count is ${i}`)).toBeVisible();
       await page.click('text=Inc');
     }
+  });
+
+  it('can check that a spy was called', async () => {
+    const spy = browserMock.fn();
+    const { page } = await render(async (ng) => {
+      const template = `<button (click)="onIncrement()">Inc</button>`;
+
+      @ng.Component({ template })
+      class TestComponent {
+        onIncrement = () => spy('foo');
+      }
+
+      return TestComponent;
+    });
+
+    expect(await spy).not.toHaveBeenCalled();
+    await page.click('text=Inc');
+    expect(await spy).toHaveBeenCalled();
+    expect(await spy).toHaveBeenCalledWith('foo');
   });
 });
