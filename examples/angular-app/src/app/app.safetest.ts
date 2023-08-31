@@ -56,4 +56,27 @@ describe('angular-app', () => {
 
     expect(bodyText).toBeTruthy();
   });
+
+  it('allows custom components', async () => {
+    const { page } = await render(async (ng) =>
+      ng.Component({
+        template: `
+                    <div>
+                      <span>Count is {{ count }}</span>
+                      <button (click)="onIncrement()">Inc</button>
+                    </div>
+                  `,
+      })(
+        class {
+          count = 0;
+          onIncrement = () => (this.count += 1);
+        }
+      )
+    );
+
+    for (let i = 0; i < 500; i++) {
+      await expect(page.locator(`text=Count is ${i}`)).toBeVisible();
+      await page.click('text=Inc');
+    }
+  });
 });
