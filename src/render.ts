@@ -17,7 +17,7 @@ import { deferred } from './defer';
 
 export const SAFETEST_INTERFACE = '__safetestApi__';
 
-const timeout = (ms: number) => new Promise((r) => setTimeout(r, ms).unref());
+const timeout = (ms: number) => new Promise((r) => setTimeout(r, ms).unref?.());
 
 const prefixCache: Record<string, string> = {};
 
