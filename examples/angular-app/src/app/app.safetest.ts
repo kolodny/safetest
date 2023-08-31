@@ -1,7 +1,7 @@
 import { describe, it, expect, browserMock } from 'safetest/jest';
 import { makeSafetestBed } from 'safetest/ng';
 
-const { render, ng } = makeSafetestBed(() => ({
+const { render } = makeSafetestBed(() => ({
   TestBed: import('@angular/core/testing'),
   Ng: import('@angular/core'),
   PlatformBrowser: import('@angular/platform-browser'),
@@ -75,6 +75,21 @@ describe('angular-app', () => {
       await expect(page.locator(`text=Count is ${i}`)).toBeVisible();
       await page.click('text=Inc');
     }
+  });
+
+  it('can configure on the render function', async () => {
+    const { page } = await render(async (ng) => {
+      @ng.Component({ selector: 'configured', template: 'Configured!' })
+      class TestComponent {}
+
+      render.configure({
+        declarations: [TestComponent],
+      });
+
+      return '<configured></configured>';
+    });
+
+    await expect(page.locator(`text=Configured!`)).toBeVisible();
   });
 
   it('can check that a spy was called', async () => {

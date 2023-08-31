@@ -4,7 +4,6 @@ import { Page } from 'playwright';
 import type { TestModuleMetadata } from '@angular/core/testing';
 import type TestBed from '@angular/core/testing';
 import type DynamicTesting from '@angular/platform-browser-dynamic/testing';
-import type * as PlatformBrowser from '@angular/platform-browser';
 import type { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { state } from './state';
@@ -14,14 +13,13 @@ import {
   render as renderCommon,
 } from './render';
 import { isInNode } from './is-in-node';
-import { anythingProxy } from './anythingProxy';
 
 type Ng = typeof import('@angular/core');
 
 declare interface Type<T> extends Function {
   new (...args: any[]): T;
 }
-type Renderable = ((ng: Ng) => Promise<Type<any>>) | string;
+type Renderable = ((ng: Ng) => Promise<Type<any> | string>) | string;
 interface RenderReturn {
   /** The Playwright page object of the rendered component. */
   page: Page;
@@ -31,10 +29,10 @@ interface RenderReturn {
 
 type RenderFn = {
   (elementToRender: Renderable, options?: RenderOptions): Promise<RenderReturn>;
+  configure: (metadata: TestModuleMetadata) => void;
 };
 
 interface MakeSafetestBedArguments {
-  PlatformBrowser: Promise<typeof PlatformBrowser>;
   DynamicTesting: Promise<typeof DynamicTesting>;
   Ng: Promise<typeof import('@angular/core')>;
   TestBed: Promise<typeof TestBed>;
@@ -42,21 +40,19 @@ interface MakeSafetestBedArguments {
 }
 interface SafetestBed {
   render: RenderFn;
-  ng: typeof import('@angular/core');
 }
+
 export const makeSafetestBed = (
   renderArgs: () => MakeSafetestBedArguments
 ): SafetestBed => {
   if (isInNode) {
+    (render as RenderFn).configure = () => {};
     return {
       render: render as any,
-      ng: anythingProxy,
     };
   }
 
   const renderArgsValue = renderArgs();
-
-  const PlatformBrowser = renderArgsValue.PlatformBrowser;
 
   let actualNg: Ng | undefined = undefined;
 
@@ -79,8 +75,11 @@ export const makeSafetestBed = (
     }
   ) as any;
 
+  let renderMeta: undefined | TestModuleMetadata = undefined;
+  afterEach(() => (renderMeta = undefined));
+  (render as RenderFn).configure = (meta) => (renderMeta = meta);
+
   return {
-    ng: ngProxy as any,
     render: render as any,
   };
 
@@ -117,7 +116,7 @@ export const makeSafetestBed = (
         }
 
         const metadata: TestModuleMetadata = {
-          ...((await renderArgsValue.configure?.(ng)) ?? {}),
+          ...((renderMeta || (await renderArgsValue.configure?.(ng))) ?? {}),
         };
         if (!metadata.declarations) metadata.declarations = [];
         metadata.declarations.push(e.thing);
