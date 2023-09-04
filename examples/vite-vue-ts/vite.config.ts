@@ -1,7 +1,8 @@
 /// <reference types="vitest" />
 
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import vue from '@vitejs/plugin-vue';
+
 import path from 'path';
 import { exec } from 'child_process';
 import { rmdir, mkdir } from 'fs/promises';
@@ -24,10 +25,7 @@ const env = process.env.NODE_ENV || 'development';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/vite-react-ts/',
-  build: {
-    target: 'esnext',
-  },
+  base: '/vite-vue-ts/',
   server: {
     port: env === 'test' ? 3001 : 3000,
   },
@@ -37,7 +35,7 @@ export default defineConfig({
       buildStart: link,
       handleHotUpdate: link,
     },
-    react(),
+    vue(),
   ],
   test: {
     reporters: ['basic', 'json'],

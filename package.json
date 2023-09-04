@@ -6,11 +6,13 @@
   "exports": {
     ".": "./lib/index.js",
     "./jest": "./lib/jest.js",
+    "./browser-mock": "./lib/browser-mock.js",
     "./jest-setup": "./lib/jest-setup.js",
     "./react": "./lib/react.js",
     "./ng": "./lib/ng.js",
     "./docker": "./lib/docker.js",
     "./vitest": "./lib/vitest.js",
+    "./vue": "./lib/vue.js",
     "./process-action": "./lib/process-action.js"
   },
   "scripts": {
@@ -27,7 +29,8 @@
     "@angular/platform-browser-dynamic": "^16.2.2",
     "react-scripts": "^5.0.1",
     "typescript": "^5.0.4",
-    "vercel": "^29.4.0"
+    "vercel": "^29.4.0",
+    "vue": "^3.3.4"
   },
   "dependencies": {
     "@playwright/test": "^1.34.0",

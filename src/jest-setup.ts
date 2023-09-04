@@ -1,5 +1,4 @@
 import { setOptions } from '.';
-import { beforeAll, setTimeout } from './jest';
 import { startDocker, stopDocker } from './docker';
 import { RenderOptions } from './render';
 import { state } from './state';
@@ -8,10 +7,13 @@ import { getViewUrl, openLocalBrowser, startServer } from './redirect-server';
 import { getTree } from './ps';
 import { safeRequire } from './safe-require';
 
+type BeforeAll = (callback: (...args: any[]) => any, ms?: number) => void;
+type SetTimeout = (ms: number) => void;
+
 type Options = RenderOptions | ((options: RenderOptions) => RenderOptions);
 type Parameters = {
   runner: 'jest' | 'vitest';
-  api: { beforeAll: typeof beforeAll; setTimeout: typeof setTimeout };
+  api: { beforeAll: BeforeAll; setTimeout: SetTimeout };
   options?: Options;
 };
 

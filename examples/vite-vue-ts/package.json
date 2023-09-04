@@ -1,0 +1,25 @@
+{
+  "name": "-vite-vue-ts",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm i ../../ && (rm -rf ../../build/vite-vue-ts || true) && tsc && vite build && mv dist ../../build/vite-vue-ts",
+    "preview": "vite preview",
+    "safetest": "vitest --inspect --no-threads --single-thread -- --url=http://localhost:3000/vite-vue-ts/",
+    "safetest:ci:test": "vitest --run -- --ci=1 --docker=1 --url=https://safetest-two.vercel.app/vite-vue-ts",
+    "safetest:ci": "(npm run safetest:ci:test || true) && cp results.json ../../build/vite-vue-ts/results.json",
+    "process:ci": "node -e 'require(\"../../lib/process-action\")' -- --results=../../build/vite-vue-ts/results.json --artifacts=../../build/vite-vue-ts/artifacts --url=https://safetest-two.vercel.app/vite-vue-ts --build-url=."
+  },
+  "dependencies": {
+    "vue": "^3.3.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.2.3",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.5",
+    "vitest": "^0.34.3",
+    "vue-tsc": "^1.8.5"
+  }
+}
