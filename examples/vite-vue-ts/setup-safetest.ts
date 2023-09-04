@@ -1,11 +1,11 @@
-import { setup } from 'safetest/jest-setup';
+import { setup } from 'safetest/setup';
 import * as vitest from 'vitest';
 
 setup({
   runner: 'vitest',
   api: {
     setTimeout: (ms) => vitest.vitest.setConfig({ testTimeout: ms }),
-    beforeAll: vitest.beforeAll as any,
+    beforeAll: vitest.beforeAll,
   },
   options: {
     ciOptions: {

@@ -5,14 +5,14 @@
   "main": "lib/index.js",
   "exports": {
     ".": "./lib/index.js",
-    "./jest": "./lib/jest.js",
+    "./setup": "./lib/setup.js",
     "./browser-mock": "./lib/browser-mock.js",
-    "./jest-setup": "./lib/jest-setup.js",
+    "./jest": "./lib/jest.js",
     "./react": "./lib/react.js",
     "./ng": "./lib/ng.js",
-    "./docker": "./lib/docker.js",
     "./vitest": "./lib/vitest.js",
     "./vue": "./lib/vue.js",
+    "./docker": "./lib/docker.js",
     "./process-action": "./lib/process-action.js"
   },
   "scripts": {
@@ -30,6 +30,7 @@
     "react-scripts": "^5.0.1",
     "typescript": "^5.0.4",
     "vercel": "^29.4.0",
+    "vitest": "^0.34.3",
     "vue": "^3.3.4"
   },
   "dependencies": {

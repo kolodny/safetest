@@ -1,10 +1,7 @@
 import { h } from 'vue';
-// @ts-ignore
 import Counter from './components/Counter.vue';
 import { render } from 'safetest/vue';
-import { makeVitest } from 'safetest/vitest';
-
-const { describe, it, expect } = await makeVitest(() => import('vitest'));
+import { describe, it, expect } from 'safetest/vitest';
 
 describe('Example', () => {
   it('works with jsx syntax', async () => {

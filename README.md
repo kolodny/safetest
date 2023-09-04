@@ -57,7 +57,7 @@ The following instructions assume you're using `create-react-app`. Look in the e
    Create a file called `setup-safetest.tsx` in the root of your project and add the following code:
 
    ```ts
-   import { setup } from 'safetest/jest-setup';
+   import { setup } from 'safetest/setup';
 
    setup({
      api: { beforeAll, setTimeout: (ms) => jest.setTimeout(ms) },

@@ -1,8 +1,6 @@
 import React from 'react';
 import { render } from 'safetest/react';
-import { makeVitest } from 'safetest/vitest';
-
-const { describe, it, expect } = await makeVitest(() => import('vitest'));
+import { describe, it, expect } from 'safetest/vitest';
 
 describe('Main', () => {
   it('loads a simple div', async () => {

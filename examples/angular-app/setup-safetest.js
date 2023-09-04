@@ -1,4 +1,4 @@
-const { setup } = require("safetest/jest-setup");
+const { setup } = require("safetest/setup");
 
 setup({
   api: {

@@ -41,6 +41,7 @@ export default defineConfig({
     vue(),
   ],
   test: {
+    globals: true,
     reporters: ['basic', 'json'],
     outputFile: 'results.json',
     setupFiles: ['setup-safetest'],

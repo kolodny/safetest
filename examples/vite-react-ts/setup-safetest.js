@@ -1,4 +1,4 @@
-import { setup } from 'safetest/jest-setup';
+import { setup } from 'safetest/setup';
 import * as vitest from 'vitest';
 
 setup({
