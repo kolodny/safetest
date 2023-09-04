@@ -1,4 +1,5 @@
 import { h } from 'vue';
+// @ts-ignore
 import Counter from './components/Counter.vue';
 import { render } from 'safetest/vue';
 import { makeVitest } from 'safetest/vitest';
