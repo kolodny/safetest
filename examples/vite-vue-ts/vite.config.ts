@@ -26,6 +26,9 @@ const env = process.env.NODE_ENV || 'development';
 // https://vitejs.dev/config/
 export default defineConfig({
   base: '/vite-vue-ts/',
+  build: {
+    target: 'esnext',
+  },
   server: {
     port: env === 'test' ? 3001 : 3000,
   },
