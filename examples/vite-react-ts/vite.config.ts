@@ -25,9 +25,6 @@ const env = process.env.NODE_ENV || 'development';
 // https://vitejs.dev/config/
 export default defineConfig({
   base: '/vite-react-ts/',
-  build: {
-    target: 'esnext',
-  },
   server: {
     port: env === 'test' ? 3001 : 3000,
   },
@@ -40,6 +37,7 @@ export default defineConfig({
     react(),
   ],
   test: {
+    globals: true,
     reporters: ['basic', 'json'],
     outputFile: 'results.json',
     setupFiles: ['setup-safetest'],
