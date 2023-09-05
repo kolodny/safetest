@@ -55,5 +55,5 @@ export type SafeRequire = { resolve: typeof require.resolve } & (<
 /** Node require function, will return an `anything` proxy in the browser */
 export const safeRequire: SafeRequire = isInNode
   ? // eslint-disable-next-line no-eval
-    eval('require')
+    global['eval']('require')
   : anythingProxy;
