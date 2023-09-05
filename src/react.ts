@@ -5,7 +5,7 @@ import {
   SAFETEST_INTERFACE,
 } from './render';
 
-// export * from 'react-override';
+export * from 'react-override';
 
 export async function render(
   elementToRender: JSX.Element | ((app: JSX.Element) => JSX.Element) = state

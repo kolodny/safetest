@@ -249,16 +249,124 @@ describe('Header', () => {
 
 #### Communicating between node and the browser.
 
-In order to make Safetest work, the test code is run in both node and the browser (see the How it works section for more details about this). What this means is that we have full control over both what happens in node as well as the browser as the test is running. This allows us to do some powerful communication between the two environments. One of these items is the ability to make assertions in node from the browser as seen above (the `await spy` was not a typo, it's also type safe so don't worry about forgetting it). `render` also returns a bridge function which we can use to coordinate some complex use cases. For example, here's how we'd test that retires work when editing some resource:
+In order to make Safetest work, the test code is run in both node and the browser (see the How it works section for more details about this). What this means is that we have full control over both what happens in node as well as the browser as the test is running. This allows us to do some powerful communication between the two environments. One of these items is the ability to make assertions in node from the browser as seen above (the `await spy` was not a typo, it's also type safe so don't worry about forgetting it). `render` also returns a bridge function which we can use to coordinate some complex use cases. For example, here's how we'd test that a loader component can recover from an error:
 
-```ts
-// SaveResource.tsx
-export const Resource: React.FC<{ resourceId: string }> = ({ resourceId }) => {
-  const resource = useResource(resourceId);
+```tsx
+// MoreLoader.tsx
+interface LoaderProps<T> {
+  getData: (lastId?: string) => Promise<T[]>;
+  renderItem: (t: T, index: number) => React.ReactNode;
+}
+
+// Pretend this is a real component
+export const MoreLoader = <T>(props: LoaderProps<T>) => {
+  /* ... */
+};
+
+describe('MoreLoader', () => {
+  it('can recover from errors', async () => {
+    let nextIndex = 0;
+    let error = false;
+    const { page, bridge } = render(
+      <MoreLoader<number>
+        getData={async () => {
+          if (error) throw new Error('Error');
+          return nextIndex++;
+        }}
+        renderItem={(d) => <>Number is {d}</>}
+      />
+    );
+    await expect(page.locator('text=Number is 0')).toBeVisible();
+    await page.locator('.load-more').click();
+    await expect(page.locator('text=Number is 1')).toBeVisible();
+    await bridge(() => nextIndex = 10)
+    await page.locator('.load-more').click();
+    await expect(page.locator('text=Number is 10')).toBeVisible();
+    await bridge(() => error = true);
+    await page.locator('.load-more').click();
+    await expect(page.locator('text=Error loading item')).toBeVisible();
+    await bridge(() => error = false);
+    await page.locator('.load-more').click();
+    await expect(page.locator('text=Number is 11')).toBeVisible();
+  });
+});
+```
+
+#### Overrides
+
+Sometimes the `bridge` function doesn't cover all your use cases. For example if you want to test that a component can recover from an error, you'll need to be able to override some logic within the component to simulate an error. For this use case, Safetest provides the `createOverride` function. This function allows you to override any value within the component. For example let's pretend we have this existing component:
+
+```tsx
+// Records.tsx
+export const Records = () => {
+  const { records, loading, error } = useGetRecordsQuery();
+  if (loading) return <Loader />;
+  if (error) return <Error error={error} />;
+  return <RecordList records={records} />;
 };
 ```
 
-TODO: FINISH this section
+We can now override the `useGetRecordsQuery` hook to simulate an error:
+
+```diff
+ // Records.tsx
++ const useGetRecordsQuery = createOverride(useGetRecordsQuery)
+
+ export const Records = () => {
++  const useGetRecordQuery = UseGetRecordsQuery.useValue()
+   const { records, loading, error } = useGetRecordsQuery();
+   if (loading) return <Loader />;
+   if (error) return <Error error={error} />;
+   return <RecordList records={records} />;
+ };
+```
+
+The test would look like this:
+
+```tsx
+describe('Records', () => {
+  it('Has a loading state', async () => {
+    const { page } = render(
+      <UseGetRecordQuery.Override with={(old) => ({ ...old(), loading: true })}>
+        <Records />
+      </UseGetRecordQuery.Override>
+    );
+    await expect(await page.locator('text=Loading')).toBeVisible();
+  });
+
+  it('Has an error state', async () => {
+    const { page } = render(
+      <UseGetRecordQuery.Override
+        with={(old) => ({ ...old(), error: new Error('Test Error') })}
+      >
+        <Records />
+      </UseGetRecordQuery.Override>
+    );
+    await expect(await page.locator('text=Test Error')).toBeVisible();
+  });
+
+  it('Has a loaded state', async () => {
+    const { page } = render(
+      <UseGetRecordQuery.Override
+        with={(old) => ({
+          ...old(),
+          loading: false,
+          value: [{ name: 'Tester' }],
+        })}
+      >
+        <Records />
+      </UseGetRecordQuery.Override>
+    );
+    await expect(await page.locator('text=Tester')).toBeVisible();
+  });
+});
+```
+
+This isn't limited to overriding a hook or a service, we can override anything we want. For example we can override the `Date.now()` to get consistent time stamps in our tests. A powerful use case for this is when we have a component that combines 3 graphql calls, we can test what happens if only one of those call fails, etc.
+
+// TODO: Flesh this section out some more since this is really where Safetest can do things that other testing libraries fundamentally can't.
+
+With the tools above we can test pretty much any scenario we can think of. The motto of Safetest is to make any test possible, no matter how complex and involved the test is.
 
 ### Providers and Contexts
 
@@ -308,4 +416,93 @@ The `render` also returns a `pause` method that will pause the execution of the 
 
 ## How Safetest works
 
-TODO:
+Safetest is a combination of a few different technologies glued together intelligently to leverage the best parts of each. The essential technologies used are
+
+- A test runner (this can be Jest or Vitest, feel free to open a PR for other test runners)
+- A browser automation library (`Playwright` is the default and only one used currently, this will be a bit harder to extend)
+- A UI framework (`React` is the main example used in this Readme, but the examples folder has many more app types)
+
+Take a look at the [examples](./examples/) folder to see different combinations of these technologies. Please feel free to open a PR with more examples.
+
+When the runner first starts it will build a mapping of the test structure. For example suppose we have a test file `src/App.safetest.tsx` with the following contents:
+
+```tsx
+import { describe, it, expect } from 'safetest/jest';
+import { render } from 'safetest/react';
+
+import { Header } from './components/header';
+
+describe('App', () => {
+  it('renders the app', async () => {
+    const { page } = await render();
+    await expect(page.locator('text=Welcome to The App')).toBeVisible();
+  });
+
+  it('can render a regular header', async () => {
+    const { page } = await render(<Header />);
+    await expect(page.locator('text=Logout')).toBeVisible();
+    await expect(page.locator('text=admin')).not.toBeVisible();
+    expect(await page.screenshot()).toMatchImageSnapshot();
+  });
+
+  it('can render an admin header', async () => {
+    const { page } = await render(<Header admin={true} />);
+    await expect(page.locator('text=Logout')).toBeVisible();
+    await expect(page.locator('text=admin')).toBeVisible();
+    expect(await page.screenshot()).toMatchImageSnapshot();
+  });
+});
+```
+
+Safetest will build a tree of the tests and their structure:
+
+```tsx
+{
+  "App": {
+    "renders the app": async () => { /* ... */ },
+    "can render a regular header": async () => { /* ... */ },
+    "can render an admin header": async () => { /* ... */ },
+  }
+}
+```
+
+The test runner also continues running so for example the `"renders the app"` test will run, it will hit the `render()` function, this will resolve once Safetest opens a browser and navigates to the page. Safetest controls the browser instance and will expose a "magic" function get info about the currently executing test `"App renders the app"`. There's also a magic function exposed that will be called when the browser page is "ready"
+
+On the browser side of things, when the call to bootstrap is called the following happens:
+
+- Safetest will check if there's a a "magic" function available that will give us information about the current executing test.
+  - If there is no test info available Safetest will render the page as normal and the bootstrapping process is done.
+- Safetest will now call the `import` function that was passed to bootstrap with the name of the test file.
+- This will allow Safetest to build that same mapping in the browser.
+- Safetest will now execute the `mapping["app renders the app]` function.
+- Safetest will hit the `render` function. Safetest will now render this component on the page.
+- Safetest will now call the magic exposed function to signal that the page is ready for testing.
+
+  Back in node...
+
+- The await `render(...)` call now resolves and we can continue with the test.
+
+---
+
+By existing in both node and the browser we gain some unique abilities. For example we can enable powerful two way communication between the two environments. This allows us to do things like assert that spies on the component side of things were called as expected. It also allows us to do things like pause the execution of the test and inspect the page in the browser. This is done by calling the `pause` function returned from `render`. This will pause the execution of the test and open a browser window with the page loaded. You can now inspect the page and continue to use the `page` object to interact with the page. This is useful for debugging and troubleshooting.
+
+We can pass nodejs data to the browser and have the browser pass data back to assert on. For a silly example, we can have nodejs make an api call to some non CORs enabled service, or check for the existence of a file in a directory, have the browser so some processing with that data and then pass it back to nodejs. Here's a silly demonstration of this:
+
+```tsx
+it('passes data', async () => {
+  const { page, bridge } = await render();
+  const bridged = await bridge(
+    { fromNode: !!require('os').platform() },
+    (passed) => {
+      return {
+        ...passed,
+        fromBrowser: !!document.location.href.length,
+      };
+    }
+  );
+  expect(bridged).toEqual({
+    fromNode: true,
+    fromBrowser: true,
+  });
+});
+```
