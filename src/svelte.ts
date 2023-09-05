@@ -7,6 +7,7 @@ import {
   SAFETEST_INTERFACE,
   render as renderCommon,
 } from './render';
+import { bootstrap as bootstrapCommon } from './bootstrap';
 
 interface RenderReturn {
   /** The Playwright page object of the rendered component. */
@@ -50,30 +51,14 @@ interface BootstrapArgs {
 export const bootstrap = async (
   args: BootstrapArgs
 ): Promise<SvelteComponent> => {
-  let searchParams: URLSearchParams | undefined;
   state.browserState = {
     retryAttempt: 0,
     renderElement: { __type: 'renderElement', value: args.element },
     renderContainer: { __type: 'renderContainer', value: args.options },
   };
 
-  try {
-    searchParams = new URLSearchParams(window.location.search);
-  } catch (e) {}
-  let testName = searchParams?.get('test_name');
-  let testPath = searchParams?.get('test_path');
-  let retryAttempt = 0;
-  if (!testPath && !testName && (window as any)[SAFETEST_INTERFACE]) {
-    ({ testPath, testName, retryAttempt } =
-      (await (window as any)[SAFETEST_INTERFACE]?.('GET_INFO')) ?? {});
-  }
-  if (testName && testPath) {
-    await args.import(testPath);
-    state.browserState.retryAttempt = retryAttempt;
-    state.tests[testName]?.();
-  } else {
-    const app = new args.element(args.options);
-    return app;
-  }
-  return {} as any;
+  return bootstrapCommon({
+    import: args.import,
+    defaultRender: () => new args.element(args.options),
+  });
 };

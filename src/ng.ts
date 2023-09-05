@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Page } from 'playwright';
 import type { TestModuleMetadata } from '@angular/core/testing';
 import type TestBed from '@angular/core/testing';
@@ -7,11 +5,8 @@ import type DynamicTesting from '@angular/platform-browser-dynamic/testing';
 import type { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { state } from './state';
-import {
-  RenderOptions,
-  SAFETEST_INTERFACE,
-  render as renderCommon,
-} from './render';
+import { RenderOptions, render as renderCommon } from './render';
+import { bootstrap as bootstrapCommon } from './bootstrap';
 import { isInNode } from './is-in-node';
 
 type Ng = typeof import('@angular/core');
@@ -68,7 +63,7 @@ export const makeSafetestBed = (
   const ngProxy: Ng = new Proxy(
     {},
     {
-      get: (target, prop) => {
+      get: (_target, prop) => {
         if (!actualNg) throw new Error('ng can only be used within a test');
         return (actualNg as any)[prop as any];
       },
@@ -139,33 +134,19 @@ interface BootstrapArgs {
   Module: Type<any>;
 }
 
-export const bootstrap = async (args: BootstrapArgs): Promise<void> => {
-  let searchParams: URLSearchParams | undefined;
+export const bootstrap = async (args: BootstrapArgs) => {
   state.browserState = {
     retryAttempt: 0,
     renderElement: { __type: 'renderElement', value: args.Module },
     renderContainer: { __type: 'renderContainer', value: undefined },
   };
 
-  try {
-    searchParams = new URLSearchParams(window.location.search);
-  } catch (e) {}
-  let testName = searchParams?.get('test_name');
-  let testPath = searchParams?.get('test_path');
-  let retryAttempt = 0;
-
-  if (!testPath && !testName && (window as any)[SAFETEST_INTERFACE]) {
-    ({ testPath, testName, retryAttempt } =
-      (await (window as any)[SAFETEST_INTERFACE]?.('GET_INFO')) ?? {});
-  }
-  if (testName && testPath) {
-    await args.import(testPath);
-    state.browserState.retryAttempt = retryAttempt;
-    state.tests[testName]?.();
-  } else {
-    args
-      .platformBrowserDynamic()
-      .bootstrapModule(args.Module)
-      .catch((err) => console.error(err));
-  }
+  return bootstrapCommon({
+    import: args.import,
+    defaultRender: () =>
+      args
+        .platformBrowserDynamic()
+        .bootstrapModule(args.Module)
+        .catch((err) => console.error(err)),
+  });
 };

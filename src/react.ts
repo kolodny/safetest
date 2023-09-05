@@ -1,8 +1,5 @@
-import {
-  render as renderCommon,
-  RenderOptions,
-  SAFETEST_INTERFACE,
-} from './render';
+import { render as renderCommon, RenderOptions } from './render';
+import { bootstrap as bootstrapCommon } from './bootstrap';
 import { state } from './state';
 
 export * from 'react-override';
@@ -46,22 +43,9 @@ export const bootstrap = async (args: BootstrapArgs): Promise<void> => {
     renderFn: args.render,
   };
 
-  try {
-    searchParams = new URLSearchParams(window.location.search);
-  } catch (e) {}
-  let testName = searchParams?.get('test_name');
-  let testPath = searchParams?.get('test_path');
-  let retryAttempt = 0;
-  if (!testPath && !testName && (window as any)[SAFETEST_INTERFACE]) {
-    ({ testPath, testName, retryAttempt } =
-      (await (window as any)[SAFETEST_INTERFACE]?.('GET_INFO')) ?? {});
-  }
-  if (testName && testPath) {
-    await args.import(testPath);
-    state.browserState.retryAttempt = retryAttempt;
-    await (window as any).waitForSafetestReady;
-    state.tests[testName]!();
-  } else {
-    state.browserState.renderFn!(args.element, args.container!);
-  }
+  return bootstrapCommon({
+    import: args.import,
+    defaultRender: () =>
+      state.browserState?.renderFn!(args.element, args.container!),
+  });
 };
