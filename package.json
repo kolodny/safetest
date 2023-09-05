@@ -28,6 +28,7 @@
     "@angular/core": "^16.2.2",
     "@angular/platform-browser": "^16.2.2",
     "@angular/platform-browser-dynamic": "^16.2.2",
+    "react": "^18.2.0",
     "react-scripts": "^5.0.1",
     "svelte": "^4.2.0",
     "typescript": "^5.0.4",
