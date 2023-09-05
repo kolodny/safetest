@@ -1,9 +1,9 @@
-import { state } from './state';
 import {
   render as renderCommon,
   RenderOptions,
   SAFETEST_INTERFACE,
 } from './render';
+import { state } from './state';
 
 export * from 'react-override';
 
