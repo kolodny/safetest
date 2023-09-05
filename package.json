@@ -11,6 +11,7 @@
     "./react": "./lib/react.js",
     "./ng": "./lib/ng.js",
     "./vitest": "./lib/vitest.js",
+    "./svelte": "./lib/svelte.js",
     "./vue": "./lib/vue.js",
     "./docker": "./lib/docker.js",
     "./process-action": "./lib/process-action.js"
@@ -28,6 +29,7 @@
     "@angular/platform-browser": "^16.2.2",
     "@angular/platform-browser-dynamic": "^16.2.2",
     "react-scripts": "^5.0.1",
+    "svelte": "^4.2.0",
     "typescript": "^5.0.4",
     "vercel": "^29.4.0",
     "vitest": "^0.34.3",

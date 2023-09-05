@@ -1,0 +1,35 @@
+{
+  "numTotalTestSuites": 2,
+  "numPassedTestSuites": 2,
+  "numFailedTestSuites": 0,
+  "numPendingTestSuites": 0,
+  "numTotalTests": 1,
+  "numPassedTests": 1,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "numTodoTests": 0,
+  "startTime": 1693919764776,
+  "success": true,
+  "testResults": [
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "",
+            "example"
+          ],
+          "fullName": " example works",
+          "status": "passed",
+          "title": "works",
+          "duration": 1652,
+          "failureMessages": []
+        }
+      ],
+      "startTime": 1693920034730,
+      "endTime": 1693920036382,
+      "status": "passed",
+      "message": "",
+      "name": "/Users/mkolodny/projects/safetest/examples/vite-svelte-ts/src/App.safetest.ts"
+    }
+  ]
+}
