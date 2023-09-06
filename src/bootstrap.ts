@@ -4,16 +4,18 @@ import { state } from './state';
 
 export type Importer =
   | {
-      webpackContext: {
-        keys(): Array<string>;
-        (dependency: string): Promise<unknown>;
-      };
+      webpackContext:
+        | false
+        | {
+            keys(): Array<string>;
+            (dependency: string): Promise<unknown>;
+          };
     }
   | {
-      importGlob: Record<string, () => Promise<unknown>>;
+      importGlob: false | Record<string, () => Promise<unknown>>;
     }
   | {
-      import: (s: string) => Promise<unknown>;
+      import: false | ((s: string) => Promise<unknown>);
     };
 
 type BootstrapArgs = Importer & {
@@ -26,13 +28,16 @@ export const bootstrap = async (args: BootstrapArgs): Promise<any> => {
   let known: string[] = [];
   let importer: (s: string) => Promise<any>;
   if ('webpackContext' in args) {
+    if (args.webpackContext === false) return args.defaultRender();
     known = [...new Set(args.webpackContext.keys().map(mapper))];
     importer = args.webpackContext;
   } else if ('importGlob' in args) {
+    if (args.importGlob === false) return args.defaultRender();
     const mappedGlob = _.mapKeys(args.importGlob, (v, k) => mapper(k));
     known = [...new Set(Object.keys(mappedGlob).map(mapper))];
     importer = (s: string) => mappedGlob[s]!();
   } else {
+    if (args.import === false) return args.defaultRender();
     importer = args.import;
   }
   let searchParams: URLSearchParams | undefined;

@@ -86,6 +86,8 @@ The following instructions assume you're using `create-react-app`. Look in the e
    +const container = document.getElementById("app");
    +const element = <App />;
    +
+   +const isProd = process.env.NODE_ENV === 'production';
+   +
    +bootstrap({
    +  container,
    +  element,
@@ -94,22 +96,22 @@ The following instructions assume you're using `create-react-app`. Look in the e
    +  // Add one of the following depending on your bundler...
    +
    +  // Webpack:
-   +  webpackContext: import.meta.webpackContext('.', {
+   +  webpackContext: !isProd && import.meta.webpackContext('.', {
    +    recursive: true,
    +    regExp: /\.safetest$/,
    +    mode: 'lazy'
    +  })
    +
    +  // Vite:
-   +  // importGlob: import.meta.glob('./**/*.safetest.{j,t}s{,x}'),
+   +  // importGlob: !isProd && import.meta.glob('./**/*.safetest.{j,t}s{,x}'),
    +
    +  // Other:
-   +  // import: async (s) => import(`${s.replace(/.*src/, '.').replace(/\.safetest$/, '')}.safetest`),
+   +  // import: !isProd && async (s) => import(`${s.replace(/.*src/, '.').replace(/\.safetest$/, '')}.safetest`),
    +
    +});
    ```
 
-   The above magic import makes use of [Webpack Context](https://webpack.js.org/api/module-variables/#importmetawebpackcontext) Or [Vite Glob import](https://vitejs.dev/guide/features.html#glob-import) (or [whatever flavor dynamic import is available](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import)), to bundle the `.safetest.tsx` files in your project separately. This allows you to write tests for your application in the same project as your application, without having to worry about setting up a separate test project or about the tests being loaded when loading your application in a non test context. The `isProd` check is only really needed if you don't want to leak your tests into production, but it's not strictly necessary.
+   The above magic import makes use of [Webpack Context](https://webpack.js.org/api/module-variables/#importmetawebpackcontext) Or [Vite Glob import](https://vitejs.dev/guide/features.html#glob-import) (or [whatever flavor dynamic import is available](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import)), to bundle the `.safetest.tsx` files in your project separately. This allows you to write tests for your application in the same project as your application, without having to worry about setting up a separate test project or about the tests being loaded when loading your application in a non test context. The `isProd` check is only really needed if you don't want to leak your tests into production, but it's not strictly necessary. In this project it's turned off for the examples since I want to test against the final deployed app to keep things simple.
 
 1. ### Creating your first tests
 
@@ -175,7 +177,7 @@ Now when you create a PR you'll get a bunch of CI goodies like a detailed report
 - Video of test execution
 - Ability to open tested component in the deployed environment
 
-[See here](https://safetest-kolodnygithub-gmailcom.vercel.app/) for a the reports (and apps) of each the example projects.
+[See here](https://safetest-kolodnygithub-gmailcom.vercel.app/) for a the reports (and apps) of each the [example projects](https://github.com/kolodny/safetest/tree/main/examples).
 
 ## Writing Tests
 
@@ -264,7 +266,7 @@ describe('Header', () => {
 
 #### Communicating between node and the browser.
 
-In order to make Safetest work, the test code is run in both node and the browser (see the How it works section for more details about this). What this means is that we have full control over both what happens in node as well as the browser as the test is running. This allows us to do some powerful communication between the two environments. One of these items is the ability to make assertions in node from the browser as seen above (the `await spy` was not a typo, it's also type safe so don't worry about forgetting it). `render` also returns a bridge function which we can use to coordinate some complex use cases. For example, here's how we'd test that a loader component can recover from an error:
+In order to make Safetest work, the test code is run in both node and the browser (see the [How Safetest works](#how-safetest-works) section for more details about this). What this means is that we have full control over both what happens in node as well as the browser as the test is running. This allows us to do some powerful communication between the two environments. One of these items is the ability to make assertions in node from the browser as seen above (the `await spy` was not a typo, it's also type safe so don't worry about forgetting it). `render` also returns a bridge function which we can use to coordinate some complex use cases. For example, here's how we'd test that a loader component can recover from an error:
 
 ```tsx
 // MoreLoader.tsx
@@ -588,7 +590,7 @@ Safetest is a combination of a few different technologies glued together intelli
 
 - A test runner (this can be Jest or Vitest, feel free to open a PR for other test runners, it's pretty [easy](src/jest.ts) to [add](src/vitest.ts))
 - A browser automation library (`Playwright` is the default and only one used currently, this will be a bit harder to extend)
-- A UI framework (`React` is the main example used in this Readme, but [vue](src/vue.ts), [svelte](src/svelte.ts), and [angular](src/angular.ts) all work as well, feel free to open a PR for other frameworks)
+- A UI framework (`React` is the main example used in this Readme, but there are adapters for [vue](src/vue.ts), [svelte](src/svelte.ts), and [angular](src/angular.ts) all work as well, feel free to open a PR for other frameworks)
 
 Take a look at the [examples](./examples/) folder to see different combinations of these technologies. Please feel free to open a PR with more examples.
 
@@ -642,7 +644,7 @@ On the browser side of things, when the call to bootstrap is called the followin
   - If there is no test info available Safetest will render the page as normal and the bootstrapping process is done.
 - Safetest will now call the `import` function that was passed to bootstrap with the name of the test file.
 - This will allow Safetest to build that same mapping in the browser.
-- Safetest will now execute the `mapping["app renders the app]` function.
+- Safetest will now execute the `mapping["app renders the app"]` function.
 - Safetest will hit the `render` function. Safetest will now render this component on the page.
 - Safetest will now call the magic exposed function to signal that the page is ready for testing.
 
@@ -652,13 +654,14 @@ On the browser side of things, when the call to bootstrap is called the followin
 
 ---
 
-By existing in both node and the browser we gain some unique abilities. For example we can enable powerful two way communication between the two environments. This allows us to do things like assert that spies on the component side of things were called as expected. It also allows us to do things like pause the execution of the test and inspect the page in the browser. This is done by calling the `pause` function returned from `render`. This will pause the execution of the test and open a browser window with the page loaded. You can now inspect the page and continue to use the `page` object to interact with the page. This is useful for debugging and troubleshooting.
+By running in both node and the browser we gain some unique abilities. For example we can enable powerful two way communication between the two environments. This allows us to do things like assert that spies on the component side of things were called as expected. It also allows us to do things like pause the execution of the test and inspect the page in the browser. This is done by calling the `pause` function returned from `render`. This will pause the execution of the test and open a browser window with the page loaded. You can now inspect the page and continue to use the `page` object to interact with the page. This is useful for debugging and troubleshooting.
 
-We can pass nodejs data to the browser and have the browser pass data back to assert on. For a silly example, we can have nodejs make an api call to some non CORs enabled service, or check for the existence of a file in a directory, have the browser so some processing with that data and then pass it back to nodejs. Here's a silly demonstration of this:
+We can pass nodejs data to the browser and have the browser pass data back to assert on. For a silly example, we can have nodejs make an api call to some non CORs enabled service, or check for the existence of a file in a directory, have the browser so some processing with that data and then pass it back to nodejs. Here's a silly example of just passing some simple data back and forth:
 
 ```tsx
 it('passes data', async () => {
   const { page, bridge } = await render();
+
   const bridged = await bridge(
     { fromNode: !!require('os').platform() },
     (passed) => {
@@ -668,6 +671,7 @@ it('passes data', async () => {
       };
     }
   );
+
   expect(bridged).toEqual({
     fromNode: true,
     fromBrowser: true,
