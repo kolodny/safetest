@@ -55,4 +55,37 @@ describe('Main', () => {
       await expect(page.locator('text=Count is 6')).toBeVisible();
     });
   }
+
+  it('can use the bridge function', async () => {
+    let count = 0;
+    let forceNumber: (num: number) => void = () => {};
+    const Counter = () => {
+      const forceRender = React.useReducer(() => count, 0)[1];
+      forceNumber = (n) => {
+        count = n;
+        forceRender();
+      };
+      return (
+        <div>
+          <button
+            onClick={() => {
+              count++;
+              forceRender();
+            }}
+          >
+            Count is {count}
+          </button>
+        </div>
+      );
+    };
+
+    const { page, bridge } = await render(<Counter />);
+    await expect(page.locator('text=Count is 0')).toBeVisible();
+    await page.click('button');
+    await expect(page.locator('text=Count is 1')).toBeVisible();
+    await bridge(() => forceNumber(50));
+    await expect(page.locator('text=Count is 50')).toBeVisible();
+    await page.click('button');
+    await expect(page.locator('text=Count is 51')).toBeVisible();
+  });
 });

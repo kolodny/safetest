@@ -59,9 +59,14 @@ The following instructions assume you're using `create-react-app`. Look in the e
    ```ts
    import { setup } from 'safetest/setup';
 
+   import vitest from 'vitest';
+
+   vitest.vitest.setConfig({ testTimeout: 30000 });
+
+   // Or jest.setTimeout(30000)
+
    setup({
-     api: { beforeAll, setTimeout: (ms) => jest.setTimeout(ms) },
-     options: { ciOptions: { usingArtifactsDir: 'artifacts' } },
+     ciOptions: { usingArtifactsDir: 'artifacts' },
    });
    ```
 
@@ -83,16 +88,22 @@ The following instructions assume you're using `create-react-app`. Look in the e
    +const container = document.getElementById("app");
    +const element = <App />;
 
-   +const isProd = process.env.NODE_ENV === 'production';
-
    +bootstrap({
    +  container,
    +  element,
    +  render: (e, c) => ReactDOM.render(e, c) as any,
-   +  import: async (s) =>
-   +    // Build time check so we don't bundle our tests in prod. This is optional since it'll only bundle the tests as a lazy webpack module and not part of the main bundle.
-   +    !isProd &&
-   +    import(`${s.replace(/.*src/, '.').replace(/\.safetest$/, '')}.safetest`),
+   +  // Add one of the following depending on your bundler...
+   +
+   +  // Webpack:
+   +  webpackContext: import.meta.webpackContext('.', {
+   +     recursive: true,
+   +     regExp: /\.safetest$/,
+   +     mode: 'lazy'
+   + })
+   +  // Vite:
+   +  // importGlob: import.meta.glob('./**/*.safetest.{j,t}s{,x}'),
+   +  // Other:
+   +  // import: async (s) => import(`${s.replace(/.*src/, '.').replace(/\.safetest$/, '')}.safetest`),
    +});
    ```
 
@@ -127,6 +138,8 @@ The following instructions assume you're using `create-react-app`. Look in the e
    ```
 
 1. ### Running your tests
+
+   # <b>Important: Your app needs to already be running to run the tests. Safetest will not start your app for you!</b>
 
    Now that you've created your first tests, you can run it using the following command:
 
@@ -364,7 +377,117 @@ describe('Records', () => {
 
 This isn't limited to overriding a hook or a service, we can override anything we want. For example we can override the `Date.now()` to get consistent time stamps in our tests. A powerful use case for this is when we have a component that combines 3 graphql calls, we can test what happens if only one of those call fails, etc.
 
-// TODO: Flesh this section out some more since this is really where Safetest can do things that other testing libraries fundamentally can't.
+#### Targeted Injecting in App
+
+Since Safetest is bootstrapped within the application, we can also anything into the application. This ensures that even seemingly complex use cases can be tested.
+Here are some examples of this:
+
+- Our app makes a bunch of GPRC calls and we want to test that if one of them fails the page doesn't crash. This isn't feasible using attempting to override the network calls unless we can understand binary.
+    <details>
+    <summary>Solution</summary>
+
+  ```tsx
+  // Page.tsx
+  const myServiceClient = new MyServiceClient('http://localhost:8080');
+  const useGrpc = (dataType: string) => {
+    const [data, setData] = React.useState(null);
+    const [error, setError] = React.useState(null);
+    const [loading, setLoading] = React.useState(false);
+
+    React.useMemo(() => {
+      setLoading(true);
+      const request = new DataRequest();
+      request.setType(dataType);
+      myServiceClient.getData(request, {}, (err, response) => {
+        setLoading(false);
+        if (err) {
+          setData(null);
+          setError(err);
+        } else {
+          setData(response.toObject());
+          setError(null);
+        }
+      });
+    }, [dataType]);
+
+    return { loading, error, data };
+  };
+
+  export const Page = () => {
+    const settingsPanel = useGrpc('settings');
+    const alertsPanel = useGrpc('alerts');
+    const todosPanel = useGrpc('todos');
+    return (
+      <Grid>
+        <Settings settings={settingsPanel} />
+        <Alerts alerts={alertsPanel} />
+        <Todos todos={todosPanel} />
+      </Grid>
+    );
+  };
+  ```
+
+  ```diff
+  // Updated Page.tsx
+  // ... snip
+  + export const UseGrpc = createOverride(useGrpc);
+
+  export const Page = () => {
+  +  const useGrpc = UseGrpc.useValue();
+    const settingsPanel = useGrpc('settings');
+    const alertsPanel = useGrpc('alerts');
+    const todosPanel = useGrpc('todos');
+    return (
+      <Grid>
+        <Settings settings={settingsPanel} />
+        <Alerts alerts={alertsPanel} />
+        <Todos todos={todosPanel} />
+      </Grid>
+    );
+  };
+  ```
+
+  ```tsx
+  // Page.safetest.tsx
+  describe('Page', () => {
+    it('can handle an error on the Alerts pane', async () => {
+      const UseGrpcOverride = UseGrpc.Override;
+      const { page } = render((app) => (
+        <UseGrpcOverride
+          with={(old) => {
+            return (dataType) => {
+              const oldValue = old(dataType);
+              if (dataType === 'alerts') {
+                return {
+                  ...oldValue,
+                  error: new Error('Test Error'),
+                };
+              }
+              return oldValue;
+            };
+          }}
+        >
+          {app}
+        </UseGrpcOverride>
+      ));
+      await page.locator('.view-panels').click();
+      await expect(page.locator('text=Error loading alerts')).toBeVisible();
+      await expect(
+        page.locator('text=Error loading settings')
+      ).not.toBeVisible();
+      await expect(page.locator('text=Error loading todos')).not.toBeVisible();
+    });
+  });
+  ```
+
+    </details>
+
+- Part of our build process is to regenerate the graphql schema and now we want to test one of those calls failing, overriding the network calls means that anytime the schema changes we'll need to update our tests.
+<!-- TODO demonstration -->
+- There was a regression with debouncing/throttling and not using cached results in an autocomplete and we want to make sure it doesn't break in the future.
+<!-- TODO demonstration -->
+- We want to test that an absolutely positioned element set to the users width preference doesn't cover over a clickable element.
+<!-- TODO demonstration -->
 
 With the tools above we can test pretty much any scenario we can think of. The motto of Safetest is to make any test possible, no matter how complex and involved the test is.
 
@@ -399,14 +522,58 @@ bootstrap({
   container,
   element,
   render: (e, c) => ReactDOM.render(<Provider>{e}</Provider>, c) as any,
-  import: async (s: string) =>
-    // Build time check so we don't bundle our tests in prod where Replicant can't run them.
-    !isProd &&
-    import(`${s.replace(/.*src/, '.').replace(/\.safetest$/, '')}.safetest`),
+  importGlob: import.meta.glob('./**/*.safetest.{j,t}s{,x}'),
 });
 ```
 
 Now you never need to think again about providers and contexts, just use `render` as you normally would.
+
+## Authentication
+
+Most corporate applications require some form of authentication. Safetest provides a simple way to handle authentication in your tests. Ideally you already have a service to generate a cookie for you, but if you don't, you'll need to create one. Here's an example of a service that generates a cookie for you:
+
+```ts
+// auth.ts
+import { Cookie, Page, chromium } from 'playwright';
+
+let cookies: Cookie[];
+
+const getCookies = async () => {
+  const browser = await chromium.launch();
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await page.goto('https://my-app.com/login');
+  await page.fill('input[name="username"]', process.env.USERNAME);
+  await page.fill('input[name="password"]', process.env.PASSWORD);
+  await page.click('button[type="submit"]');
+  await page.waitForNavigation();
+  cookies = await context.cookies();
+  await browser.close();
+};
+
+const addCookies = async (page: Page) => {
+  await page.context().addCookies(cookies);
+};
+```
+
+To use it, you need to add the following code to your `setup-safetest.tsx` file:
+
+```ts
+// setup-safetest.tsx
+import { setup } from 'safetest/setup';
+import vitest from 'vitest';
+
+import { getCookies, addCookies } from './auth';
+
+vitest.vitest.setConfig({ testTimeout: 30000 });
+
+beforeAll(getCookies);
+
+setup({
+  ciOptions: { usingArtifactsDir: 'artifacts' },
+  hooks: { beforeNavigate: [addCookies] },
+});
+```
 
 ## Debugging and Troubleshooting
 
@@ -418,9 +585,9 @@ The `render` also returns a `pause` method that will pause the execution of the 
 
 Safetest is a combination of a few different technologies glued together intelligently to leverage the best parts of each. The essential technologies used are
 
-- A test runner (this can be Jest or Vitest, feel free to open a PR for other test runners)
+- A test runner (this can be Jest or Vitest, feel free to open a PR for other test runners, it's pretty [easy](src/jest.ts) to [add](src/vitest.ts))
 - A browser automation library (`Playwright` is the default and only one used currently, this will be a bit harder to extend)
-- A UI framework (`React` is the main example used in this Readme, but the examples folder has many more app types)
+- A UI framework (`React` is the main example used in this Readme, but [vue](src/vue.ts), [svelte](src/svelte.ts), and [angular](src/angular.ts) all work as well, feel free to open a PR for other frameworks)
 
 Take a look at the [examples](./examples/) folder to see different combinations of these technologies. Please feel free to open a PR with more examples.
 

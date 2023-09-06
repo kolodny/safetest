@@ -1,18 +1,10 @@
 import { setup } from 'safetest/setup';
-import * as vitest from 'vitest';
+import vitest from 'vitest';
+
+vitest.vitest.setConfig({ testTimeout: 30000 });
 
 setup({
-  runner: 'vitest',
-  api: {
-    setTimeout: (ms) => vitest.vitest.setConfig({ testTimeout: ms }),
-    beforeAll: vitest.beforeAll,
-  },
-  options: {
-    defaultTimeout: 3000000,
-    defaultNavigationTimeout: 3000000,
-    timeout: 3000000,
-    ciOptions: {
-      usingArtifactsDir: '../../build/vite-svelte-ts/artifacts',
-    },
+  ciOptions: {
+    usingArtifactsDir: '../../build/vite-svelte-ts/artifacts',
   },
 });

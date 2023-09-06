@@ -1,15 +1,10 @@
 import { setup } from 'safetest/setup';
-import * as vitest from 'vitest';
+import vitest from 'vitest';
+
+vitest.vitest.setConfig({ testTimeout: 30000 });
 
 setup({
-  runner: 'vitest',
-  api: {
-    setTimeout: (ms) => vitest.vitest.setConfig({ testTimeout: ms }),
-    beforeAll: vitest.beforeAll,
-  },
-  options: {
-    ciOptions: {
-      usingArtifactsDir: '../../build/vite-react-ts/artifacts',
-    },
+  ciOptions: {
+    usingArtifactsDir: '../../build/vite-react-ts/artifacts',
   },
 });

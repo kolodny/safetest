@@ -7,20 +7,12 @@ import { getViewUrl, openLocalBrowser, startServer } from './redirect-server';
 import { getTree } from './ps';
 import { safeRequire } from './safe-require';
 
-type BeforeAll = (callback: (...args: any[]) => any, ms?: number) => void;
-type SetTimeout = (ms: number) => void;
-
 type Options = RenderOptions | ((options: RenderOptions) => RenderOptions);
-type Parameters = {
-  runner: 'jest' | 'vitest';
-  api: { beforeAll: BeforeAll; setTimeout: SetTimeout };
-  options?: Options;
-};
 
-export const setup = ({ runner, api, options }: Parameters) => {
+export const setup = (options: Options) => {
   const processes = getTree();
   let argv = process.argv;
-  if (runner === 'vitest') {
+  if (typeof vitest !== 'undefined') {
     let current = processes[process.pid];
     while (current && !current.argv.join(' ').includes('.bin/vitest')) {
       current = processes[current.ppid];
@@ -70,11 +62,9 @@ export const setup = ({ runner, api, options }: Parameters) => {
   }
   useDocker = !!state.options.useDocker;
 
-  api.setTimeout(30000);
-
   if (useDocker) {
     if (localUrl) url.hostname = 'host.docker.internal';
-    api.beforeAll(async () => {
+    beforeAll(async () => {
       const docker = await startDocker();
       await startServer(parsed);
 

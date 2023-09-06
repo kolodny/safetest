@@ -1,10 +1,9 @@
 import { setup } from 'safetest/setup';
 
+jest.setTimeout(30000);
+
 setup({
-    api: { beforeAll, setTimeout: (ms) => jest.setTimeout(ms) },
-    options: {
-        ciOptions: {
-            usingArtifactsDir: '../../build/cra/artifacts'
-        }
+    ciOptions: {
+        usingArtifactsDir: '../../build/cra/artifacts'
     }
 });
