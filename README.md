@@ -59,9 +59,7 @@ The following instructions assume you're using `create-react-app`. Look in the e
    ```ts
    import { setup } from 'safetest/setup';
 
-   import vitest from 'vitest';
-
-   vitest.vitest.setConfig({ testTimeout: 30000 });
+   vitest.setConfig({ testTimeout: 30000 });
 
    // Or jest.setTimeout(30000)
 
@@ -87,27 +85,31 @@ The following instructions assume you're using `create-react-app`. Look in the e
    -);
    +const container = document.getElementById("app");
    +const element = <App />;
-
+   +
    +bootstrap({
    +  container,
    +  element,
    +  render: (e, c) => ReactDOM.render(e, c) as any,
+   +
    +  // Add one of the following depending on your bundler...
    +
    +  // Webpack:
    +  webpackContext: import.meta.webpackContext('.', {
-   +     recursive: true,
-   +     regExp: /\.safetest$/,
-   +     mode: 'lazy'
-   + })
+   +    recursive: true,
+   +    regExp: /\.safetest$/,
+   +    mode: 'lazy'
+   +  })
+   +
    +  // Vite:
    +  // importGlob: import.meta.glob('./**/*.safetest.{j,t}s{,x}'),
+   +
    +  // Other:
    +  // import: async (s) => import(`${s.replace(/.*src/, '.').replace(/\.safetest$/, '')}.safetest`),
+   +
    +});
    ```
 
-   The above magic import makes use of [Webpack Dynamic Imports](https://webpack.js.org/guides/code-splitting/#dynamic-imports) to bundle the `.safetest.tsx` files in your project separately. This allows you to write tests for your application in the same project as your application, without having to worry about setting up a separate test project or about the tests being loaded when loading your application in a non test context. The `isProd` check is only really needed if you don't want to leak your tests into production, but it's not strictly necessary.
+   The above magic import makes use of [Webpack Context](https://webpack.js.org/api/module-variables/#importmetawebpackcontext) Or [Vite Glob import](https://vitejs.dev/guide/features.html#glob-import) (or [whatever flavor dynamic import is available](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import)), to bundle the `.safetest.tsx` files in your project separately. This allows you to write tests for your application in the same project as your application, without having to worry about setting up a separate test project or about the tests being loaded when loading your application in a non test context. The `isProd` check is only really needed if you don't want to leak your tests into production, but it's not strictly necessary.
 
 1. ### Creating your first tests
 
@@ -561,11 +563,10 @@ To use it, you need to add the following code to your `setup-safetest.tsx` file:
 ```ts
 // setup-safetest.tsx
 import { setup } from 'safetest/setup';
-import vitest from 'vitest';
 
 import { getCookies, addCookies } from './auth';
 
-vitest.vitest.setConfig({ testTimeout: 30000 });
+vitest.setConfig({ testTimeout: 30000 });
 
 beforeAll(getCookies);
 
