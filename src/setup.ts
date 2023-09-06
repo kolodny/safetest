@@ -18,7 +18,6 @@ type Parameters = {
 };
 
 export const setup = ({ runner, api, options }: Parameters) => {
-  debugger;
   const processes = getTree();
   let argv = process.argv;
   if (runner === 'vitest') {

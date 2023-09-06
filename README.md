@@ -310,7 +310,7 @@ We can now override the `useGetRecordsQuery` hook to simulate an error:
 
 ```diff
  // Records.tsx
-+ const useGetRecordsQuery = createOverride(useGetRecordsQuery)
++ const UseGetRecordsQuery = createOverride(useGetRecordsQuery)
 
  export const Records = () => {
 +  const useGetRecordQuery = UseGetRecordsQuery.useValue()
