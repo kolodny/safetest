@@ -1,7 +1,7 @@
 {
   "name": "safetest",
-  "version": "0.0.0",
-  "description": "",
+  "version": "0.0.0-alpha",
+  "description": "Safetest is a powerful UI testing library that combines Playwright, Jest, and React for a powerful end-to-end testing solution for applications and component testing. With Safetest, you can easily test the functionality and appearance of your application, ensuring that it works as expected and looks great on all devices.",
   "main": "lib/index.js",
   "exports": {
     ".": "./lib/index.js",
@@ -22,7 +22,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Moshe Kolodny",
   "license": "MIT",
   "devDependencies": {
     "@angular/core": "^16.2.2",
@@ -50,5 +50,13 @@
     "react-override": "^0.0.11",
     "setimmediate": "^1.0.5",
     "ws": "^8.13.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kolodny/safetest.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kolodny/safetest/issues"
+  },
+  "homepage": "https://github.com/kolodny/safetest#readme"
 }
