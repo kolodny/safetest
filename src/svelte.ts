@@ -39,7 +39,6 @@ export async function render(
 type BootstrapOptions = ConstructorParameters<typeof SvelteComponent>[0];
 
 type BootstrapArgs = Importer & {
-  import: (s: string) => Promise<any>;
   element: typeof SvelteComponent;
   options: BootstrapOptions;
 };
@@ -54,7 +53,7 @@ export const bootstrap = async (
   };
 
   return bootstrapCommon({
-    import: args.import,
+    ...args,
     defaultRender: () => new args.element(args.options),
   });
 };
