@@ -1,6 +1,7 @@
 import { render as renderCommon, RenderOptions } from './render';
 import { bootstrap as bootstrapCommon, Importer } from './bootstrap';
 import { state } from './state';
+import { isInNode } from './is-in-node';
 
 export * from 'react-override';
 
@@ -9,7 +10,7 @@ export async function render(
     .browserState?.renderElement.value,
   options: RenderOptions = {}
 ) {
-  if (typeof elementToRender === 'function') {
+  if (!isInNode && typeof elementToRender === 'function') {
     const rendered = elementToRender(
       state.browserState?.renderElement.value ?? ({} as any)
     );
@@ -34,7 +35,6 @@ type BootstrapArgs = Importer & {
 };
 
 export const bootstrap = async (args: BootstrapArgs): Promise<void> => {
-  let searchParams: URLSearchParams | undefined;
   state.browserState = {
     retryAttempt: 0,
     renderElement: { __type: 'renderElement', value: args.element },

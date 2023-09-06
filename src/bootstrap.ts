@@ -2,8 +2,6 @@ import _ from 'lodash';
 import { SAFETEST_INTERFACE } from './render';
 import { state } from './state';
 
-// import webpack from 'webpack';
-
 export type Importer =
   | {
       webpackContext: {
@@ -62,7 +60,9 @@ export const bootstrap = async (args: BootstrapArgs): Promise<any> => {
     await importer(testPath);
     const tests = Object.keys(state.tests).map((test) => {
       const url = new URL(location.href);
-      url.searchParams.set('test_name', test);
+      const append = url.search.includes('?') ? '&' : '?';
+      url.search = `${url.search}${append}test_name=${test}`;
+      url.hash = '';
       return url.href;
     });
     if (tests.length) {

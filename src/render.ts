@@ -169,7 +169,8 @@ export async function render(
 
     const testPath = filename
       .replace(pathToUse, '')
-      .replace(/^\//, '')
+      .replace(/^\/src/, '')
+      .replace(/^\//, './')
       .replace(/\.[jt]sx?$/g, '');
 
     const switchingHeadlessness =
