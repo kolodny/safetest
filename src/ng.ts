@@ -129,8 +129,8 @@ export const makeSafetestBed = (
 let lastRendered: TestBed.ComponentFixture<unknown> | undefined = undefined;
 
 type BootstrapArgs = Importer & {
-  platformBrowserDynamic: typeof platformBrowserDynamic;
   Module: Type<any>;
+  platformBrowserDynamic: typeof platformBrowserDynamic;
 };
 
 export const bootstrap = async (args: BootstrapArgs) => {
