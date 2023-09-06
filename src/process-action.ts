@@ -118,6 +118,12 @@ const flattenResults = results.testResults.flatMap((result) =>
   }))
 );
 
+const cleanedFilename = (filename: string) =>
+  filename
+    .replace(/\.(m?[tj]sx?)$/, '')
+    .replace(/^\/?src/, '')
+    .replace(/^\//, './');
+
 const failedTests = flattenResults.filter((r) => r.status === 'failed');
 if (failedTests.length) {
   if (commentParts.length) commentParts.push('---');
@@ -169,10 +175,7 @@ if (failedTests.length) {
     debugUrl.searchParams.set('test_name', failedTest.fullName);
     debugUrl.searchParams.set(
       'test_path',
-      failedTest.filename
-        .replace(/\.(m?[tj]sx?)$/, '')
-        .replace(/^\/?src/, '')
-        .replace(/^\//, './')
+      cleanedFilename(failedTest.filename)
     );
     const debugUrlEncoded = debugUrl.toString().replace(/%2F/g, '/');
     commentParts.push(
@@ -183,9 +186,7 @@ if (failedTests.length) {
 
 const tests: Record<string, any> = {};
 for (const result of results.testResults) {
-  const filename = path
-    .relative(process.cwd(), result.name)
-    .replace(/\.[jt]sx?$/g, '');
+  const filename = cleanedFilename(path.relative(process.cwd(), result.name));
   for (const assertionResult of result.assertionResults) {
     let map: Record<string, any> = (tests[filename] ??= {});
     for (const ancestorTitles of assertionResult.ancestorTitles) {
@@ -261,10 +262,7 @@ function collect() {
 
         const debugUrl = new URL(url);
         debugUrl.searchParams.set('test_name', fullName);
-        debugUrl.searchParams.set(
-          'test_path',
-          filename.replace(/\.([tj]sx?)$/, '')
-        );
+        debugUrl.searchParams.set('test_path', cleanedFilename(filename));
         const debugUrlEncoded = debugUrl.toString().replace(/%2F/g, '/');
         summary += `<a href="${debugUrlEncoded}">[Open initial component state]</a>`;
         summary += '</li>';
