@@ -2,12 +2,8 @@ import type { SvelteComponent } from 'svelte';
 import { Page } from 'playwright';
 
 import { state } from './state';
-import {
-  RenderOptions,
-  SAFETEST_INTERFACE,
-  render as renderCommon,
-} from './render';
-import { bootstrap as bootstrapCommon } from './bootstrap';
+import { RenderOptions, render as renderCommon } from './render';
+import { Importer, bootstrap as bootstrapCommon } from './bootstrap';
 
 interface RenderReturn {
   /** The Playwright page object of the rendered component. */
@@ -42,11 +38,11 @@ export async function render(
 
 type BootstrapOptions = ConstructorParameters<typeof SvelteComponent>[0];
 
-interface BootstrapArgs {
+type BootstrapArgs = Importer & {
   import: (s: string) => Promise<any>;
   element: typeof SvelteComponent;
   options: BootstrapOptions;
-}
+};
 
 export const bootstrap = async (
   args: BootstrapArgs

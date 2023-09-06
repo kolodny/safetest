@@ -6,7 +6,7 @@ import type { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { state } from './state';
 import { RenderOptions, render as renderCommon } from './render';
-import { bootstrap as bootstrapCommon } from './bootstrap';
+import { Importer, bootstrap as bootstrapCommon } from './bootstrap';
 import { isInNode } from './is-in-node';
 
 type Ng = typeof import('@angular/core');
@@ -128,11 +128,10 @@ export const makeSafetestBed = (
 };
 let lastRendered: TestBed.ComponentFixture<unknown> | undefined = undefined;
 
-interface BootstrapArgs {
-  import: (s: string) => Promise<any>;
+type BootstrapArgs = Importer & {
   platformBrowserDynamic: typeof platformBrowserDynamic;
   Module: Type<any>;
-}
+};
 
 export const bootstrap = async (args: BootstrapArgs) => {
   state.browserState = {
@@ -142,7 +141,7 @@ export const bootstrap = async (args: BootstrapArgs) => {
   };
 
   return bootstrapCommon({
-    import: args.import,
+    ...args,
     defaultRender: () =>
       args
         .platformBrowserDynamic()

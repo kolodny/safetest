@@ -1,5 +1,5 @@
 import { render as renderCommon, RenderOptions } from './render';
-import { bootstrap as bootstrapCommon } from './bootstrap';
+import { bootstrap as bootstrapCommon, Importer } from './bootstrap';
 import { state } from './state';
 
 export * from 'react-override';
@@ -27,12 +27,11 @@ export async function render(
   );
 }
 
-interface BootstrapArgs {
-  import: (s: string) => Promise<any>;
+type BootstrapArgs = Importer & {
   element: JSX.Element;
   container: HTMLElement | null;
   render: (e: JSX.Element, c: HTMLElement) => { unmount: () => void };
-}
+};
 
 export const bootstrap = async (args: BootstrapArgs): Promise<void> => {
   let searchParams: URLSearchParams | undefined;
@@ -44,7 +43,7 @@ export const bootstrap = async (args: BootstrapArgs): Promise<void> => {
   };
 
   return bootstrapCommon({
-    import: args.import,
+    ...args,
     defaultRender: () =>
       state.browserState?.renderFn!(args.element, args.container!),
   });

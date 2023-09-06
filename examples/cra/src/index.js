@@ -40,7 +40,11 @@ bootstrap({
         root.render(e);
         return root;
     },
-    import: async (s) => import(`${s.replace(/.*src/, '.').replace(/\.safetest$/, '')}.safetest`)
+    webpackContext: import.meta.webpackContext('.', {
+        recursive: true,
+        regExp: /\.safetest$/,
+        mode: 'lazy'
+    })
 });
 
 // If you want your app to work offline and load faster, you can change

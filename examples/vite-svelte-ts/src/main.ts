@@ -7,10 +7,7 @@ const app = bootstrap({
   options: {
     target: document.getElementById('app')!,
   },
-  import: async (moduleName) =>
-    Object.entries(import.meta.glob('./**/*.safetest.[t,j]s{,x}')).find(
-      ([key]) => key.startsWith(moduleName.replace(/.*src/, '.'))
-    )?.[1](),
+  importGlob: import.meta.glob('./**/*.safetest.{j,t}s{,x}'),
 });
 
 export default app;

@@ -10,8 +10,5 @@ import App from './App.vue';
 bootstrap({
   element: App,
   container: '#app',
-  import: async (moduleName) =>
-    Object.entries(import.meta.glob('./**/*.safetest.[t,j]s{,x}')).find(
-      ([key]) => key.startsWith(moduleName.replace(/.*src/, '.'))
-    )![1](),
+  importGlob: import.meta.glob('./**/*.safetest.{j,t}s{,x}'),
 });

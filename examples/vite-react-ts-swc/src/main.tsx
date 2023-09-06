@@ -11,10 +11,7 @@ bootstrap({
       <App />
     </React.StrictMode>
   ),
-  import: async (moduleName: string) =>
-    // Note we're forced to use .test.tsx since vitest won't work with .safetest.tsx files
-    await Object.entries(import.meta.glob('./**/*.safetest.{j,t}s{,x}')).find(
-      ([key]) => key.startsWith(moduleName.replace(/.*src/, '.'))
-    )?.[1](),
+  importGlob: import.meta.glob('./**/*.safetest.{j,t}s{,x}'),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   render: (e, c) => ReactDOM.createRoot(c).render(e) as any,
 });

@@ -2,7 +2,7 @@ import { createApp } from 'vue';
 
 import { state } from './state';
 import { RenderOptions, render as renderCommon } from './render';
-import { bootstrap as bootstrapCommon } from './bootstrap';
+import { Importer, bootstrap as bootstrapCommon } from './bootstrap';
 import type { App, Component } from '@vue/runtime-core';
 
 interface VueRenderOptions extends RenderOptions {
@@ -42,11 +42,10 @@ export async function render(
 
 type BootstrapElement<Element> = Parameters<CreateAppFunction<Element>>[0];
 
-interface BootstrapArgs<Element> {
-  import: (s: string) => Promise<any>;
+type BootstrapArgs<Element> = Importer & {
   element: BootstrapElement<Element>;
   container: Element | string;
-}
+};
 
 export const bootstrap = async <Element>(
   args: BootstrapArgs<Element>
@@ -58,7 +57,7 @@ export const bootstrap = async <Element>(
   };
 
   return bootstrapCommon({
-    import: args.import,
+    ...args,
     defaultRender: () =>
       createApp(args.element as any).mount(args.container as any),
   });
