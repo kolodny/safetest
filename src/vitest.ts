@@ -9,6 +9,7 @@ import { browserMock } from './browser-mock';
 
 import type * as VitestType from 'vitest';
 import { makeExpect } from './expect';
+import { global } from './global';
 
 const ensureImported = <T>(
   globalProp: string,
