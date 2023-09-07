@@ -10,9 +10,9 @@ import { safeRequire } from './safe-require';
 type Options = RenderOptions | ((options: RenderOptions) => RenderOptions);
 
 export const setup = (options: Options) => {
-  const processes = getTree();
   let argv = process.argv;
   if (typeof vitest !== 'undefined') {
+    const processes = getTree();
     let current = processes[process.pid];
     while (current && !current.argv.join(' ').includes('.bin/vitest')) {
       current = processes[current.ppid];
