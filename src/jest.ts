@@ -10,11 +10,8 @@ import { safeRequire } from './safe-require';
 
 import { configureSnapshot } from './configure-snapshot';
 import { makeExpect } from './expect';
-import type { Mock as JestMock } from 'jest-mock';
-
-global.global = global;
-const jestMock: typeof import('jest-mock') = require('jest-mock');
-const { spyOn, fn } = jestMock;
+import { type Mock as JestMock, spyOn, fn } from './jest-mock';
+import { browserMock } from './browser-mock';
 
 type Mock<R, A extends any[]> = JestMock<(...args: A) => R>;
 
@@ -238,40 +235,6 @@ const browserSpy = <Args extends unknown[], Return>(
 
   return facade;
 };
-
-type FunctionPropertyNames<T> = {
-  [K in keyof T]: T[K] extends Function ? K : never;
-}[keyof T];
-function spyOnWrapped<T, K extends FunctionPropertyNames<T>>(
-  obj: T,
-  method: K
-): T[K] extends Fn<infer Args, infer Return>
-  ? BrowserSpy<Return, Args>
-  : BrowserSpy<any[], any>;
-function spyOnWrapped<T>(
-  obj: T,
-  method: keyof T,
-  accessType: 'get' | 'set'
-): BrowserSpy<any[], any>;
-function spyOnWrapped(obj: any, method: any, accessType?: 'get' | 'set') {
-  let spy: Mock<any[], any>;
-  let original = undefined;
-  if (isInNode) {
-    spy = fn();
-  } else {
-    original = obj[method];
-    spy = accessType
-      ? (spyOn(obj, method, accessType as any) as any)
-      : spyOn(obj, method);
-  }
-  return browserSpy(spy, original);
-}
-
-const fnWrapped = function (impl?: (...args: any) => any) {
-  const spy = fn(impl);
-  return browserSpy(spy, impl);
-};
-const browserMock = { spyOn: spyOnWrapped, fn: fnWrapped };
 
 export {
   exportedDescribe as describe,

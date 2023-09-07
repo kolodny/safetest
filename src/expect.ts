@@ -1,5 +1,5 @@
 import { Matchers } from './playwright-types';
-import type { BrowserSpy } from './jest';
+import type { BrowserSpy } from './browser-mock';
 import { isInNode } from './is-in-node';
 import { anythingProxy } from './anythingProxy';
 

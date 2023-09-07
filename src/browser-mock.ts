@@ -1,14 +1,7 @@
-import 'setimmediate';
-
 import { state } from './state';
 import { isInNode } from './is-in-node';
-import { global } from './global';
 
-import type { Mock as JestMock } from 'jest-mock';
-
-global.global = global;
-const jestMock: typeof import('jest-mock') = require('jest-mock');
-const { spyOn, fn } = jestMock;
+import { type Mock as JestMock, spyOn, fn } from './jest-mock';
 
 type Mock<R, A extends any[]> = JestMock<(...args: A) => R>;
 
