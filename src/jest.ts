@@ -10,7 +10,7 @@ import { safeRequire } from './safe-require';
 
 import { configureSnapshot } from './configure-snapshot';
 import { makeExpect } from './expect';
-import { type Mock as JestMock, spyOn, fn } from './jest-mock';
+import { type Mock as JestMock } from './jest-mock';
 import { browserMock } from './browser-mock';
 
 type Mock<R, A extends any[]> = JestMock<(...args: A) => R>;
@@ -168,73 +168,6 @@ export const spied = <T extends Fn<unknown[], unknown>>(
   fn: T
 ): (T extends Fn<infer Args, infer Return> ? BrowserSpy<Return, Args> : never) &
   T => fn as any;
-
-const browserSpy = <Args extends unknown[], Return>(
-  spy: Mock<Return, Args>,
-  original?: (...args: any[]) => any
-): BrowserSpy<Return, Args> => {
-  const facade = function (this: any) {
-    return spy.apply(this, arguments);
-  } as BrowserSpy<Return, Args>;
-  const makeOverride = (once: boolean) => {
-    const property = once ? 'overrideOnce' : 'override';
-    const mockMethod = once ? 'mockImplementationOnce' : 'mockImplementation';
-    (spy as any)[property] = (callback: Function) => {
-      spy[mockMethod]((...args: any[]) => {
-        let originalCalled = false;
-        let returned: any;
-        const wrapped = (...args: any[]) => {
-          if (originalCalled) {
-            throw new Error('Original function called multiple times');
-          } else {
-            originalCalled = true;
-            returned = original?.(...args);
-            return returned;
-          }
-        };
-        const passed = {
-          args,
-          get returned() {
-            if (originalCalled) return returned;
-            return wrapped(...args);
-          },
-          original,
-        };
-
-        const returns = callback(passed);
-        if (!originalCalled) {
-          wrapped(...args);
-        }
-        return returns;
-      });
-      return spy;
-    };
-  };
-  if (original || isInNode) {
-    makeOverride(false);
-    makeOverride(true);
-    const mockRestore = spy.mockRestore.bind(spy);
-    spy.mockRestore = () => {
-      mockRestore();
-      if (original) spy.mockImplementation(original);
-    };
-  }
-  for (const key of Object.keys(spy)) {
-    if (isInNode && typeof (spy as any)[key] === 'function') {
-      (facade as any)[key] = () => spy;
-    } else {
-      (facade as any)[key] = (spy as any)[key];
-    }
-  }
-  facade.then = async (resolve: any) => {
-    const mock = await state.bridge?.(() => spy.mock);
-    if (isInNode) spy.mock = mock;
-    return resolve(spy);
-  };
-  (facade as any).__isBrowserSpy = true;
-
-  return facade;
-};
 
 export {
   exportedDescribe as describe,
