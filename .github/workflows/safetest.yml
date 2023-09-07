@@ -46,7 +46,4 @@ jobs:
         run: node test.js
       - name: Deploy test artifacts to Vercel
         run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta UUID=${{ env.VERCEL_UUID }}
-      - run: echo debug $(node -p 'process.argv.find(a => a.startsWith("http"))' $(npx vercel list --token=${{ secrets.VERCEL_TOKEN }} --meta UUID=${{ env.VERCEL_UUID }} 2>&1))
-      - name: Deploy test artifacts to Vercel again
-        run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta UUID=${{ env.VERCEL_UUID }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
