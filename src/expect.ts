@@ -2,8 +2,11 @@ import { Matchers } from './playwright-types';
 import type { BrowserSpy } from './browser-mock';
 import { isInNode } from './is-in-node';
 import { anythingProxy } from './anythingProxy';
+import * as matchers from './matchers';
 
 export const makeExpect = <T>(expect: T) => {
+  (expect as any).extend(matchers);
+
   const expectMatchers = [
     'anything',
     'any',

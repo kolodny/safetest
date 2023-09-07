@@ -31,15 +31,6 @@ const ensureImported = <T>(
   return original;
 };
 
-if (isInNode)
-  try {
-    const pkg = safeRequire.resolve('@playwright/test/package.json');
-    const path = safeRequire('path');
-    const parent = path.dirname(pkg);
-    const matchers = safeRequire(`${parent}/lib/matchers/matchers`);
-    (global as any).expect.extend(matchers);
-  } catch {}
-
 const describe = ensureImported<jest.Describe>('describe', 'describe', true);
 const it = ensureImported<jest.It>('it', 'test/it', true);
 const expect = ensureImported<jest.Expect>('expect', 'expect', true);

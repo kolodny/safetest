@@ -13,6 +13,13 @@ describe('Main', () => {
     expect(page).toBeTruthy();
   });
 
+  it('Does not break regular expects', async () => {
+    const { page } = await render();
+    expect(page).toBeTruthy();
+    expect(1).toEqual(1);
+    expect(1).toBe(1);
+  });
+
   it('can do many interactions fast', async () => {
     const Counter = () => {
       const [count, setCount] = React.useState(0);

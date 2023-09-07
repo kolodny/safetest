@@ -2,7 +2,6 @@ import { anythingProxy } from './anythingProxy';
 import { createBlockFn } from './blocks';
 import { configureSnapshot } from './configure-snapshot';
 import { isInNode } from './is-in-node';
-import { safeRequire } from './safe-require';
 import { state } from './state';
 import { afterAllFn, afterEachFn } from './teardown';
 import { browserMock } from './browser-mock';
@@ -39,15 +38,6 @@ const afterEach = ensureImported<V['afterEach']>('afterEach', 'afterEach');
 const afterAll = ensureImported<V['afterAll']>('afterAll', 'afterAll');
 
 const exportedExpect = makeExpect(expect);
-
-if (isInNode)
-  try {
-    const pkg = safeRequire.resolve('@playwright/test/package.json');
-    const path = safeRequire('path');
-    const parent = path.dirname(pkg);
-    const matchers = safeRequire(`${parent}/lib/matchers/matchers`);
-    expect.extend(matchers);
-  } catch {}
 
 if (isInNode) {
   if (!require.main?.filename) {
