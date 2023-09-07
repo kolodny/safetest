@@ -45,5 +45,5 @@ jobs:
       - name: 'Run Safetest tests'
         run: node test.js
       - name: Deploy test artifacts to Vercel
-        run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta UUID=${{ env.VERCEL_UUID }}
+        run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --meta UUID=${{ env.VERCEL_UUID }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
