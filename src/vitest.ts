@@ -1,4 +1,3 @@
-import { anythingProxy } from './anythingProxy';
 import { createBlockFn } from './blocks';
 import { configureSnapshot } from './configure-snapshot';
 import { isInNode } from './is-in-node';
@@ -8,23 +7,7 @@ import { browserMock } from './browser-mock';
 
 import type * as VitestType from 'vitest';
 import { makeExpect } from './expect';
-import { global } from './global';
-
-const ensureImported = <T>(
-  globalProp: string,
-  name: string,
-  throwing?: boolean
-): T => {
-  const g = global as any;
-  const original = g[globalProp] ?? anythingProxy;
-  g[globalProp] = () => {
-    if (throwing)
-      throw new Error(`'${name}' must be imported from safetest/vitest`);
-    return original;
-  };
-
-  return original;
-};
+import { ensureImported } from './ensure-imported';
 
 type Vitest = typeof VitestType;
 type V = Vitest;

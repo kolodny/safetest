@@ -4,32 +4,14 @@ import { createBlockFn } from './blocks';
 import { state } from './state';
 import { isInNode } from './is-in-node';
 import { afterAllFn, afterEachFn } from './teardown';
-import { global } from './global';
-import { anythingProxy } from './anythingProxy';
-import { safeRequire } from './safe-require';
 
 import { configureSnapshot } from './configure-snapshot';
 import { makeExpect } from './expect';
 import { type Mock as JestMock } from './jest-mock';
 import { browserMock } from './browser-mock';
+import { ensureImported } from './ensure-imported';
 
 type Mock<R, A extends any[]> = JestMock<(...args: A) => R>;
-
-const ensureImported = <T>(
-  globalProp: string,
-  name: string,
-  throwing?: boolean
-): T => {
-  const g = global as any;
-  const original = g[globalProp] ?? anythingProxy;
-  g[globalProp] = () => {
-    if (throwing)
-      throw new Error(`'${name}' must be imported from safetest/jest`);
-    return original;
-  };
-
-  return original;
-};
 
 const describe = ensureImported<jest.Describe>('describe', 'describe', true);
 const it = ensureImported<jest.It>('it', 'test/it', true);
