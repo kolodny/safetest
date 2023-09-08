@@ -1,6 +1,6 @@
 {
   "name": "safetest",
-  "version": "0.0.0-alpha-4",
+  "version": "0.0.0-alpha-8",
   "description": "Safetest is a powerful UI testing library that combines Playwright, Jest, and React for a powerful end-to-end testing solution for applications and component testing. With Safetest, you can easily test the functionality and appearance of your application, ensuring that it works as expected and looks great on all devices.",
   "main": "lib/index.js",
   "exports": {
@@ -28,6 +28,10 @@
     "@angular/core": "^16.2.2",
     "@angular/platform-browser": "^16.2.2",
     "@angular/platform-browser-dynamic": "^16.2.2",
+    "@types/lodash": "^4.14.194",
+    "@types/node": "^20.2.1",
+    "@types/react": "^18.2.6",
+    "@types/ws": "^8.5.4",
     "react": "^18.2.0",
     "react-scripts": "^5.0.1",
     "svelte": "^4.2.0",
@@ -39,10 +43,6 @@
   "dependencies": {
     "@playwright/test": "^1.34.0",
     "@types/jest-image-snapshot": "^6.1.0",
-    "@types/lodash": "^4.14.194",
-    "@types/node": "^20.2.1",
-    "@types/react": "^18.2.6",
-    "@types/ws": "^8.5.4",
     "deepmerge": "^4.3.1",
     "jest-image-snapshot": "^6.1.0",
     "lodash": "^4.17.21",
