@@ -91,7 +91,7 @@ The following instructions assume you're using `create-react-app`. Look in the e
    +bootstrap({
    +  container,
    +  element,
-   +  render: (e, c) => ReactDOM.render(e, c) as any,
+   +  render: (e, c) => ReactDOM.render(e, c),
    +
    +  // Add one of the following depending on your bundler...
    +
@@ -525,7 +525,7 @@ import { Provider } from './Provider';
 bootstrap({
   container,
   element,
-  render: (e, c) => ReactDOM.render(<Provider>{e}</Provider>, c) as any,
+  render: (e, c) => ReactDOM.render(<Provider>{e}</Provider>, c),
   importGlob: import.meta.glob('./**/*.safetest.{j,t}s{,x}'),
 });
 ```

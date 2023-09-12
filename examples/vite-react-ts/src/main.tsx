@@ -16,5 +16,5 @@ bootstrap({
   ),
   importGlob: import.meta.glob('./**/*.safetest.{j,t}s{,x}'),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  render: (e, c) => ReactDOM.createRoot(c).render(e) as any,
+  render: (e, c) => ReactDOM.createRoot(c).render(e),
 });

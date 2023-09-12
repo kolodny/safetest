@@ -31,7 +31,7 @@ export async function render(
 type BootstrapArgs = Importer & {
   element: JSX.Element;
   container: HTMLElement | null;
-  render: (e: JSX.Element, c: HTMLElement) => { unmount: () => void };
+  render: (e: JSX.Element, c: HTMLElement) => void;
 };
 
 export const bootstrap = async (args: BootstrapArgs): Promise<void> => {

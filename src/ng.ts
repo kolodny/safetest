@@ -60,15 +60,6 @@ export const makeSafetestBed = (
       DynamicTesting.platformBrowserDynamicTesting()
     );
   });
-  const ngProxy: Ng = new Proxy(
-    {},
-    {
-      get: (_target, prop) => {
-        if (!actualNg) throw new Error('ng can only be used within a test');
-        return (actualNg as any)[prop as any];
-      },
-    }
-  ) as any;
 
   let renderMeta: undefined | TestModuleMetadata = undefined;
   afterEach(() => (renderMeta = undefined));
