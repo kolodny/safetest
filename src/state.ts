@@ -51,7 +51,7 @@ export interface State {
   };
 }
 
-const cachedExpect = expect;
+const cachedExpect = typeof expect !== 'undefined' ? expect : undefined;
 
 export const state: State = {
   tests: {},
@@ -66,5 +66,5 @@ export const state: State = {
   afterAllsDone: [],
   isCi: false,
   bootstrappedAt: '',
-  getState: () => cachedExpect.getState(),
+  getState: () => cachedExpect?.getState()!,
 };
