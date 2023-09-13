@@ -149,10 +149,7 @@ export async function render(
     const inspector = safeRequire('inspector');
     const path = safeRequire('path');
 
-    const filename =
-      require.main?.filename ||
-      state.vitestGlobals?.expect.getState().testPath ||
-      '';
+    const filename = state.getState().testPath ?? '';
 
     const videoDir = options.recordVideo?.dir ?? options.videosPath;
     const testName = state.activeTest;

@@ -22,12 +22,6 @@ const afterAll = ensureImported<V['afterAll']>('afterAll', 'afterAll');
 
 const exportedExpect = makeExpect(expect);
 
-if (isInNode) {
-  if (!require.main?.filename) {
-    require.main = { ...require.main!, filename: __filename };
-  }
-}
-
 const globalSetup = () => {
   state.isGlobalSetupTeardownRegistered = true;
   afterEach(afterEachFn);
@@ -83,16 +77,6 @@ exportedIt.debug = ((...args: Parameters<Vitest['it']>) => {
   const testKey = (makeIt(it.only) as any)(...args);
   state.debugging.add(testKey);
 }) as any;
-
-if (isInNode) {
-  state.vitestGlobals = {
-    beforeEach,
-    beforeAll,
-    afterEach,
-    afterAll,
-    expect,
-  };
-}
 
 export {
   exportedDescribe as describe,

@@ -22,7 +22,6 @@ export interface State {
   bridge?: Function;
   pause?: Function;
   pauseAtEveryStep?: boolean;
-  vitestGlobals?: any;
   /**
    * Tests run way faster if we keep the window alive. Note: Only do this when not
    * in video mode else the video memory wreaks havoc.
@@ -37,6 +36,7 @@ export interface State {
   afterAllsDone: Array<() => Promise<void>>;
   isCi: boolean;
   bootstrappedAt: string;
+  getState: () => ReturnType<typeof expect.getState>;
   /**
    * When a test is being run we need to track which element to render, this is only useful for
    * the browser side of things
@@ -64,4 +64,5 @@ export const state: State = {
   afterAllsDone: [],
   isCi: false,
   bootstrappedAt: '',
+  getState: expect.getState.bind(expect),
 };
