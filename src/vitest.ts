@@ -10,15 +10,14 @@ import { makeExpect } from './expect';
 import { ensureImported } from './ensure-imported';
 
 type Vitest = typeof VitestType;
-type V = Vitest;
 
-const describe = ensureImported<V['describe']>('describe', 'describe', true);
-const it = ensureImported<V['it']>('it', 'test/it', true);
-const expect = ensureImported<V['expect']>('expect', 'expect', true);
-const beforeEach = ensureImported<V['beforeEach']>('beforeEach', 'beforeEach');
-const beforeAll = ensureImported<V['beforeAll']>('beforeAll', 'beforeAll');
-const afterEach = ensureImported<V['afterEach']>('afterEach', 'afterEach');
-const afterAll = ensureImported<V['afterAll']>('afterAll', 'afterAll');
+ensureImported('describe', 'describe');
+ensureImported('it', 'test/it');
+ensureImported('expect', 'expect');
+ensureImported('beforeEach', 'beforeEach');
+ensureImported('beforeAll', 'beforeAll');
+ensureImported('afterEach', 'afterEach');
+ensureImported('afterAll', 'afterAll');
 
 const exportedExpect = makeExpect(expect);
 
@@ -26,10 +25,10 @@ const globalSetup = () => {
   state.isGlobalSetupTeardownRegistered = true;
   afterEach(afterEachFn);
   afterAll(afterAllFn);
-  configureSnapshot(expect as any);
+  configureSnapshot(expect);
 };
 
-const makeDescribe =
+const makeDescribe: (actualThing: Function) => any =
   (actualThing: Function) =>
   (name: string, fn: () => void, ...extraArgs: any[]) =>
     createBlockFn(
@@ -45,8 +44,7 @@ const makeDescribe =
       true
     );
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-const makeIt =
+const makeIt: (actualThing: Function) => any =
   (actualThing: Function) =>
   (name: string, fn: () => void, ...extraArgs: any[]) =>
     createBlockFn(
@@ -62,19 +60,19 @@ const makeIt =
       false
     );
 
-const exportedDescribe: Vitest['describe'] = makeDescribe(describe) as any;
-exportedDescribe.only = makeDescribe(describe.only) as any;
-exportedDescribe.skip = makeDescribe(describe.skip) as any;
-exportedDescribe.todo = makeDescribe(describe.todo) as any;
+const exportedDescribe: Vitest['describe'] = makeDescribe(describe);
+exportedDescribe.only = makeDescribe(describe.only);
+exportedDescribe.skip = makeDescribe(describe.skip);
+exportedDescribe.todo = makeDescribe((describe as any)?.todo);
 
-const exportedIt: Vitest['it'] & { debug: Vitest['it'] } = makeIt(it) as any;
-exportedIt.only = makeIt(it.only) as any;
-exportedIt.skip = makeIt(it.skip) as any;
+const exportedIt: Vitest['it'] & { debug: Vitest['it'] } = makeIt(it);
+exportedIt.only = makeIt(it.only);
+exportedIt.skip = makeIt(it.skip);
 exportedIt.todo = ((name: string) =>
   createBlockFn(name, undefined as any, [], it.todo, false)) as any;
 
 exportedIt.debug = ((...args: Parameters<Vitest['it']>) => {
-  const testKey = (makeIt(it.only) as any)(...args);
+  const testKey = makeIt(it.only)(...args);
   state.debugging.add(testKey);
 }) as any;
 
@@ -82,10 +80,6 @@ export {
   exportedDescribe as describe,
   exportedIt as it,
   exportedIt as test,
-  afterEach,
-  afterAll,
-  beforeEach,
-  beforeAll,
   exportedExpect as expect,
   browserMock,
 };

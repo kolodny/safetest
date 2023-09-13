@@ -5,19 +5,9 @@ import { anythingProxy } from './anythingProxy';
 import * as matchers from './matchers';
 
 export const makeExpect = <T>(expect: T) => {
-  (expect as any).extend(matchers);
+  const anyExpect = expect as any;
+  anyExpect.extend(matchers);
 
-  const expectMatchers = [
-    'anything',
-    'any',
-    'not',
-    'arrayContaining',
-    'closeTo',
-    'objectContaining',
-    'stringContaining',
-    'stringMatching',
-  ] as const;
-  type ExpectMatchers = typeof expectMatchers[number];
   const _exportedExpect = <T>(
     actual: T
   ): 0 extends 1 & T
@@ -31,17 +21,20 @@ export const makeExpect = <T>(expect: T) => {
       );
       return 'Browser mocks need to be awaited. Try changing `expect(spy)` to `expect(await spy)`' as any;
     }
-    return (expect as any)(actual) as any;
+    return anyExpect(actual);
   };
 
-  const exportedExpect: typeof _exportedExpect &
-    Pick<typeof expect, ExpectMatchers & keyof T> = isInNode
-    ? _exportedExpect
-    : anythingProxy;
+  const exportedExpect = isInNode ? _exportedExpect : (anythingProxy as never);
 
   if (isInNode) {
-    for (const matcher of expectMatchers) {
-      (exportedExpect as any)[matcher] = (expect as any)[matcher];
+    for (const matcher of Object.keys(anyExpect)) {
+      try {
+        if (typeof anyExpect[matcher] === 'function') {
+          (exportedExpect as any)[matcher] = anyExpect[matcher].bind(expect);
+        } else {
+          (exportedExpect as any)[matcher] = anyExpect[matcher];
+        }
+      } catch {}
     }
   }
   return exportedExpect;

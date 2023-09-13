@@ -13,13 +13,13 @@ import { ensureImported } from './ensure-imported';
 
 type Mock<R, A extends any[]> = JestMock<(...args: A) => R>;
 
-const describe = ensureImported<jest.Describe>('describe', 'describe', true);
-const it = ensureImported<jest.It>('it', 'test/it', true);
-const expect = ensureImported<jest.Expect>('expect', 'expect', true);
-const beforeEach = ensureImported<jest.Lifecycle>('beforeEach', 'beforeEach');
-const beforeAll = ensureImported<jest.Lifecycle>('beforeAll', 'beforeAll');
-const afterEach = ensureImported<jest.Lifecycle>('afterEach', 'afterEach');
-const afterAll = ensureImported<jest.Lifecycle>('afterAll', 'afterAll');
+ensureImported('describe', 'describe');
+ensureImported('it', 'test/it');
+ensureImported('expect', 'expect');
+ensureImported('beforeEach', 'beforeEach');
+ensureImported('beforeAll', 'beforeAll');
+ensureImported('afterEach', 'afterEach');
+ensureImported('afterAll', 'afterAll');
 
 const setTimeout = (timeout: number) => {
   if (isInNode) {
@@ -35,7 +35,7 @@ const globalSetup = () => {
   configureSnapshot(expect);
 };
 
-const makeDescribe =
+const makeDescribe: (actualThing: Function) => any =
   (actualThing: Function) =>
   (name: string, fn: () => void, ...extraArgs: any[]) => {
     return createBlockFn(
@@ -53,7 +53,7 @@ const makeDescribe =
   };
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-const makeIt =
+const makeIt: (actualThing: Function) => any =
   (actualThing: Function) =>
   (name: string, fn: () => void, ...extraArgs: any[]) => {
     return createBlockFn(
@@ -76,33 +76,33 @@ const makeIt =
     );
   };
 
-const todo = (name: string) =>
+const todo: any = (name: string) =>
   createBlockFn(name, undefined as any, [], it.todo, false);
 
 const eachNotSupported = () => {
   throw new Error("`.each(...)` tests can't be run in the browser");
 };
 
-const exportedDescribe: jest.Describe = makeDescribe(describe) as any;
+const exportedDescribe: jest.Describe = makeDescribe(describe);
 exportedDescribe.each = eachNotSupported;
-exportedDescribe.only = makeDescribe(describe.only) as any;
+exportedDescribe.only = makeDescribe(describe.only);
 exportedDescribe.only.each = eachNotSupported;
-exportedDescribe.skip = makeDescribe(describe.skip) as any;
+exportedDescribe.skip = makeDescribe(describe.skip);
 exportedDescribe.skip.each = eachNotSupported;
 
-const exportedIt: jest.It & { debug: jest.It } = makeIt(it) as any;
-exportedIt.concurrent = makeIt(it.concurrent) as any;
+const exportedIt: jest.It & { debug: jest.It } = makeIt(it);
+exportedIt.concurrent = makeIt(it.concurrent);
 exportedIt.concurrent.each = eachNotSupported;
-exportedIt.concurrent.only = makeIt(it.concurrent?.only) as any;
+exportedIt.concurrent.only = makeIt(it.concurrent?.only);
 exportedIt.concurrent.only.each = eachNotSupported;
-exportedIt.concurrent.skip = makeIt(it.concurrent?.skip) as any;
+exportedIt.concurrent.skip = makeIt(it.concurrent?.skip);
 exportedIt.concurrent.skip.each = eachNotSupported;
 exportedIt.each = eachNotSupported;
-exportedIt.only = makeIt(it.only) as any;
+exportedIt.only = makeIt(it.only);
 exportedIt.only.each = eachNotSupported;
-exportedIt.skip = makeIt(it.skip) as any;
+exportedIt.skip = makeIt(it.skip);
 exportedIt.skip.each = eachNotSupported;
-exportedIt.todo = todo as any;
+exportedIt.todo = todo;
 
 exportedIt.debug = ((...args: Parameters<jest.It>) => {
   const testKey = (exportedIt.only as any)(...args);
@@ -147,10 +147,6 @@ export {
   exportedIt as it,
   exportedIt as test,
   setTimeout,
-  afterEach,
-  afterAll,
-  beforeEach,
-  beforeAll,
   retryTimes,
   exportedExpect as expect,
   browserMock,

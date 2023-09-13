@@ -64,7 +64,8 @@ The following instructions assume you're using `create-react-app`. Look in the e
    // Or jest.setTimeout(30000)
 
    setup({
-     ciOptions: { usingArtifactsDir: 'artifacts' },
+     bootstrappedAt: require.resolve('./src/main.tsx'),
+     // ciOptions: { usingArtifactsDir: 'artifacts' },
    });
    ```
 
@@ -86,7 +87,7 @@ The following instructions assume you're using `create-react-app`. Look in the e
    +const container = document.getElementById("app");
    +const element = <App />;
    +
-   +const isProd = process.env.NODE_ENV === 'production';
+   +const isDev = process.env.NODE_ENV !== 'production';
    +
    +bootstrap({
    +  container,
@@ -96,22 +97,22 @@ The following instructions assume you're using `create-react-app`. Look in the e
    +  // Add one of the following depending on your bundler...
    +
    +  // Webpack:
-   +  webpackContext: !isProd && import.meta.webpackContext('.', {
+   +  webpackContext: isDev && import.meta.webpackContext('.', {
    +    recursive: true,
    +    regExp: /\.safetest$/,
    +    mode: 'lazy'
    +  })
    +
    +  // Vite:
-   +  // importGlob: !isProd && import.meta.glob('./**/*.safetest.{j,t}s{,x}'),
+   +  // importGlob: isDev && import.meta.glob('./**/*.safetest.{j,t}s{,x}'),
    +
    +  // Other:
-   +  // import: !isProd && async (s) => import(`${s.replace(/.*src/, '.').replace(/\.safetest$/, '')}.safetest`),
+   +  // import: isDev && async (s) => import(`${s.replace(/.*src/, '.').replace(/\.safetest$/, '')}.safetest`),
    +
    +});
    ```
 
-   The above magic import makes use of [Webpack Context](https://webpack.js.org/api/module-variables/#importmetawebpackcontext) Or [Vite Glob import](https://vitejs.dev/guide/features.html#glob-import) (or [whatever flavor dynamic import is available](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import)), to bundle the `.safetest.tsx` files in your project separately. This allows you to write tests for your application in the same project as your application, without having to worry about setting up a separate test project or about the tests being loaded when loading your application in a non test context. The `isProd` check is only really needed if you don't want to leak your tests into production, but it's not strictly necessary. In this project it's turned off for the examples since I want to test against the final deployed app to keep things simple.
+   The above magic import makes use of [Webpack Context](https://webpack.js.org/api/module-variables/#importmetawebpackcontext) Or [Vite Glob import](https://vitejs.dev/guide/features.html#glob-import) (or [whatever flavor dynamic import is available](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import)), to bundle the `.safetest.tsx` files in your project separately. This allows you to write tests for your application in the same project as your application, without having to worry about setting up a separate test project or about the tests being loaded when loading your application in a non test context. The `isDev` check is only really needed if you don't want to leak your tests into production, but it's not strictly necessary. In this project it's turned off for the examples since I want to test against the final deployed app to keep things simple.
 
 1. ### Creating your first tests
 
@@ -573,6 +574,7 @@ vitest.setConfig({ testTimeout: 30000 });
 beforeAll(getCookies);
 
 setup({
+  bootstrappedAt: require.resolve('./src/main.tsx'),
   ciOptions: { usingArtifactsDir: 'artifacts' },
   hooks: { beforeNavigate: [addCookies] },
 });

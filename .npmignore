@@ -1,0 +1,5 @@
+examples
+node_modules
+.vercel
+build
+results.json
