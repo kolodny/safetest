@@ -51,6 +51,8 @@ export interface State {
   };
 }
 
+const cachedExpect = expect;
+
 export const state: State = {
   tests: {},
   retryMap: {},
@@ -64,5 +66,5 @@ export const state: State = {
   afterAllsDone: [],
   isCi: false,
   bootstrappedAt: '',
-  getState: expect.getState.bind(expect),
+  getState: () => cachedExpect.getState(),
 };
