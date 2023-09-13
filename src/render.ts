@@ -148,30 +148,19 @@ export async function render(
 
     const inspector = safeRequire('inspector');
     const path = safeRequire('path');
-    const cp = safeRequire('child_process');
 
     const filename =
       require.main?.filename ||
       state.vitestGlobals?.expect.getState().testPath ||
       '';
-    if (!prefixCache[filename]) {
-      prefixCache[filename] = await new Promise((resolve, reject) => {
-        cp.exec('npm prefix', { cwd: path.dirname(filename) }, (err, out) => {
-          if (err) reject(err);
-          else resolve(`${out}`.trim());
-        });
-      });
-    }
-    const pathToUse = prefixCache[filename]!;
 
     const videoDir = options.recordVideo?.dir ?? options.videosPath;
     const testName = state.activeTest;
 
-    const testPath = filename
-      .replace(pathToUse, '')
-      .replace(/^\/?src/, '')
-      .replace(/^\//, './')
-      .replace(/\.[jt]sx?$/g, '');
+    const bootstrapDir = path.dirname(state.bootstrappedAt);
+    const filenameWithoutExt = filename.split('.').slice(0, -1).join('.');
+    const relative = path.relative(bootstrapDir, filenameWithoutExt);
+    const testPath = `./${relative}`;
 
     const switchingHeadlessness =
       state.browserContextInstance &&

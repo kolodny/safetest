@@ -7,9 +7,11 @@ import { getViewUrl, openLocalBrowser, startServer } from './redirect-server';
 import { getTree } from './ps';
 import { safeRequire } from './safe-require';
 
-type Options = RenderOptions | ((options: RenderOptions) => RenderOptions);
+type Options = RenderOptions & { bootstrappedAt: string };
 
 export const setup = (options: Options) => {
+  if (!options.bootstrappedAt) throw new Error('bootstrappedAt is required');
+  state.bootstrappedAt = options.bootstrappedAt;
   let argv = process.argv;
   if (typeof vitest !== 'undefined') {
     const processes = getTree();
@@ -57,7 +59,6 @@ export const setup = (options: Options) => {
   });
 
   if (options) {
-    if (typeof options === 'function') options = options(state.options);
     setOptions(options);
   }
   useDocker = !!state.options.useDocker;

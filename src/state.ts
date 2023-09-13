@@ -36,6 +36,7 @@ export interface State {
   /** What to do when everything is really done, like shutdown docker container */
   afterAllsDone: Array<() => Promise<void>>;
   isCi: boolean;
+  bootstrappedAt: string;
   /**
    * When a test is being run we need to track which element to render, this is only useful for
    * the browser side of things
@@ -62,4 +63,5 @@ export const state: State = {
   nextIndex: 0,
   afterAllsDone: [],
   isCi: false,
+  bootstrappedAt: '',
 };
