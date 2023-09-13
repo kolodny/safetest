@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { cleanupBrowser } from './cleanup-browser';
 import { state } from './state';
+import type { SafePage } from './safepage';
 
 export const afterEachFn = async () => {
-  const pages = state.browserContextInstance?.pages() ?? [];
+  const pages = (state.browserContextInstance?.pages() as SafePage[]) ?? [];
   for (const [_index, page] of Object.entries(pages)) {
     const index = +_index;
     const hooks = page._safetest_internal?.hooks;

@@ -84,9 +84,8 @@ export async function getPage(
   }
 
   const server = options.browserServer;
-  const page =
-    state.browserContextInstance.pages()[0] ??
-    ((await state.browserContextInstance.newPage()) as SafePage);
+  const page: SafePage = (state.browserContextInstance.pages()[0] ??
+    (await state.browserContextInstance.newPage())) as any;
 
   if (server) {
     const debugPageShown = new Set<string>();
@@ -125,7 +124,7 @@ export async function getPage(
         console.log(`Closed tab    ${debugUrl}`);
       }
     };
-    (page as SafePage)._safetest_internal.pageSetupPromise = logDebugTabs();
+    page._safetest_internal.pageSetupPromise = logDebugTabs();
     page.on('close', logDebugTabs);
   }
 

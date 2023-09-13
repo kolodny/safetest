@@ -1,12 +1,5 @@
 import type { BrowserContext } from 'playwright';
 import { RenderOptions } from './render';
-import type { SafePage } from './safepage';
-
-declare module 'playwright' {
-  interface BrowserContext {
-    pages(): SafePage[];
-  }
-}
 
 export interface State {
   tests: Record<string, () => void>;
@@ -51,8 +44,6 @@ export interface State {
   };
 }
 
-const cachedExpect = typeof expect !== 'undefined' ? expect : undefined;
-
 export const state: State = {
   tests: {},
   retryMap: {},
@@ -66,5 +57,5 @@ export const state: State = {
   afterAllsDone: [],
   isCi: false,
   bootstrappedAt: '',
-  getState: () => cachedExpect?.getState()!,
+  getState: () => expect?.getState?.() ?? {},
 };

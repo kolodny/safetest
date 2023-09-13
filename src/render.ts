@@ -312,7 +312,7 @@ export async function render(
 
     if (videoDir) {
       page._safetest_internal.hooks.afterTest.push(async () => {
-        const pages = state.browserContextInstance?.pages();
+        const pages = state.browserContextInstance?.pages() as SafePage[];
         for (const page of pages ?? []) {
           const index = page._safetest_internal.pageIndex;
           await ensureDir(videoDir);
