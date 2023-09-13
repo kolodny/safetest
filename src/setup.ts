@@ -84,6 +84,6 @@ export const setup = (options: Options) => {
         const msg = `\n\nGo to ${viewUrl} to view the remote tests\n\n`;
         if (viewUrl) console.log(msg);
       }
-    }, 30000);
+    });
   }
 };
