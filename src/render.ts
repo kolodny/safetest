@@ -19,8 +19,6 @@ export const SAFETEST_INTERFACE = '__safetestApi__';
 
 const timeout = (ms: number) => new Promise((r) => setTimeout(r, ms).unref?.());
 
-const prefixCache: Record<string, string> = {};
-
 export interface Bridge {
   <Return>(callback: () => Return | Promise<Return>): Promise<Return>;
   <Args, Return>(

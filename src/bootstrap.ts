@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { SAFETEST_INTERFACE } from './render';
 import { state } from './state';
 
-export type Importer = { fixPath?: (s: string) => string } & (
+export type Importer =
   | {
       webpackContext:
         | false
@@ -16,8 +16,7 @@ export type Importer = { fixPath?: (s: string) => string } & (
     }
   | {
       import: false | ((s: string) => Promise<unknown>);
-    }
-);
+    };
 
 type BootstrapArgs = Importer & {
   defaultRender: () => any;
@@ -63,8 +62,7 @@ export const bootstrap = async (args: BootstrapArgs): Promise<any> => {
       console.groupEnd();
     }
   } else if (testPath && !testName) {
-    const fixPath = args.fixPath ?? ((s) => s);
-    await importer(fixPath(testPath));
+    await importer(testPath);
     const tests = Object.keys(state.tests).map((test) => {
       const url = new URL(location.href);
       const append = url.search.includes('?') ? '&' : '?';
@@ -84,8 +82,7 @@ export const bootstrap = async (args: BootstrapArgs): Promise<any> => {
       (await (window as any)[SAFETEST_INTERFACE]?.('GET_INFO')) ?? {});
   }
   if (testName && testPath) {
-    const fixPath = args.fixPath ?? ((s) => s);
-    await importer(fixPath(testPath));
+    await importer(testPath);
     if (state.browserState) state.browserState.retryAttempt = retryAttempt;
     await (window as any).waitForSafetestReady;
     state.tests[testName]!();
