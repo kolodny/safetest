@@ -25,23 +25,18 @@ if (
   !parsed['artifacts'] ||
   !parsed['buildUrl'] ||
   !parsed['url'] ||
-  !parsed['bootstrappedAt']
+  !parsed['bootstrappedDir']
 ) {
   throw new Error(
-    'results, artifacts, url, and buildUrl arguments are required'
+    'results, artifacts, url, buildUrl, and bootstrappedDir arguments are required'
   );
 }
 
-const { artifacts, buildUrl, url, bootstrappedAt } = parsed;
+const { artifacts, buildUrl, url, bootstrappedDir } = parsed;
 
 const testPath = (filename: string) => {
-  const fileParts = filename.split('.');
-  if (/m?[tj]sx?/.test(fileParts[fileParts.length - 1] ?? '')) {
-    fileParts.pop();
-  }
-  const filenameWithoutExt = fileParts.join('.');
-  const absolute = path.relative(path.resolve(), filenameWithoutExt);
-  const relative = path.relative(bootstrappedAt, absolute);
+  const filenameWithoutExt = filename.replace(/\.m?[tj]sx?$/, '/');
+  const relative = path.relative(bootstrappedDir, filenameWithoutExt);
   return `./${relative}`;
 };
 const urlString = (url: URL) => {
@@ -183,7 +178,7 @@ if (failedTests.length) {
     const debugUrl = new URL(url);
     debugUrl.searchParams.set('test_name', failedTest.fullName);
     debugUrl.searchParams.set('test_path', testPath(failedTest.filename));
-    const debugUrlEncoded = debugUrl.toString().replace(/%2F/g, '/');
+    const debugUrlEncoded = urlString(debugUrl);
     commentParts.push(
       `- ${failedTest.fullName} ${videoComment} ${failureScreenshotComment} ${traceComment} [[Open initial component state](${debugUrlEncoded})]`
     );
@@ -269,7 +264,7 @@ function collect() {
         const debugUrl = new URL(url);
         debugUrl.searchParams.set('test_name', fullName);
         debugUrl.searchParams.set('test_path', testPath(filename));
-        const debugUrlEncoded = debugUrl.toString().replace(/%2F/g, '/');
+        const debugUrlEncoded = urlString(debugUrl);
         summary += `<a href="${debugUrlEncoded}">[Open initial component state]</a>`;
         summary += '</li>';
       } else {
