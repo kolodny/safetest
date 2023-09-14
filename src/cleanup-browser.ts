@@ -22,6 +22,6 @@ export const cleanupBrowser = async (): Promise<void> => {
     await tryFn(() => page.close());
   }
   await tryFn(() => context?.close());
-  await tryFn(() => browser?.close());
+  if (!closed) await tryFn(() => browser?.close());
   delete state.browserContextInstance;
 };

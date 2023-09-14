@@ -50,6 +50,19 @@ The following instructions assume you're using `create-react-app`. Look in the e
    }
    ```
 
+   If you're using Vitest you'd use these scripts instead:
+
+   ```json
+   {
+     "scripts": {
+       "safetest": "vitest --inspect --no-threads -- --url=http://localhost:3000/ ",
+       "safetest:ci": "npm run safetest --run --bail=5 -- --ci=1 --docker=1 --url=DEPLOYED_URL",
+       "safetest:regenerate-screenshots": "npm run safetest --run --bail=5 -- --ci=1 --docker=1 --update-snapshot",
+       "process:ci": "node -e 'require(\"safetest/process-action\")' -- --results=results.json --artifacts=artifacts --url=DEPLOYED_URL --build-url=. --bootstrapped-at=src/main.ts"
+     }
+   }
+   ```
+
    The preceding script runs the default runner (`react-scripts`) with a couple of flags and environment variables to make sure Safetest is loaded and run with jest, and that all `.safetest.tsx` test files are tested. You may need to adjust based on your specific setup for example using `craco` or `react-app-rewired` instead.
 
 1. ### Add `setup-safetest.tsx` file:
@@ -70,6 +83,21 @@ The following instructions assume you're using `create-react-app`. Look in the e
    ```
 
    This file is the minimal setup required to get Safetest working with your project. It's also where you can configure Safetest by specifying options to the `setup` function.
+
+1. If you're using vitest you'll need to add at least these values to your vitest config:
+
+```ts
+export default defineConfig({
+  /* ... */
+  test: {
+    globals: true,
+    reporters: ['basic', 'json'],
+    outputFile: 'results.json',
+    setupFiles: ['setup-safetest'],
+    include: ['**/*.safetest.?(c|m)[jt]s?(x)'],
+  },
+});
+```
 
 1. ### Bootstrapping your application
 
@@ -569,7 +597,7 @@ import { setup } from 'safetest/setup';
 
 import { getCookies, addCookies } from './auth';
 
-vitest.setConfig({ testTimeout: 30000 });
+vitest.setConfig({ testTimeout: 30000 }); // or using jest.setTimeout if using jest
 
 beforeAll(getCookies);
 
