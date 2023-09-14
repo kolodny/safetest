@@ -11,7 +11,7 @@
     "safetest": "vitest --inspect --no-threads -- --url=http://localhost:3000/vite-react-ts/",
     "safetest:ci:test": "npm run safetest --run --bail=5 -- --ci=1 --docker=1 --url=https://safetest-two.vercel.app/vite-react-ts",
     "safetest:ci": "(npm run safetest:ci:test || true) && cp results.json ../../build/vite-react-ts/results.json",
-    "process:ci": "node -e 'require(\"../../lib/process-action\")' -- --results=../../build/vite-react-ts/results.json --artifacts=../../build/vite-react-ts/artifacts --url=https://safetest-two.vercel.app/vite-react-ts --build-url=."
+    "process:ci": "node -e 'require(\"../../lib/process-action\")' -- --results=../../build/vite-react-ts/results.json --artifacts=../../build/vite-react-ts/artifacts --url=https://safetest-two.vercel.app/vite-react-ts --build-url=. --bootstrapped-at=src/main.tsx"
   },
   "dependencies": {
     "react": "^18.2.0",

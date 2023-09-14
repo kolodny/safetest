@@ -24,14 +24,29 @@ if (
   !parsed['results'] ||
   !parsed['artifacts'] ||
   !parsed['buildUrl'] ||
-  !parsed['url']
+  !parsed['url'] ||
+  !parsed['bootstrappedAt']
 ) {
   throw new Error(
     'results, artifacts, url, and buildUrl arguments are required'
   );
 }
 
-const { artifacts, buildUrl, url } = parsed;
+const { artifacts, buildUrl, url, bootstrappedAt } = parsed;
+
+const testPath = (filename: string) => {
+  const fileParts = filename.split('.');
+  if (/m?[tj]sx?/.test(fileParts[fileParts.length - 1] ?? '')) {
+    fileParts.pop();
+  }
+  const filenameWithoutExt = fileParts.join('.');
+  const absolute = path.relative(path.resolve(), filenameWithoutExt);
+  const relative = path.relative(bootstrappedAt, absolute);
+  return `./${relative}`;
+};
+const urlString = (url: URL) => {
+  return `${url}`.replace(/%2f/gi, '/').replace(/%20/gi, ' ');
+};
 
 const results: FormattedTestResults = JSON.parse(
   fs.readFileSync(parsed['results'], 'utf8')
@@ -118,12 +133,6 @@ const flattenResults = results.testResults.flatMap((result) =>
   }))
 );
 
-const cleanedFilename = (filename: string) =>
-  filename
-    .replace(/\.(m?[tj]sx?)$/, '')
-    .replace(/^\/?src/, '')
-    .replace(/^\//, './');
-
 const failedTests = flattenResults.filter((r) => r.status === 'failed');
 if (failedTests.length) {
   if (commentParts.length) commentParts.push('---');
@@ -173,10 +182,7 @@ if (failedTests.length) {
 
     const debugUrl = new URL(url);
     debugUrl.searchParams.set('test_name', failedTest.fullName);
-    debugUrl.searchParams.set(
-      'test_path',
-      cleanedFilename(failedTest.filename)
-    );
+    debugUrl.searchParams.set('test_path', testPath(failedTest.filename));
     const debugUrlEncoded = debugUrl.toString().replace(/%2F/g, '/');
     commentParts.push(
       `- ${failedTest.fullName} ${videoComment} ${failureScreenshotComment} ${traceComment} [[Open initial component state](${debugUrlEncoded})]`
@@ -186,7 +192,7 @@ if (failedTests.length) {
 
 const tests: Record<string, any> = {};
 for (const result of results.testResults) {
-  const filename = cleanedFilename(path.relative(process.cwd(), result.name));
+  const filename = path.relative(process.cwd(), result.name);
   for (const assertionResult of result.assertionResults) {
     let map: Record<string, any> = (tests[filename] ??= {});
     for (const ancestorTitles of assertionResult.ancestorTitles) {
@@ -262,7 +268,7 @@ function collect() {
 
         const debugUrl = new URL(url);
         debugUrl.searchParams.set('test_name', fullName);
-        debugUrl.searchParams.set('test_path', cleanedFilename(filename));
+        debugUrl.searchParams.set('test_path', testPath(filename));
         const debugUrlEncoded = debugUrl.toString().replace(/%2F/g, '/');
         summary += `<a href="${debugUrlEncoded}">[Open initial component state]</a>`;
         summary += '</li>';

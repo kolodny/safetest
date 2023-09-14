@@ -45,7 +45,7 @@ The following instructions assume you're using `create-react-app`. Look in the e
        "safetest": "react-scripts --inspect test --runInBand --url=${TARGET_URL:-http://localhost:3000} --testMatch '**/*.safetest.{j,t}s{,x}' --setupFilesAfterEnv ./setup-safetest.tsx",
        "safetest:ci": "npm run safetest -- --watchAll=false --ci=1 --docker=1 --url=DEPLOYED_URL --json --outputFile=results.json",
        "safetest:regenerate-screenshots": "npm run safetest -- --watchAll=false --docker=1 --update-snapshot",
-       "process:ci": "node -e 'require(\"safetest/process-action\")' -- --results=results.json --artifacts=artifacts --url=DEPLOYED_URL --build-url=."
+       "process:ci": "node -e 'require(\"safetest/process-action\")' -- --results=results.json --artifacts=artifacts --url=DEPLOYED_URL --build-url=. --bootstrapped-at=src/main.ts"
      }
    }
    ```
@@ -169,7 +169,7 @@ The following instructions assume you're using `create-react-app`. Look in the e
    Safetest also provides a processor which you can also add as a script or manually invoke:
 
    ```bash
-   node -e 'require("safetest/process-action")' -- --results=results.json --artifacts=artifacts --url=https://my-app.com --build-url=.
+   node -e 'require("safetest/process-action")' -- --results=results.json --artifacts=artifacts --url=https://my-app.com --build-url=. --bootstrapped-at=src/main.tsx
    ```
 
 Now when you create a PR you'll get a bunch of CI goodies like a detailed report of what pass/failed as well as links to:

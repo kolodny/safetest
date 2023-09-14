@@ -33,5 +33,5 @@ export const afterAllFn = async () => {
   for (const afterAllDone of state.afterAllsDone ?? []) {
     await afterAllDone();
   }
-  state.afterAllsDone = [];
+  // state.afterAllsDone = [];
 };

@@ -38,7 +38,7 @@
         "safetest": "react-scripts --inspect test --runInBand --url=http://localhost:3000/cra --testMatch '**/*.safetest.{j,t}s{,x}' --setupFilesAfterEnv ./setup-safetest.js",
         "safetest:ci": "npm run safetest -- --watchAll=false --bail=5 --ci=1 --docker=1 --url=https://safetest-two.vercel.app/cra --json --outputFile=../../build/cra/results.json",
         "safetest:regenerate-screenshots": "npm run safetest -- --watchAll=false --docker=1 --update-snapshot",
-        "process:ci": "node -e 'require(\"safetest/process-action\")' -- --results=../../build/cra/results.json --artifacts=../../build/cra/artifacts --url=https://safetest-two.vercel.app/cra --build-url=.",
+        "process:ci": "node -e 'require(\"safetest/process-action\")' -- --results=../../build/cra/results.json --artifacts=../../build/cra/artifacts --url=https://safetest-two.vercel.app/cra --build-url=. --bootstrapped-at=src",
         "eject": "react-scripts eject"
     },
     "eslintConfig": {
