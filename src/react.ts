@@ -2,8 +2,11 @@ import { render as renderCommon, RenderOptions } from './render';
 import { bootstrap as bootstrapCommon, Importer } from './bootstrap';
 import { state } from './state';
 import { isInNode } from './is-in-node';
+import { configureCreateOverride } from 'react-override';
 
-export * from 'react-override';
+export { Override } from 'react-override';
+
+export const createOverride = configureCreateOverride(isInNode ? false : true);
 
 export async function render(
   elementToRender: JSX.Element | ((app: JSX.Element) => JSX.Element) = state
