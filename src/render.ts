@@ -219,9 +219,11 @@ export async function render(
         sources: true,
         title: state.activeTest!,
       });
+      const test = expect.getState().currentTestName ?? '<unknown>';
       page._safetest_internal.hooks.afterTest.push(async () => {
         const attempt = getRetryAttempt();
         const path = `${options.recordTraces}/traces/${state.activeTest}-attempt-${attempt}.zip`;
+        state.artifacts.push({ type: 'trace', test, path });
         try {
           await page.context().tracing.stop({ path });
         } catch {}
@@ -311,6 +313,7 @@ export async function render(
     }
 
     if (videoDir) {
+      const test = expect.getState().currentTestName ?? '<unknown>';
       page._safetest_internal.hooks.afterTest.push(async () => {
         const pages = state.browserContextInstance?.pages() as SafePage[];
         for (const page of pages ?? []) {
@@ -320,8 +323,9 @@ export async function render(
           const attempt = getRetryAttempt();
           const suffix = (pages?.length ?? 0) > 1 ? `_tab${index}` : '';
           const newName = `${testName}-attempt-${attempt}${suffix}.webm`;
-          const saveAs = `${videoDir}/${newName}`;
-          page?.video()?.saveAs(saveAs);
+          const path = `${videoDir}/${newName}`;
+          state.artifacts.push({ type: 'video', test, path });
+          page?.video()?.saveAs(path);
         }
       });
     }

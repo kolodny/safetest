@@ -59,7 +59,6 @@ export async function getPage(
           {
             beforeNavigate: [],
             beforeClose: [],
-            afterClose: [],
             afterTest: [],
           },
           options.hooks ?? {}

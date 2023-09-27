@@ -27,7 +27,13 @@ export interface State {
   redirectUrl?: string;
   /** What to do when everything is really done, like shutdown docker container */
   afterAllsDone: Array<() => Promise<void>>;
+  artifacts: Array<{
+    test: string;
+    type: 'snapshot' | 'diff' | 'received' | 'trace' | 'video';
+    path: string;
+  }>;
   isCi: boolean;
+  artifactsJson?: string;
   bootstrappedAt: string;
   getState: () => ReturnType<typeof expect.getState>;
   /**
@@ -55,6 +61,7 @@ export const state: State = {
   passedTests: new Set(),
   nextIndex: 0,
   afterAllsDone: [],
+  artifacts: [],
   isCi: false,
   bootstrappedAt: '',
   getState: () => expect?.getState?.() ?? {},

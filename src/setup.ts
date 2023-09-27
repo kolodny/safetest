@@ -6,6 +6,7 @@ import { camelCase } from 'lodash';
 import { getViewUrl, openLocalBrowser, startServer } from './redirect-server';
 import { getTree } from './ps';
 import { safeRequire } from './safe-require';
+import { collectArtifacts } from './artifacts';
 
 type Options = RenderOptions & { bootstrappedAt: string };
 
@@ -45,6 +46,9 @@ export const setup = (options: Options) => {
   const headless = useDocker ? true : !parsed['headed'];
 
   state.isCi = !!parsed['ci'] || !!process.env['CI'];
+  if (parsed['artifactsJson']) {
+    state.artifactsJson = parsed['artifactsJson'];
+  }
 
   const localUrl = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
 
@@ -62,6 +66,14 @@ export const setup = (options: Options) => {
     setOptions(options);
   }
   useDocker = !!state.options.useDocker;
+
+  afterAll(async () => {
+    // Jest creates a fresh context for each test, vitest needs to be cleaned up
+    state.currentSuitePlusTest = '';
+
+    // This needs to run for each vitest test, not sure why this doesn't work with vitest in the vitest.ts setup.
+    await collectArtifacts();
+  });
 
   if (useDocker) {
     if (localUrl) url.hostname = 'host.docker.internal';

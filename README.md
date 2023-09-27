@@ -180,7 +180,7 @@ export default defineConfig({
    npm run safetest
    ```
 
-   Additionally, you can pass it a a number of custom command line arguments. The options are `--headed=1`, `--url=...`, `--docker=1`, and `--ci=1`, for example to see the browser window while the tests are running:
+   Additionally, you can pass it a a number of custom command line arguments. The options are `--headed=1`, `--url=...`, `--artifacts-json=...`, `--docker=1`, and `--ci=1`, for example to see the browser window while the tests are running:
 
    ```bash
    npm run safetest -- --headed=1
