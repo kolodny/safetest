@@ -151,6 +151,7 @@ export async function render(
 
     const videoDir = options.recordVideo?.dir ?? options.videosPath;
     const testName = state.activeTest;
+    const safeName = testName?.replace(/[^a-z0-9_]/gi, '_');
 
     const bootstrapDir = path.dirname(state.bootstrappedAt);
     const filenameWithoutExt = filename.split('.').slice(0, -1).join('.');
@@ -220,9 +221,12 @@ export async function render(
         title: state.activeTest!,
       });
       const test = expect.getState().currentTestName ?? '<unknown>';
+      const testPath = path
+        .relative(process.cwd(), expect.getState().testPath!)
+        .replace(/[^a-z0-9_]/g, '_');
       page._safetest_internal.hooks.afterTest.push(async () => {
         const attempt = getRetryAttempt();
-        const path = `${options.recordTraces}/traces/${state.activeTest}-attempt-${attempt}.zip`;
+        const path = `${options.recordTraces}/traces/${testPath}_${safeName}-attempt-${attempt}.zip`;
         state.artifacts.push({ type: 'trace', test, path });
         try {
           await page.context().tracing.stop({ path });
@@ -314,6 +318,9 @@ export async function render(
 
     if (videoDir) {
       const test = expect.getState().currentTestName ?? '<unknown>';
+      const testPath = path
+        .relative(process.cwd(), expect.getState().testPath!)
+        .replace(/[^a-z0-9_]/g, '_');
       page._safetest_internal.hooks.afterTest.push(async () => {
         const pages = state.browserContextInstance?.pages() as SafePage[];
         for (const page of pages ?? []) {
@@ -322,8 +329,8 @@ export async function render(
 
           const attempt = getRetryAttempt();
           const suffix = (pages?.length ?? 0) > 1 ? `_tab${index}` : '';
-          const newName = `${testName}-attempt-${attempt}${suffix}.webm`;
-          const path = `${videoDir}/${newName}`;
+          const newName = `${safeName}-attempt-${attempt}${suffix}.webm`;
+          const path = `${videoDir}/${testPath}_${newName}`;
           state.artifacts.push({ type: 'video', test, path });
           page?.video()?.saveAs(path);
         }

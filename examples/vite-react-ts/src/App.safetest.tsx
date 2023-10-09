@@ -12,6 +12,10 @@ describe('Main', () => {
     const { page } = await render();
     expect(page).toBeTruthy();
   });
+  it('Has a landing page', async () => {
+    const { page } = await render();
+    expect(page).toBeTruthy();
+  });
 
   it('Does not break regular expects', async () => {
     const { page } = await render();

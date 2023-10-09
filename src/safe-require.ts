@@ -52,13 +52,7 @@ export type SafeRequire = { resolve: typeof require.resolve } & (<
   t: T
 ) => T extends keyof Module ? Module[T] : any);
 
-const nodeRequire = // @ts-ignore
-  !isInNode || typeof __webpack_require__ === 'function'
-    ? anythingProxy
-    : require;
+declare let __webpack_require__: any;
 
-/** Node require function, will return an `anything` proxy in the browser */
-export const safeRequire: SafeRequire = isInNode
-  ? // eslint-disable-next-line no-eval
-    nodeRequire
-  : anythingProxy;
+const req = typeof __webpack_require__ === 'function' ? anythingProxy : require;
+export const safeRequire: SafeRequire = isInNode ? req : anythingProxy;

@@ -6,6 +6,19 @@ const smartAppendToCurrent = (appending: string) =>
   (state.currentSuitePlusTest ? state.currentSuitePlusTest + ' ' : '') +
   appending;
 
+const seen = new Set<string>();
+const createId = (name: string, parent: string) => {
+  const separator = parent ? ' ' : '';
+  const concat = `${parent}${separator}${name}`;
+  let candidate = concat;
+  let index = 2;
+  while (seen.has(candidate)) {
+    candidate = `${concat} ${index++}`;
+  }
+  seen.add(candidate);
+  return candidate;
+};
+
 export const createBlockFn = (
   name: string,
   fn: () => void,
@@ -14,24 +27,26 @@ export const createBlockFn = (
   // eslint-disable-next-line @typescript-eslint/ban-types
   actualThing: Function,
   /** Is function `describe` which we always run or `it` which we don't run */
-  isSetupFn: boolean
+  isDescribe: boolean
 ): string => {
   const previous = state.currentSuitePlusTest;
   let key = smartAppendToCurrent(name);
-  if (!isSetupFn && key in state.tests) {
+  if (!isDescribe && key in state.tests) {
     let index = 2;
     while (key in state.tests) {
       key = smartAppendToCurrent(`${name} - ${index++}`);
     }
   }
-  state.tests[key] = fn;
+  if (!isDescribe) state.tests[key] = fn;
+  const previousSuite = state.currentSuite;
+  if (isDescribe) state.currentSuite = createId(name, state.currentSuite);
   state.currentSuitePlusTest = key;
   if (isInNode) {
-    // console.log({ STATE: state.tests });
     if (!fn) {
       // `it.todo` does this
       actualThing(name);
     } else {
+      if (!isDescribe) state.currentTest = name;
       actualThing(
         name,
         function (this: any, ...args: any[]) {
@@ -57,10 +72,11 @@ export const createBlockFn = (
     }
   } else {
     // In the browser
-    if (isSetupFn) {
+    if (isDescribe) {
       fn();
     }
   }
+  if (isDescribe) state.currentSuite = previousSuite;
   state.currentSuitePlusTest = previous;
   return key;
 };

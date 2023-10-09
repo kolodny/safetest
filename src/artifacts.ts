@@ -12,10 +12,9 @@ const artifacts = state.artifacts;
 
 export const collectArtifacts = async () => {
   const path = safeRequire('path');
-  const testPath = path
-    .relative(process.cwd(), expect.getState().testPath!)
-    .replace(/[^a-z0-9_]/g, '_');
-  console.log({ testPath });
+  const testPath = path.relative(process.cwd(), expect.getState().testPath!);
+
+  const safePath = testPath.replace(/[^a-z0-9_]/g, '_');
 
   const file = state.artifactsJson;
   if (file) {
@@ -34,8 +33,8 @@ export const collectArtifacts = async () => {
     }
 
     const isJest = typeof jest !== 'undefined';
-    const saveTo = isJest ? `${file}_${testPath}.json` : file;
-    fs.writeFileSync(saveTo, JSON.stringify(byTest, null, 2));
-    console.log(byTest);
+    const saveTo = isJest ? `${file}_${safePath}.json` : file;
+    const json = isJest ? { [testPath]: byTest } : byTest;
+    fs.writeFileSync(saveTo, JSON.stringify(json, null, 2));
   }
 };

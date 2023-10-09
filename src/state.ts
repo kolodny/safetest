@@ -4,6 +4,8 @@ import { RenderOptions } from './render';
 export interface State {
   tests: Record<string, () => void>;
   currentSuitePlusTest: string;
+  currentSuite: string;
+  currentTest: string;
   retryMap: Record<string, number>;
   __filename?: string;
   activeTest?: string;
@@ -55,6 +57,8 @@ export const state: State = {
   retryMap: {},
   options: {},
   currentSuitePlusTest: '',
+  currentSuite: '',
+  currentTest: '',
   isGlobalSetupTeardownRegistered: false,
   exposeGlobals: {},
   debugging: new Set(),
