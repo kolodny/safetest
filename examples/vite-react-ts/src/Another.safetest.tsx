@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from 'safetest/react';
 import { describe, it, expect } from 'safetest/vitest';
 
-describe.skip('Main2', () => {
+describe('Main2', () => {
   it('hey loads a simple div', async () => {
     const { page } = await render(() => <>Testing123</>);
     expect(await page.screenshot()).toMatchImageSnapshot({});
