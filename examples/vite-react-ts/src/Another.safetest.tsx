@@ -5,7 +5,7 @@ import { describe, it, expect } from 'safetest/vitest';
 describe('Main2', () => {
   it('hey loads a simple div', async () => {
     const { page } = await render(() => <>Testing123</>);
-    expect(await page.screenshot()).toMatchImageSnapshot({});
+    expect(await page.screenshot()).toMatchImageSnapshot();
   });
 
   it('Has a landing page', async () => {

@@ -29,12 +29,16 @@ const pkg = JSON.parse(
   readFileSync(join(__dirname, '../package.json'), 'utf8')
 );
 const playwrightVersion = pkg.dependencies.playwright.match(/(\d|\.)+/)[0];
-const GUID = Math.random().toString(36).substring(2, 15);
-const imageName = `safetest-image-${playwrightVersion}-${GUID}`;
-const containerName = `safetest-server-${playwrightVersion}-${GUID}`;
+let GUID = Math.random().toString(36).substring(2, 15);
+let imageName = `safetest-image-${playwrightVersion}-${GUID}`;
+let containerName = `safetest-server-${playwrightVersion}-${GUID}`;
 
 export const stopDocker = async () => {
   spawn('docker', ['stop', containerName]);
+  // In case another test wants to start up docker.
+  GUID = Math.random().toString(36).substring(2, 15);
+  imageName = `safetest-image-${playwrightVersion}-${GUID}`;
+  containerName = `safetest-server-${playwrightVersion}-${GUID}`;
 };
 
 export const buildDocker = async () => {
