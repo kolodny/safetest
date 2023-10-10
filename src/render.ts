@@ -108,6 +108,8 @@ export async function render(
     container: HTMLElement | string
   ) => Promise<any>
 ): Promise<RenderReturn> {
+  const testName = state.activeTest;
+
   if (state.options) {
     options = merge(state.options, options);
   }
@@ -119,7 +121,7 @@ export async function render(
       JSON.parse(process.env['SAFETEST_OPTIONS']) as RenderOptions
     );
   }
-  options.headless = state.debugging.has(state.activeTest ?? '')
+  options.headless = state.debugging.has(testName ?? '')
     ? false
     : 'headless' in options
     ? options.headless
@@ -150,13 +152,15 @@ export async function render(
     const filename = state.getState().testPath ?? '';
 
     const videoDir = options.recordVideo?.dir ?? options.videosPath;
-    const testName = state.activeTest;
+
     const safeName = testName?.replace(/[^a-z0-9_]/gi, '_');
 
     const bootstrapDir = path.dirname(state.bootstrappedAt);
     const filenameWithoutExt = filename.split('.').slice(0, -1).join('.');
     const relative = path.relative(bootstrapDir, filenameWithoutExt);
     const testPath = `./${relative}`;
+
+    const attempt = getRetryAttempt();
 
     const switchingHeadlessness =
       state.browserContextInstance &&
@@ -178,9 +182,9 @@ export async function render(
             }
             if (type === 'GET_INFO') {
               const info = {
-                testName: state.activeTest,
+                testName,
                 testPath,
-                retryAttempt: getRetryAttempt(),
+                retryAttempt: attempt,
               };
               const hooks = safetest_internal.hooks;
               for (const beforeRender of hooks.beforeRender ?? []) {
@@ -218,14 +222,13 @@ export async function render(
         screenshots: true,
         snapshots: true,
         sources: true,
-        title: state.activeTest!,
+        title: testName!,
       });
       const test = expect.getState().currentTestName ?? '<unknown>';
       const testPath = path
         .relative(process.cwd(), expect.getState().testPath!)
         .replace(/[^a-z0-9_]/g, '_');
       page._safetest_internal.hooks.afterTest.push(async () => {
-        const attempt = getRetryAttempt();
         const path = `${options.recordTraces}/traces/${testPath}_${safeName}-attempt-${attempt}.zip`;
         state.artifacts.push({ type: 'trace', test, path });
         try {
@@ -304,12 +307,12 @@ export async function render(
     const failDir = page._safetest_internal.failureScreenshotDir;
     if (failDir) {
       page._safetest_internal.hooks.afterTest.push(async () => {
-        const passed = state.passedTests.has(state.activeTest ?? '');
+        const passed = state.passedTests.has(testName ?? '');
         if (!passed) {
           const pages = state.browserContextInstance?.pages();
           for (const [index, page] of pages?.entries() ?? []) {
             const suffix = index ? `_${index}` : '';
-            const path = `${failDir}/${state.activeTest}${suffix}.png`;
+            const path = `${failDir}/${testName}${suffix}.png`;
             await page.screenshot({ path });
           }
         }
@@ -327,7 +330,6 @@ export async function render(
           const index = page._safetest_internal.pageIndex;
           await ensureDir(videoDir);
 
-          const attempt = getRetryAttempt();
           const suffix = (pages?.length ?? 0) > 1 ? `_tab${index}` : '';
           const newName = `${safeName}-attempt-${attempt}${suffix}.webm`;
           const path = `${videoDir}/${testPath}_${newName}`;
@@ -366,9 +368,7 @@ export async function render(
         const plan = shouldRetry
           ? `retrying (attempts left: ${gotoAttempts + 1})...`
           : 'giving up';
-        console.log(
-          `page.goto error: ${error.name} on "${state.activeTest}" ${plan}`
-        );
+        console.log(`page.goto error: ${error.name} on "${testName}" ${plan}`);
         if (shouldRetry) return gotoTestUrl();
         throw new PageReadyTimeoutError();
       });
@@ -393,12 +393,12 @@ export async function render(
       console.log(`Go to ${debugUrl} to debug this test`);
     }
     page._safetest_internal.hooks.afterTest.push(async () => {
-      const activeTest = state.activeTest ?? '';
+      const activeTest = testName ?? '';
       timeout(100).then(() => {
         const passed = state.passedTests.has(activeTest);
         if (!passed && !isDebugging) {
           console.log(
-            `'${state.activeTest}' Failed. Go to ${debugUrl.replace(
+            `'${testName}' Failed. Go to ${debugUrl.replace(
               'host.docker.internal',
               'localhost'
             )} to debug this test`
