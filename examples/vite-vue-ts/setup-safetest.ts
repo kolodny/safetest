@@ -5,6 +5,6 @@ vitest.setConfig({ testTimeout: 30000 });
 setup({
   bootstrappedAt: require.resolve('./src/main.ts'),
   ciOptions: {
-    usingArtifactsDir: '../../build/vite-vue-ts/artifacts',
+    usingArtifactsDir: 'artifacts',
   },
 });

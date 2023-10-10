@@ -5,6 +5,6 @@ jest.setTimeout(30000);
 setup({
     bootstrappedAt: require.resolve('./src'),
     ciOptions: {
-        usingArtifactsDir: '../../build/cra/artifacts'
+        usingArtifactsDir: 'artifacts'
     }
 });

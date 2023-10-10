@@ -8,9 +8,9 @@
     "build": "npm i ../../ && (rm -rf ../../build/vite-svelte-ts || true) && vite build && mv dist ../../build/vite-svelte-ts",
     "preview": "vite preview",
     "safetest": "vitest --inspect --no-threads --globals -- --url=http://localhost:3000/vite-svelte-ts/",
-    "safetest:ci:test": "npm run safetest --run --bail=5 -- --ci=1 --docker=1 --url=https://safetest-two.vercel.app/vite-svelte-ts",
+    "safetest:ci:test": "npm run safetest --run --bail=5 -- --ci=1 --docker=1 --artifacts-json=artifacts-info.json --url=https://safetest-two.vercel.app/vite-svelte-ts",
     "safetest:ci": "(npm run safetest:ci:test || true) && cp results.json ../../build/vite-svelte-ts/results.json",
-    "process:ci": "node -e 'require(\"../../lib/process-action\")' -- --results=../../build/vite-svelte-ts/results.json --artifacts=../../build/vite-svelte-ts/artifacts --url=https://safetest-two.vercel.app/vite-svelte-ts --build-url=. --bootstrapped-dir=src",
+    "process:ci": "node -e 'require(\"../../lib/process-action\")' -- --results=results.json --artifacts=artifacts --url=https://safetest-two.vercel.app/vite-svelte-ts --build-url=. --bootstrapped-dir=src",
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "devDependencies": {
