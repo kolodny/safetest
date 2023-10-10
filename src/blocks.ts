@@ -2,10 +2,6 @@
 import { state } from './state';
 import { isInNode } from './is-in-node';
 
-const smartAppendToCurrent = (appending: string) =>
-  (state.currentSuitePlusTest ? state.currentSuitePlusTest + ' ' : '') +
-  appending;
-
 const seen = new Set<string>();
 const createId = (name: string, parent: string) => {
   const separator = parent ? ' ' : '';
@@ -29,40 +25,45 @@ export const createBlockFn = (
   /** Is function `describe` which we always run or `it` which we don't run */
   isDescribe: boolean
 ): string => {
-  const previous = state.currentSuitePlusTest;
-  let key = smartAppendToCurrent(name);
-  if (!isDescribe && key in state.tests) {
-    let index = 2;
-    while (key in state.tests) {
-      key = smartAppendToCurrent(`${name} - ${index++}`);
-    }
-  }
-  if (!isDescribe) state.tests[key] = fn;
+  let key = '';
   const previousSuite = state.currentSuite;
-  if (isDescribe) state.currentSuite = createId(name, state.currentSuite);
-  state.currentSuitePlusTest = key;
+  if (isDescribe) {
+    key = state.currentSuite = createId(name, state.currentSuite);
+  } else {
+    key = createId(name, state.currentSuite);
+  }
+
+  if (!isDescribe) state.tests[key] = fn;
   if (isInNode) {
     if (!fn) {
       // `it.todo` does this
       actualThing(name);
     } else {
-      if (!isDescribe) state.currentTest = name;
       actualThing(
         name,
         function (this: any, ...args: any[]) {
-          state.activeTest = key;
+          if (!isDescribe) state.activeTest = key;
+          const exitTest = () => {
+            if (isDescribe) {
+              state.currentSuite = previousSuite;
+            } else delete state.activeTest;
+          };
+
           if (key in state.retryMap) {
             state.retryMap[key]++;
           } else {
             state.retryMap[key] = 0;
           }
-          state.currentSuitePlusTest = key;
           const result = (fn as any).call(this, ...args);
           if (result && 'then' in result) {
-            return result.then((resolved: any) => {
-              state.passedTests.add(key);
-              return resolved;
-            });
+            return result
+              .then((resolved: any) => {
+                state.passedTests.add(key);
+                return resolved;
+              })
+              .finally(exitTest);
+          } else {
+            exitTest();
           }
           state.passedTests.add(key);
           return result;
@@ -76,7 +77,5 @@ export const createBlockFn = (
       fn();
     }
   }
-  if (isDescribe) state.currentSuite = previousSuite;
-  state.currentSuitePlusTest = previous;
   return key;
 };

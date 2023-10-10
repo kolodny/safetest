@@ -68,9 +68,6 @@ export const setup = (options: Options) => {
   useDocker = !!state.options.useDocker;
 
   afterAll(async () => {
-    // Jest creates a fresh context for each test, vitest needs to be cleaned up
-    state.currentSuitePlusTest = '';
-
     // This needs to run for each vitest test, not sure why this doesn't work with vitest in the vitest.ts setup.
     await collectArtifacts();
   });

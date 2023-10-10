@@ -65,7 +65,7 @@ const makeIt: (actualThing: Function) => any =
           globalSetup();
         }
         const debugTests = state.options.debugTests;
-        const current = state.currentSuitePlusTest;
+        const current = state.activeTest!;
         if (debugTests && !debugTests.includes(current)) {
           it.skip(name, () => {});
         } else {

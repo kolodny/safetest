@@ -15,7 +15,7 @@ export const overrideEvents = (page: Page) => {
       if (state.pauseAtEveryStep) {
         const optionsStr = options ? JSON.stringify(options) : '';
         const selector = JSON.stringify(this._selector);
-        const test = state.currentSuitePlusTest;
+        const test = state.activeTest;
         const msg = `'${test}' ${mid} page.locator(${selector}).${evt}(${optionsStr})`;
         console.log(msg);
         await page.evaluate(({ msg }) => console.log(msg), { msg });
@@ -30,7 +30,7 @@ export const overrideEvents = (page: Page) => {
       if (state.pauseAtEveryStep) {
         const optionsStr = options ? `, ${JSON.stringify(options)}` : '';
         const selectorStr = JSON.stringify(selector);
-        const test = state.currentSuitePlusTest;
+        const test = state.activeTest;
         const msg = `'${test}' ${mid} page.${evt}(${selectorStr}${optionsStr})`;
         console.log(msg);
         await page.evaluate(({ msg }) => console.log(msg), { msg });
