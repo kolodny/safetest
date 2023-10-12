@@ -11,12 +11,12 @@ const exists = async (path: string) => {
 const artifacts = state.artifacts;
 
 export const collectArtifacts = async () => {
+  const file = state.artifactsJson;
   const path = safeRequire('path');
-  const testPath = path.relative(process.cwd(), expect.getState().testPath!);
+  const bootstrappedAt = path.dirname(require.resolve(state.bootstrappedAt));
+  const testPath = path.relative(bootstrappedAt, expect.getState().testPath!);
 
   const safePath = testPath.replace(/[^a-z0-9_]/g, '_');
-
-  const file = state.artifactsJson;
   if (file) {
     const byTest: Record<
       string,
