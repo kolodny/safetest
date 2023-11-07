@@ -25,7 +25,8 @@ export const collectArtifacts = async () => {
     const fs = safeRequire('fs');
 
     for (const artifact of artifacts) {
-      if (await exists(artifact.path)) {
+      // Videos take a few ms to write to disk but we know they'll be there, hack to get around that race condition
+      if (artifact.confirmed || (await exists(artifact.path))) {
         if (!byTest[artifact.test]) byTest[artifact.test] = [];
         const info = { type: artifact.type, path: artifact.path };
         byTest[artifact.test]?.push(info);

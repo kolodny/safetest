@@ -56,9 +56,19 @@ export const configureSnapshot = (expect: jest.Expect) => {
 
           const diff = path.join(diffDir, `${id}-diff.png`);
           const snapshot = path.join(snapshotsDir, `${id}.png`);
-          artifacts.push({ type: 'snapshot', test, path: snapshot });
-          artifacts.push({ type: 'received', test, path: received });
-          artifacts.push({ type: 'diff', test, path: diff });
+          artifacts.push({
+            type: 'snapshot',
+            test,
+            path: snapshot,
+            confirmed: false,
+          });
+          artifacts.push({
+            type: 'received',
+            test,
+            path: received,
+            confirmed: false,
+          });
+          artifacts.push({ type: 'diff', test, path: diff, confirmed: false });
 
           return id;
         }

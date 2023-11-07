@@ -32,6 +32,7 @@ export interface State {
     test: string;
     type: 'snapshot' | 'diff' | 'received' | 'trace' | 'video';
     path: string;
+    confirmed: boolean;
   }>;
   isCi: boolean;
   artifactsJson?: string;

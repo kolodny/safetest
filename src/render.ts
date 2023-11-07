@@ -230,7 +230,7 @@ export async function render(
         .replace(/[^a-z0-9_]/g, '_');
       page._safetest_internal.hooks.afterTest.push(async () => {
         const path = `${options.recordTraces}/traces/${testPath}_${safeName}-attempt-${attempt}.zip`;
-        state.artifacts.push({ type: 'trace', test, path });
+        state.artifacts.push({ type: 'trace', test, path, confirmed: true });
         try {
           await page.context().tracing.stop({ path });
         } catch {}
@@ -333,7 +333,7 @@ export async function render(
           const suffix = (pages?.length ?? 0) > 1 ? `_tab${index}` : '';
           const newName = `${safeName}-attempt-${attempt}${suffix}.webm`;
           const path = `${videoDir}/${testPath}_${newName}`;
-          state.artifacts.push({ type: 'video', test, path });
+          state.artifacts.push({ type: 'video', test, path, confirmed: true });
           page?.video()?.saveAs(path);
         }
       });
