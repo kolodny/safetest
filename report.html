@@ -91,10 +91,10 @@
           }
         }
 
-        const artifactsEntries = Object.entries(resultsJson.data.artifacts);
-        const hasFilename = Object.keys(
-          artifactsEntries[0]?.[1] ?? {}
-        )[0]?.includes(artifactsEntries[0][0]);
+        const artifactsEntries = Object.entries(results?.artifacts ?? {});
+        const hasFilename = artifactsEntries.some((entry) =>
+          Object.keys(entry[1] ?? {})[0]?.includes(entry[0])
+        );
 
         root = recur(tests);
         function recur(map, filename = '', title = '') {
