@@ -7,8 +7,8 @@
     "build": "(rm -rf ../../build/angular-app || true) && ng build --base-href 'https://safetest-two.vercel.app/angular-app/' && mv dist/angular-app ../../build/angular-app",
     "watch": "ng build --watch --configuration development",
     "safetest": "node --inspect node_modules/.bin/jest --runInBand --bail=5 --url=http://localhost:4200/angular-app --testMatch '**/*.safetest.{j,t}s{,x}' --setupFilesAfterEnv ./setup-safetest.js",
-    "safetest:ci": "npm run safetest -- --watchAll=false --ci=1 --docker=1 --url=https://safetest-two.vercel.app/angular-app --artifacts-json=artifacts-info --json --outputFile=results.json",
-    "process:ci": "safetest collect-artifacts artifacts-info",
+    "safetest:ci": "npm run safetest -- --watchAll=false --ci=1 --docker=1 --url=https://safetest-two.vercel.app/angular-app --artifacts-json=artifacts-info --json --outputFile=results.json --artifacts-json=artifacts.json",
+    "process:ci": "npx safetest merge-json results.json artifacts.json && cp results.json ../../build/angular-app/results.json",
     "test": "ng test"
   },
   "private": true,

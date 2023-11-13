@@ -25,7 +25,7 @@ fs.writeFileSync(
     dirs
       .map(
         (dir) =>
-          `<td><a href="${dir}">${dir} App</a></td><td><a href="${dir}/artifacts/results.html">${dir} Artifacts</a>`
+          `<td><a href="${dir}">${dir} App</a></td><td><a href="https://safetest-two.vercel.app/report.html#results=${dir}/artifacts/results.json&base=/${dir}/">${dir} Artifacts</a>`
       )
       .join('</tr></tr>')
 );

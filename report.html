@@ -6,6 +6,8 @@
 <!-- http://localhost:9000/jest-report.html#results=%2Fexamples%2Fcra%2Fresults.json&base=https://safetest-two.vercel.app/cra/ -->
 <!-- http://localhost:9000/jest-report.html#results=%2Fexamples%2Fvite-react-ts%2Fresults.json&base=https://safetest-two.vercel.app/vite-react-ts/ -->
 
+<!-- https://safetest-two.vercel.app/report.html#results=cra%2Fartifacts%2Fresults.json&base=https%3A%2F%2Fsafetest-two.vercel.app%2Fcra%2F -->
+
 <html lang="en">
   <title>htm Demo</title>
   <meta charset="UTF-8" />
@@ -69,7 +71,7 @@
       // const base = '';
       const flattenResults = resultsJson.data?.testResults?.flatMap((result) =>
         result.assertionResults.flatMap((s) => ({
-          filename: result.name.slice(base.length + 1),
+          filename: result.name,
           ...s,
         }))
       );
@@ -78,7 +80,7 @@
       if (results) {
         const tests = {};
         for (const result of results.testResults) {
-          const filename = result.name.slice(base.length + 1);
+          const filename = result.name;
           for (const assertionResult of result.assertionResults) {
             let test = (tests[filename] ??= {});
             for (const ancestorTitles of assertionResult.ancestorTitles) {
@@ -124,12 +126,6 @@
               );
 
               const artifacts = cleanedArtifacts[fullName];
-
-              // const artifacts = artifactsEntries.find((e) =>
-              //   filename.endsWith(e[0])
-              // )?.[1]?.[result.fullName];
-
-              console.log({ cleanedArtifacts, artifacts });
 
               if (!item.tests) item.tests = [];
               item.tests.push({ result, artifacts });
@@ -192,28 +188,24 @@
       return html`
         <div>
           <div style="display: flex">
-            <label
-              style="display: flex; flex-grow: 1; align-items: center; padding: 8px"
-            >
-              Results
-              <input
-                style="flex-grow: 1; margin: 0 8px"
-                type="text"
-                value=${resultsLocation}
-                onInput=${(e) => setResults(e.target.value)}
-              />
-            </label>
-            <label
-              style="display: flex; flex-grow: 1; align-items: center; padding: 8px"
-            >
-              Artifacts
-              <input
-                style="flex-grow: 1; margin: 0 8px"
-                type="text"
-                value=${''}
-                onInput=${(e) => setArtifacts(e.target.value)}
-              />
-            </label>
+            ${!resultsLocation &&
+            html`
+              <label
+                style="display: flex; flex-grow: 1; align-items: center; padding: 8px"
+              >
+                Results
+                <input
+                  style="flex-grow: 1; margin: 0 8px"
+                  type="text"
+                  value=${resultsLocation}
+                  onKeydown=${(e) => {
+                    if (e.key === 'Enter') {
+                      setResults(e.target.value);
+                    }
+                  }}
+                />
+              </label>
+            `}
           </div>
           <div>${root}</div>
         </div>
