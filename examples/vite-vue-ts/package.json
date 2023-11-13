@@ -13,7 +13,8 @@
     "process:ci": "npx safetest merge-json results.json artifacts.json && cp results.json ../../build/vite-vue-ts/results.json"
   },
   "dependencies": {
-    "vue": "^3.3.4"
+    "vue": "^3.3.4",
+    "safetest": "file:../.."
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.3",
