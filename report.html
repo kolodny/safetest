@@ -56,6 +56,12 @@
       return { loading, data, error };
     };
 
+    const absolute = (relative) => {
+      const link = document.createElement('a');
+      link.href = relative;
+      return link.href;
+    };
+
     const App = () => {
       const [resultsLocation, setResults] = useHashState('results');
       const [base] = useHashState('base', '');
@@ -172,7 +178,9 @@
                     )}
                     ${byType['trace']?.map(
                       (a) =>
-                        html`<a target="_blank" href="${base}artifacts/trace/index.html?trace=${base}${a.path}">Trace</a`
+                        html`<a target="_blank" href="${base}artifacts/trace/index.html?trace=${absolute(
+                          `${base}${a.path}`
+                        )}">Trace</a`
                     )}
                   </div>
                 </details>`
