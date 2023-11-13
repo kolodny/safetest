@@ -38,7 +38,7 @@
         "safetest": "react-scripts --inspect test --runInBand --url=http://localhost:3000/cra --testMatch '**/*.safetest.{j,t}s{,x}' --setupFilesAfterEnv ./setup-safetest.js",
         "safetest:ci": "npm run safetest -- --watchAll=false --json --outputFile=results.json --bail=5 --ci=1 --docker=1 --url=https://safetest-two.vercel.app/cra --artifacts-json=artifacts.json && npx safetest merge-json results.json artifacts.json",
         "safetest:regenerate-screenshots": "npm run safetest -- --watchAll=false --docker=1 --update-snapshot",
-        "process:ci": "npx safetest merge-json results.json artifacts.json",
+        "process:ci": "npx safetest merge-json results.json artifacts.json && cp results.json ../../build/cra/results.json",
         "eject": "react-scripts eject"
     },
     "eslintConfig": {
