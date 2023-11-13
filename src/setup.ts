@@ -7,6 +7,7 @@ import { getViewUrl, openLocalBrowser, startServer } from './redirect-server';
 import { getTree } from './ps';
 import { safeRequire } from './safe-require';
 import { collectArtifacts } from './artifacts';
+import merge from 'deepmerge';
 
 type Options = RenderOptions & { bootstrappedAt: string };
 
@@ -39,8 +40,15 @@ export const setup = (options: Options) => {
       .filter(Boolean)
   );
 
+  if (typeof process !== 'undefined' && process.env['SAFETEST_OPTIONS']) {
+    merge(parsed, JSON.parse(process.env['SAFETEST_OPTIONS']) as RenderOptions);
+  }
+
   const targetUrl = parsed['url'] || process.env['TARGET_URL'];
-  if (!targetUrl) throw new Error('Target URL is required');
+  if (!targetUrl)
+    throw new Error(
+      'Target URL is required! Either pass --url, set TARGET_URL, or set the SAFETEST_OPTIONS'
+    );
   const url = new URL(targetUrl);
   let useDocker = !!parsed['docker'];
   const headless = useDocker ? true : !parsed['headed'];

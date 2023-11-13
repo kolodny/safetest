@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <title>htm Demo</title>
+  <meta charset="UTF-8" />
   <style>
     details {
       padding-left: 8px;
@@ -17,9 +18,6 @@
         let value = defaultValue;
         if (hash.has(name)) {
           value = hash.get(name);
-          try {
-            value = JSON.parse(value);
-          } catch {}
         }
         return value;
       });
@@ -27,7 +25,7 @@
         const nextValue = typeof value === 'function' ? value(state) : value;
         setState(nextValue);
         if (nextValue === defaultValue) hash.delete(name);
-        else hash.set(name, JSON.stringify(nextValue));
+        else hash.set(name, nextValue);
         location.hash = new URLSearchParams(hash);
       };
       return [state, setWrapped];
@@ -50,28 +48,18 @@
     };
 
     const App = () => {
-      const [count, setCount] = useHashState('count', 0);
-
       const [resultsLocation, setResults] = useHashState('results');
+      const [base] = useHashState('base', '');
       const resultsJson = useFetching(resultsLocation, {
         enabled: !!resultsLocation,
       });
 
-      const [artifacts, setArtifacts] = useHashState('artifacts');
-      const artifactsJson = useFetching(artifacts, { enabled: !!artifacts });
-
       window.resultsJson = resultsJson;
-      window.artifactsJson = artifactsJson;
-
-      if (artifactsJson.data) {
-        artifactsJson.data.bootstrappedAt =
-          '/home/runner/work/safetest/safetest/examples/cra/src/index.js';
-      }
 
       const results = resultsJson.data;
 
-      const strapped = artifactsJson.data?.bootstrappedAt;
-      const base = strapped ? strapped.slice(0, strapped.lastIndexOf('/')) : '';
+      // const strapped = artifactsJson.data?.bootstrappedAt;
+      // const base = '';
       const flattenResults = resultsJson.data?.testResults?.flatMap((result) =>
         result.assertionResults.flatMap((s) => ({
           filename: result.name.slice(base.length + 1),
@@ -94,6 +82,11 @@
           }
         }
 
+        const artifactsEntries = Object.entries(resultsJson.data.artifacts);
+        const hasFilename = Object.keys(
+          artifactsEntries[0]?.[1] ?? {}
+        )[0]?.includes(artifactsEntries[0][0]);
+
         root = recur(tests);
         function recur(map, filename = '', title = '') {
           const item = {};
@@ -107,9 +100,29 @@
               const fullName = value;
 
               const result = flattenResults.find(
-                (f) => f.filename === filename && f.fullName === fullName
+                (f) =>
+                  f.filename === filename &&
+                  f.fullName.trim() === fullName.trim()
               );
-              const artifacts = artifactsJson.data?.[filename][fullName];
+
+              const fileEntries = artifactsEntries.find((e) =>
+                filename.endsWith(e[0])
+              );
+
+              const cleanedArtifacts = Object.fromEntries(
+                Object.entries(fileEntries[1]).map(([k, v]) => [
+                  hasFilename ? k.split(' > ').slice(1).join(' ').trim() : k,
+                  v,
+                ])
+              );
+
+              const artifacts = cleanedArtifacts[fullName];
+
+              // const artifacts = artifactsEntries.find((e) =>
+              //   filename.endsWith(e[0])
+              // )?.[1]?.[result.fullName];
+
+              console.log({ cleanedArtifacts, artifacts });
 
               if (!item.tests) item.tests = [];
               item.tests.push({ result, artifacts });
@@ -132,29 +145,33 @@
               children.push(
                 html`<details>
                   <summary>${result.fullName} ${icons[result.status]}</summary>
-                  ${byType['video']?.map(
-                    (a) =>
-                      html`<details style="display: inline-block">
-                        <summary>Video</summary>
-                        <video
-                          src="https://safetest-two.vercel.app/cra/${a.path}"
-                          controls
-                        ></video>
-                      </details>`
-                  )}
-                  ${byType['snapshot']?.map(
-                    (a) =>
-                      html`<details style="display: inline-block">
-                        <summary>Snapshot</summary>
-                        <img
-                          src="https://safetest-two.vercel.app/cra/artifacts/${a.path}"
-                        />
-                      </details>`
-                  )}
-                  ${byType['trace']?.map(
-                    (a) =>
-                      html`<a target="_blank" href="https://safetest-two.vercel.app/cra/artifacts/trace/index.html?trace=https://safetest-two.vercel.app/cra/${a.path}">Trace</a`
-                  )}
+                  <div style="display: flex; gap: 12px">
+                    ${byType['video']?.map(
+                      (a) =>
+                        html`<details style="display: inline-flex">
+                          <summary>Video</summary>
+                          <video
+                            style="border: 1px solid"
+                            src="${base}${a.path}"
+                            controls
+                          ></video>
+                        </details>`
+                    )}
+                    ${byType['snapshot']?.map(
+                      (a) =>
+                        html`<details style="display: inline-flex">
+                          <summary>Snapshot</summary>
+                          <img
+                            style="border: 1px solid"
+                            src="${base}artifacts/${a.path}"
+                          />
+                        </details>`
+                    )}
+                    ${byType['trace']?.map(
+                      (a) =>
+                        html`<a target="_blank" href="${base}artifacts/trace/index.html?trace=${base}${a.path}">Trace</a`
+                    )}
+                  </div>
                 </details>`
               );
             } else {
@@ -167,6 +184,30 @@
 
       return html`
         <div>
+          <div style="display: flex">
+            <label
+              style="display: flex; flex-grow: 1; align-items: center; padding: 8px"
+            >
+              Results
+              <input
+                style="flex-grow: 1; margin: 0 8px"
+                type="text"
+                value=${resultsLocation}
+                onInput=${(e) => setResults(e.target.value)}
+              />
+            </label>
+            <label
+              style="display: flex; flex-grow: 1; align-items: center; padding: 8px"
+            >
+              Artifacts
+              <input
+                style="flex-grow: 1; margin: 0 8px"
+                type="text"
+                value=${''}
+                onInput=${(e) => setArtifacts(e.target.value)}
+              />
+            </label>
+          </div>
           <div>${root}</div>
         </div>
       `;

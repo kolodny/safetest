@@ -22,23 +22,18 @@ program
   .action(buildDocker);
 
 program
-  .command('collect-artifacts')
-  .description('Collect artifacts of the current test run')
-  .argument(
-    '<artifacts-json>',
-    'artifacts json sources to collect - ie what you passed as `--artifacts-json`'
-  )
-  .argument('[destination]', 'artifacts json file to save collected artifacts')
-  .action(async (src, dest) => {
-    const dir = await readdir(dirname(src));
-    const artifacts = dir.filter((f) => f.startsWith(`${src}_`));
-    const collected = {};
-    for (const artifact of artifacts) {
-      const data = require(resolve(artifact));
-      Object.assign(collected, data);
+  .command('merge-json')
+  .description('Merge multiple json objects')
+  .argument('<destination>', 'existing file to merge into')
+  .argument('<jsons...>', 'json source you want to add to destination')
+  .action(async (dest, jsons) => {
+    const existing = require(resolve(dest));
+    for (const json of jsons) {
+      const data = require(resolve(json));
+      Object.assign(existing, data);
     }
-    dest = dest || `${src}.json`;
-    await writeFile(dest, JSON.stringify(collected, null, 2));
+
+    await writeFile(dest, JSON.stringify(existing, null, 2));
   });
 
 program.parse();

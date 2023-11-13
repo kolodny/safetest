@@ -1,8 +1,10 @@
 import { safeRequire } from './safe-require';
 import { state } from './state';
 
+const path = safeRequire('path');
+const fs = safeRequire('fs');
+
 const exists = async (path: string) => {
-  const fs = safeRequire('fs');
   return new Promise((resolve) => {
     fs.access(path, (err) => resolve(!err));
   });
@@ -12,11 +14,9 @@ const artifacts = state.artifacts;
 
 export const collectArtifacts = async () => {
   const file = state.artifactsJson;
-  const path = safeRequire('path');
   const bootstrappedAt = path.dirname(require.resolve(state.bootstrappedAt));
   const testPath = path.relative(bootstrappedAt, expect.getState().testPath!);
 
-  const safePath = testPath.replace(/[^a-z0-9_]/g, '_');
   if (file) {
     const byTest: Record<
       string,
@@ -33,9 +33,12 @@ export const collectArtifacts = async () => {
       }
     }
 
-    const isJest = typeof jest !== 'undefined';
-    const saveTo = isJest ? `${file}_${safePath}.json` : file;
-    const json = isJest ? { [testPath]: byTest } : byTest;
-    fs.writeFileSync(saveTo, JSON.stringify(json, null, 2));
+    const json = { artifacts: { [testPath]: byTest } };
+    try {
+      const contents = fs.readFileSync(path.resolve(file), 'utf-8');
+      const existing = JSON.parse(contents);
+      Object.assign(json.artifacts, existing.artifacts);
+    } catch {}
+    fs.writeFileSync(file, JSON.stringify(json, null, 2));
   }
 };
