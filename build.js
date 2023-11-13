@@ -5,6 +5,8 @@ try {
   fs.mkdirSync('build');
 } catch (e) {}
 
+fs.cpSync('jest-report.html', 'build/jest-report.html');
+
 const examples = fs.readdirSync('examples');
 const dirs = [];
 for (const example of examples) {
