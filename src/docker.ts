@@ -1,7 +1,7 @@
-import { mkdtempSync, writeFileSync, readFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import cp from 'node:child_process';
+import { mkdtempSync, writeFileSync, readFileSync } from 'fs';
+import { tmpdir } from 'os';
+import { join } from 'path';
+import cp from 'child_process';
 import { state } from './state';
 
 const DOCKER_DEBUG_PORT = 9222;
