@@ -108,8 +108,6 @@ export async function render(
     container: HTMLElement | string
   ) => Promise<any>
 ): Promise<RenderReturn> {
-  const testName = state.activeTest;
-
   if (state.options) {
     options = merge(state.options, options);
   }
@@ -121,7 +119,7 @@ export async function render(
       JSON.parse(process.env['SAFETEST_OPTIONS']) as RenderOptions
     );
   }
-  options.headless = state.debugging.has(testName ?? '')
+  options.headless = state.debugging.has(state.activeTest ?? '')
     ? false
     : 'headless' in options
     ? options.headless
@@ -153,8 +151,6 @@ export async function render(
 
     const videoDir = options.recordVideo?.dir ?? options.videosPath;
 
-    const safeName = testName?.replace(/[^a-z0-9_]/gi, '_');
-
     const bootstrapDir = path.dirname(state.bootstrappedAt);
     const filenameWithoutExt = filename.split('.').slice(0, -1).join('.');
     const relative = path.relative(bootstrapDir, filenameWithoutExt);
@@ -182,7 +178,7 @@ export async function render(
             }
             if (type === 'GET_INFO') {
               const info = {
-                testName,
+                testName: state.activeTest,
                 testPath,
                 retryAttempt: attempt,
               };
@@ -222,13 +218,14 @@ export async function render(
         screenshots: true,
         snapshots: true,
         sources: true,
-        title: testName!,
+        title: state.activeTest!,
       });
       const test = expect.getState().currentTestName ?? '<unknown>';
       const testPath = path
         .relative(process.cwd(), expect.getState().testPath!)
         .replace(/[^a-z0-9_]/g, '_');
       page._safetest_internal.hooks.afterTest.push(async () => {
+        const safeName = state.activeTest?.replace(/[^a-z0-9_]/gi, '_');
         const path = `${options.recordTraces}/traces/${testPath}_${safeName}-attempt-${attempt}.zip`;
         state.artifacts.push({ type: 'trace', test, path, confirmed: true });
         try {
@@ -237,7 +234,7 @@ export async function render(
       });
     }
 
-    const isDebugging = state.debugging.has(testName ?? '');
+    const isDebugging = state.debugging.has(state.activeTest ?? '');
 
     state.exposeGlobals['page'] = page;
     const pause = (state.pause = await makePause({ page, isDebugging }));
@@ -307,12 +304,12 @@ export async function render(
     const failDir = page._safetest_internal.failureScreenshotDir;
     if (failDir) {
       page._safetest_internal.hooks.afterTest.push(async () => {
-        const passed = state.passedTests.has(testName ?? '');
+        const passed = state.passedTests.has(state.activeTest ?? '');
         if (!passed) {
           const pages = state.browserContextInstance?.pages();
           for (const [index, page] of pages?.entries() ?? []) {
             const suffix = index ? `_${index}` : '';
-            const path = `${failDir}/${testName}${suffix}.png`;
+            const path = `${failDir}/${state.activeTest}${suffix}.png`;
             await page.screenshot({ path });
           }
         }
@@ -331,6 +328,7 @@ export async function render(
           await ensureDir(videoDir);
 
           const suffix = (pages?.length ?? 0) > 1 ? `_tab${index}` : '';
+          const safeName = state.activeTest?.replace(/[^a-z0-9_]/gi, '_');
           const newName = `${safeName}-attempt-${attempt}${suffix}.webm`;
           const path = `${videoDir}/${testPath}_${newName}`;
           state.artifacts.push({ type: 'video', test, path, confirmed: true });
@@ -368,12 +366,15 @@ export async function render(
         const plan = shouldRetry
           ? `retrying (attempts left: ${gotoAttempts + 1})...`
           : 'giving up';
-        console.log(`page.goto error: ${error.name} on "${testName}" ${plan}`);
+        console.log(
+          `page.goto error: ${error.name} on "${state.activeTest}" ${plan}`
+        );
         if (shouldRetry) return gotoTestUrl();
         throw new PageReadyTimeoutError();
       });
     };
 
+    const testName = state.activeTest;
     page._safetest_internal.renderIsReadyDeferred = deferred();
     await gotoTestUrl();
 
@@ -386,7 +387,7 @@ export async function render(
         console.log(`Go to ${debugUrl} to debug this test`);
         return debugUrl;
       },
-      { testName, testPath }
+      { testName: state.activeTest, testPath }
     );
 
     if (isDebugging) {
@@ -398,7 +399,7 @@ export async function render(
         const passed = state.passedTests.has(activeTest);
         if (!passed && !isDebugging) {
           console.log(
-            `'${testName}' Failed. Go to ${debugUrl.replace(
+            `'${state.activeTest}' Failed. Go to ${debugUrl.replace(
               'host.docker.internal',
               'localhost'
             )} to debug this test`

@@ -2,12 +2,11 @@ import { setOptions } from '.';
 import { startDocker, stopDocker } from './docker';
 import { RenderOptions } from './render';
 import { state } from './state';
-import { camelCase } from 'lodash';
+import { set } from 'lodash';
 import { getViewUrl, openLocalBrowser, startServer } from './redirect-server';
 import { getTree } from './ps';
 import { safeRequire } from './safe-require';
 import { collectArtifacts } from './artifacts';
-import merge from 'deepmerge';
 
 type Options = RenderOptions & { bootstrappedAt: string };
 
@@ -24,41 +23,38 @@ export const setup = (options: Options) => {
     argv = current?.argv!;
   }
 
-  const parsed = Object.fromEntries(
-    argv!
-      .map((arg) => arg.match(/(?<=--)([^=]*)(?:=(.*))?/)?.slice(1))
-      .map((item) => {
-        let value: any = item?.[1];
-        if (!item?.[0]) return undefined as never;
-        if (value === 'false') value = false;
-        else if (value === 'true') value = true;
-        else if (value === undefined) value = true;
-        else if (value === 'undefined') value = undefined;
-        else if (!isNaN(parseFloat(value))) value = +value;
-        return [camelCase(item?.[0]), value];
-      })
-      .filter(Boolean)
-  );
+  const parse = (s: string) => {
+    try {
+      return JSON.parse(s);
+    } catch {
+      return s;
+    }
+  };
 
-  if (typeof process !== 'undefined' && process.env['SAFETEST_OPTIONS']) {
-    merge(parsed, JSON.parse(process.env['SAFETEST_OPTIONS']) as RenderOptions);
+  const opts: Record<string, string> = {
+    url: options.url ?? '',
+    docker: options.useDocker ? 'true' : '',
+    headed: 'headless' in options ? `${options.headless}` : '',
+  };
+  const envEntries = Object.entries(process.env)
+    .map(([name, value]) => [name.toLowerCase(), `${value}`] as const)
+    .filter(([name]) => name.startsWith('opt_'))
+    .map(([name, value]) => [name.slice(4).replace(/_/g, '.'), parse(value)]);
+
+  for (const [name, value] of envEntries) set(opts, name, value);
+
+  const url = options.url ?? opts['url'];
+  if (!url) throw new Error('Target URL is required!');
+  let useDocker = !!opts['docker'] || !!options.useDocker;
+  const headless = useDocker ? true : !opts['headed'];
+
+  const isCi = (state.isCi = !!opts['ci'] || !!process.env['CI']);
+  if (opts['artifacts']) {
+    state.artifactsJson = opts['artifacts'];
   }
 
-  const targetUrl = parsed['url'] || process.env['TARGET_URL'];
-  if (!targetUrl)
-    throw new Error(
-      'Target URL is required! Either pass --url, set TARGET_URL, or set the SAFETEST_OPTIONS'
-    );
-  const url = new URL(targetUrl);
-  let useDocker = !!parsed['docker'];
-  const headless = useDocker ? true : !parsed['headed'];
-
-  state.isCi = !!parsed['ci'] || !!process.env['CI'];
-  if (parsed['artifactsJson']) {
-    state.artifactsJson = parsed['artifactsJson'];
-  }
-
-  const localUrl = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+  const hostname = new URL(url).hostname;
+  const localUrl = hostname === 'localhost' || hostname === '127.0.0.1';
 
   setOptions({
     url: `${url}`,
@@ -70,9 +66,7 @@ export const setup = (options: Options) => {
     },
   });
 
-  if (options) {
-    setOptions(options);
-  }
+  setOptions(options);
   useDocker = !!state.options.useDocker;
 
   afterAll(async () => {
@@ -81,19 +75,19 @@ export const setup = (options: Options) => {
   });
 
   if (useDocker) {
-    if (localUrl) url.hostname = 'host.docker.internal';
+    const dockerSafeUrl = new URL(url);
+    if (localUrl) dockerSafeUrl.hostname = 'host.docker.internal';
     beforeAll(async () => {
       const docker = await startDocker();
-      await startServer(parsed);
+      await startServer(opts);
 
       const browserServer = `http://localhost:${docker?.ports.SERVER_PORT}/`;
       setOptions({
-        url: `${url}`,
+        url: `${dockerSafeUrl}`,
         browserServer,
         afterAllDone: stopDocker,
       });
-      const isCi = !!parsed['ci'] || !!process.env['CI'];
-      if (parsed['headed'] && !isCi) {
+      if (opts['headed'] && !isCi) {
         await openLocalBrowser('http://localhost:8844');
       } else {
         const viewUrl = getViewUrl();

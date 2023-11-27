@@ -180,10 +180,10 @@ export default defineConfig({
    npm run safetest
    ```
 
-   Additionally, you can pass it a a number of custom command line arguments. The options are `--headed=1`, `--url=...`, `--artifacts-json=...`, `--docker=1`, and `--ci=1`, for example to see the browser window while the tests are running:
+   Additionally, you can pass it a a number of custom options via environment variables. The options are `headed`, `url`, `artifacts`, `docker`, and `ci`, for example to see the browser window while the tests are running:
 
    ```bash
-   npm run safetest -- --headed=1
+   OPT_HEADED=1 npm run safetest
    ```
 
 1. ### Integrating into CI
@@ -191,7 +191,7 @@ export default defineConfig({
    Assuming part of your CI pipeline deploys the app to some url `https://my-app.com` you can add a step to the CI pipeline by either adding a script to manually invoking the following:
 
    ```bash
-   npm run safetest -- --watchAll=false --ci=1 --docker=1 --url=https://my-app.com --json --outputFile=results.json
+   OPT_CI=1 OPT_DOCKER=1 OPT_URL=https://my-app.com npm run safetest -- --watchAll=false --ci=1 --json --outputFile=results.json
    ```
 
    Safetest also provides a processor which you can also add as a script or manually invoke:
