@@ -1,5 +1,5 @@
 import { isInNode } from './is-in-node';
-export { setOptions } from './set-options';
+export { setOptions, getOptions } from './set-options';
 
 const isInBrowser = !isInNode;
 export { isInNode, isInBrowser };

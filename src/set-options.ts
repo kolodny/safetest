@@ -58,3 +58,5 @@ export const setOptions = (
   }
   state.options = !options ? {} : merge(state.options ?? {}, options);
 };
+
+export const getOptions = () => state.options;
