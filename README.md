@@ -55,9 +55,9 @@ The following instructions assume you're using `create-react-app`. Look in the e
    ```json
    {
      "scripts": {
-       "safetest": "vitest --inspect --no-threads -- --url=http://localhost:3000/ ",
-       "safetest:ci": "npm run safetest --run --bail=5 -- --ci=1 --docker=1 --url=DEPLOYED_URL",
-       "safetest:regenerate-screenshots": "npm run safetest --run --bail=5 -- --ci=1 --docker=1 --update-snapshot",
+       "safetest": "OPT_URL=${OPT_URL:-http://localhost:3000/} vitest --config vite.safetest.config",
+       "safetest:ci:test": "OPT_URL=https://safetest-two.vercel.app OPT_CI=1 OPT_DOCKER=1 OPT_ARTIFACTS=artifacts.json npm run safetest -- --run --bail=5",
+       "safetest:regenerate-screenshots": "OPT_DOCKER=1 npm run safetest -- --run --update",
        "process:ci": "node -e 'require(\"safetest/process-action\")' -- --results=results.json --artifacts=artifacts --url=DEPLOYED_URL --build-url=. --bootstrapped-dir=src"
      }
    }
@@ -72,10 +72,6 @@ The following instructions assume you're using `create-react-app`. Look in the e
    ```ts
    import { setup } from 'safetest/setup';
 
-   vitest.setConfig({ testTimeout: 30000 });
-
-   // Or jest.setTimeout(30000)
-
    setup({
      bootstrappedAt: require.resolve('./src/main.tsx'),
      // ciOptions: { usingArtifactsDir: 'artifacts' },
@@ -84,17 +80,24 @@ The following instructions assume you're using `create-react-app`. Look in the e
 
    This file is the minimal setup required to get Safetest working with your project. It's also where you can configure Safetest by specifying options to the `setup` function.
 
-1. If you're using vitest you'll need to add at least these values to your vitest config:
+1. If you're using vitest you'll need to add a vitest.safetest.config.ts file with the following config:
 
 ```ts
+/// <reference types="vitest" />
+
+import { defineConfig } from 'vite';
+
+// https://vitejs.dev/config/
 export default defineConfig({
-  /* ... */
   test: {
     globals: true,
+    testTimeout: 30000,
     reporters: ['basic', 'json'],
     outputFile: 'results.json',
     setupFiles: ['setup-safetest'],
     include: ['**/*.safetest.?(c|m)[jt]s?(x)'],
+    singleThread: true,
+    inspectBrk: true,
   },
 });
 ```
@@ -180,7 +183,7 @@ export default defineConfig({
    npm run safetest
    ```
 
-   Additionally, you can pass it a a number of custom options via environment variables. The options are `headed`, `url`, `artifacts`, `docker`, and `ci`, for example to see the browser window while the tests are running:
+   Additionally, you can pass it a a number of custom options via environment variables prefixed with `OPT_`. (This is needed since the test runner may run in subprocesses and command line args aren't always passed through but environment variables always are.) Some examples: `OPT_HEADED`, `OPT_URL`, `OPT_ARTIFACTS`, `OPT_DOCKER`, `OPT_CI`, etc. For example to see the browser window while the tests are running:
 
    ```bash
    OPT_HEADED=1 npm run safetest
@@ -596,8 +599,6 @@ To use it, you need to add the following code to your `setup-safetest.tsx` file:
 import { setup } from 'safetest/setup';
 
 import { getCookies, addCookies } from './auth';
-
-vitest.setConfig({ testTimeout: 30000 }); // or using jest.setTimeout if using jest
 
 beforeAll(getCookies);
 

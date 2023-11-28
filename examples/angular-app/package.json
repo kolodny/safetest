@@ -6,7 +6,7 @@
     "start": "ng serve",
     "build": "(rm -rf ../../build/angular-app || true) && ng build --base-href 'https://safetest-two.vercel.app/angular-app/' && mv dist/angular-app ../../build/angular-app",
     "watch": "ng build --watch --configuration development",
-    "safetest": "node --inspect node_modules/.bin/jest --runInBand --bail=5 --url=http://localhost:4200/angular-app --testMatch '**/*.safetest.{j,t}s{,x}' --setupFilesAfterEnv ./setup-safetest.js",
+    "safetest": "node --inspect node_modules/.bin/jest --runInBand --bail=5 --url=http://localhost:4200/angular-app --testMatch '**/*.safetest.{j,t}s{,x}' --setupFilesAfterEnv ./setup-safetest.js --testTimeout=30000",
     "safetest:ci": "OPT_ARTIFACTS=artifacts.json OPT_URL=https://safetest-two.vercel.app/angular-app OPT_DOCKER=1 OPT_CI=1 npm run safetest -- --watchAll=false --json --outputFile=results.json",
     "process:ci": "npx safetest merge-json results.json artifacts.json && cp results.json ../../build/angular-app/results.json",
     "test": "ng test"
