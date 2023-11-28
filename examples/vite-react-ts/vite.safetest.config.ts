@@ -1,9 +1,11 @@
 /// <reference types="vitest" />
 
 import { defineConfig } from 'vite';
+import base from './vite.config';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  ...base,
   test: {
     globals: true,
     testTimeout: 30000,
