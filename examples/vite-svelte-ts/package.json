@@ -8,7 +8,7 @@
     "build": "npm i ../../ && (rm -rf ../../build/vite-svelte-ts || true) && vite build && mv dist ../../build/vite-svelte-ts",
     "preview": "vite preview",
     "safetest": "vitest --inspect --no-threads --globals -- --url=http://localhost:3000/vite-svelte-ts/",
-    "safetest:ci:test": "vitest --inspect --no-threads --globals --run -- --url=http://localhost:3000/vite-svelte-ts/ --run --bail=5 -- --ci=1 --docker=1 --artifacts-json=artifacts.json --url=https://safetest-two.vercel.app/vite-svelte-ts",
+    "safetest:ci:test": "OPT_URL=https://safetest-two.vercel.app/vite-svelte-ts OPT_CI=1 OPT_DOCKER=1 OPT_ARTIFACTS=artifacts.json vitest --inspect --no-threads --globals --run --bail=5",
     "safetest:ci": "(npm run safetest:ci:test || true)",
     "process:ci": "npx safetest merge-json results.json artifacts.json && cp results.json ../../build/vite-svelte-ts/results.json",
     "check": "svelte-check --tsconfig ./tsconfig.json"

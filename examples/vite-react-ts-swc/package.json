@@ -9,7 +9,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "safetest": "vitest --inspect --no-threads -- --url=http://localhost:3000/vite-react-ts-swc/",
-    "safetest:ci:test": "vitest --inspect --no-threads --globals --run -- --url=http://localhost:3000/vite-react-ts-swc/ --run --bail=5 -- --ci=1 --docker=1 --artifacts-json=artifacts.json --url=https://safetest-two.vercel.app/vite-react-ts-swc",
+    "safetest:ci:test": "OPT_URL=https://safetest-two.vercel.app/vite-react-ts-swc OPT_ARTIFACTS=artifacts.json OPT_DOCKER=1 OPT_CI=1 vitest --inspect --no-threads --globals --run --bail=5",
     "safetest:ci": "(npm run safetest:ci:test || true)",
     "process:ci": "npx safetest merge-json results.json artifacts.json && cp results.json ../../build/vite-react-ts-swc/results.json"
   },
