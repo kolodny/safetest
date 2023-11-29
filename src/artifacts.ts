@@ -15,7 +15,7 @@ const artifacts = state.artifacts;
 export const collectArtifacts = async () => {
   const file = state.artifactsJson;
   const bootstrappedAt = path.dirname(require.resolve(state.bootstrappedAt));
-  const testPath = path.relative(bootstrappedAt, expect.getState().testPath!);
+  const testPath = path.relative(bootstrappedAt, state.testPath ?? '');
 
   if (file) {
     const byTest: Record<

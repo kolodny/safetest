@@ -148,6 +148,7 @@ export async function render(
     const path = safeRequire('path');
 
     const filename = state.getState().testPath ?? '';
+    state.testPath = filename;
 
     const videoDir = options.recordVideo?.dir ?? options.videosPath;
 

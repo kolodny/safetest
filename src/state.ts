@@ -38,6 +38,7 @@ export interface State {
   artifactsJson?: string;
   bootstrappedAt: string;
   getState: () => ReturnType<typeof expect.getState>;
+  testPath?: string;
   /**
    * When a test is being run we need to track which element to render, this is only useful for
    * the browser side of things
