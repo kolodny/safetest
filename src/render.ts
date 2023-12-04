@@ -228,8 +228,9 @@ export async function render(
       const testPath = path
         .relative(process.cwd(), expect.getState().testPath!)
         .replace(/[^a-z0-9_]/g, '_');
+      const activeTest = state.activeTest;
       page._safetest_internal.hooks.afterTest.push(async () => {
-        const safeName = state.activeTest?.replace(/[^a-z0-9_]/gi, '_');
+        const safeName = activeTest?.replace(/[^a-z0-9_]/gi, '_');
         const path = `${options.recordTraces}/traces/${testPath}_${safeName}-attempt-${attempt}.zip`;
         state.artifacts.push({ type: 'trace', test, path, confirmed: true });
         try {
@@ -323,13 +324,14 @@ export async function render(
 
     const failDir = page._safetest_internal.failureScreenshotDir;
     if (failDir) {
+      const activeTest = state.activeTest;
       page._safetest_internal.hooks.afterTest.push(async () => {
-        const passed = state.passedTests.has(state.activeTest ?? '');
+        const passed = state.passedTests.has(activeTest ?? '');
         if (!passed) {
           const pages = state.browserContextInstance?.pages();
           for (const [index, page] of pages?.entries() ?? []) {
             const suffix = index ? `_${index}` : '';
-            const path = `${failDir}/${state.activeTest}${suffix}.png`;
+            const path = `${failDir}/${activeTest}${suffix}.png`;
             await page.screenshot({ path });
           }
         }
@@ -341,6 +343,7 @@ export async function render(
       const testPath = path
         .relative(process.cwd(), expect.getState().testPath!)
         .replace(/[^a-z0-9_]/g, '_');
+      const activeTest = state.activeTest;
       page._safetest_internal.hooks.afterTest.push(async () => {
         const pages = state.browserContextInstance?.pages() as SafePage[];
         for (const page of pages ?? []) {
@@ -348,7 +351,7 @@ export async function render(
           await ensureDir(videoDir);
 
           const suffix = (pages?.length ?? 0) > 1 ? `_tab${index}` : '';
-          const safeName = state.activeTest?.replace(/[^a-z0-9_]/gi, '_');
+          const safeName = activeTest?.replace(/[^a-z0-9_]/gi, '_');
           const newName = `${safeName}-attempt-${attempt}${suffix}.webm`;
           const path = `${videoDir}/${testPath}_${newName}`;
           state.artifacts.push({ type: 'video', test, path, confirmed: true });
