@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'safetest/vitest';
+import { describe, it, expect } from 'safetest/jest';
 import { render } from 'safetest/react';
 
 describe('simple', () => {
