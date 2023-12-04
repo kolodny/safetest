@@ -27,11 +27,7 @@ export const createBlockFn = (
 ): string => {
   let key = '';
   const previousSuite = state.currentSuite;
-  if (isDescribe) {
-    key = state.currentSuite = createId(name, state.currentSuite);
-  } else {
-    key = createId(name, state.currentSuite);
-  }
+  key = createId(name, state.currentSuite);
 
   if (!isDescribe) state.tests[key] = fn;
   if (isInNode) {
@@ -42,11 +38,22 @@ export const createBlockFn = (
       actualThing(
         name,
         function (this: any, ...args: any[]) {
-          if (!isDescribe) state.activeTest = key;
+          if (isDescribe) {
+            state.currentSuite = key;
+          } else state.activeTest = key;
           const exitTest = () => {
             if (isDescribe) {
               state.currentSuite = previousSuite;
             } else delete state.activeTest;
+          };
+          const passed = (resolved: any) => {
+            state.passedTests.add(key);
+            exitTest();
+            return resolved;
+          };
+          const failed = (err: any) => {
+            exitTest();
+            throw err;
           };
 
           if (key in state.retryMap) {
@@ -54,19 +61,15 @@ export const createBlockFn = (
           } else {
             state.retryMap[key] = 0;
           }
-          const result = (fn as any).call(this, ...args);
-          if (result && 'then' in result) {
-            return result
-              .then((resolved: any) => {
-                state.passedTests.add(key);
-                return resolved;
-              })
-              .finally(exitTest);
-          } else {
-            exitTest();
+          try {
+            const result = (fn as any).call(this, ...args);
+            if (result && 'then' in result) {
+              return result.then(passed, failed);
+            }
+            return passed(result);
+          } catch (error) {
+            return failed(error);
           }
-          state.passedTests.add(key);
-          return result;
         },
         ...extraArgs
       );
@@ -74,7 +77,9 @@ export const createBlockFn = (
   } else {
     // In the browser
     if (isDescribe) {
+      state.currentSuite = key;
       fn();
+      state.currentSuite = previousSuite;
     }
   }
   return key;

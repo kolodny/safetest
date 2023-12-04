@@ -8,6 +8,7 @@ export interface State {
   retryMap: Record<string, number>;
   __filename?: string;
   activeTest?: string;
+  pendingExpects: Record<string, number>;
   options: RenderOptions;
   isGlobalSetupTeardownRegistered: boolean;
   debugging: Set<string>;
@@ -60,6 +61,7 @@ export const state: State = {
   currentSuite: '',
   currentTest: '',
   isGlobalSetupTeardownRegistered: false,
+  pendingExpects: {},
   exposeGlobals: {},
   debugging: new Set(),
   passedTests: new Set(),

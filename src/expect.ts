@@ -3,10 +3,28 @@ import type { BrowserSpy } from './browser-mock';
 import { isInNode } from './is-in-node';
 import { anythingProxy } from './anythingProxy';
 import * as matchers from './matchers';
+import { state } from './state';
 
 export const makeExpect = <T>(expect: T) => {
   const anyExpect = expect as any;
-  anyExpect.extend(matchers);
+  const mappedMatchers = Object.fromEntries(
+    Object.entries(matchers).map(([key, value]) => {
+      if (typeof value !== 'function') return [key, value];
+      const wrappedFn = function (this: any, ...args: any[]) {
+        const matched = (value as any).apply(this, args);
+        if (matched && 'finally' in matched) {
+          state.pendingExpects[key] = state.pendingExpects[key] ?? 0;
+          state.pendingExpects[key]++;
+          return matched.finally(() => {
+            state.pendingExpects[key]--;
+          });
+        }
+        return matched;
+      };
+      return [key, wrappedFn];
+    })
+  );
+  anyExpect.extend(mappedMatchers);
 
   const _exportedExpect = <T>(
     actual: T
@@ -26,16 +44,5 @@ export const makeExpect = <T>(expect: T) => {
 
   const exportedExpect = isInNode ? _exportedExpect : (anythingProxy as never);
 
-  if (isInNode) {
-    for (const matcher of Object.keys(anyExpect)) {
-      try {
-        if (typeof anyExpect[matcher] === 'function') {
-          (exportedExpect as any)[matcher] = anyExpect[matcher].bind(expect);
-        } else {
-          (exportedExpect as any)[matcher] = anyExpect[matcher];
-        }
-      } catch {}
-    }
-  }
   return exportedExpect;
 };

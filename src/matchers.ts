@@ -61,9 +61,7 @@ async function toBeTruthy(
   }>,
   options: { timeout?: number } = {}
 ) {
-  // const timeout = undefined
-
-  const { matches, log, timedOut } = await query(!!this.isNot);
+  const { matches, log, timedOut } = await query(!!this.isNot, options.timeout);
 
   const message = () => '';
 

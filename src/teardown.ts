@@ -29,6 +29,8 @@ export const afterEachFn = async () => {
 };
 
 export const afterAllFn = async () => {
+  state.currentSuite = '';
+
   await cleanupBrowser();
   for (const afterAllDone of state.afterAllsDone ?? []) {
     await afterAllDone();

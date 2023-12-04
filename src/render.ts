@@ -147,15 +147,18 @@ export async function render(
     const inspector = safeRequire('inspector');
     const path = safeRequire('path');
 
-    const filename = state.getState().testPath ?? '';
-    state.testPath = filename;
-
     const videoDir = options.recordVideo?.dir ?? options.videosPath;
 
-    const bootstrapDir = path.dirname(state.bootstrappedAt);
-    const filenameWithoutExt = filename.split('.').slice(0, -1).join('.');
-    const relative = path.relative(bootstrapDir, filenameWithoutExt);
-    const testPath = `./${relative}`;
+    const getFilePath = () => {
+      const filename = state.getState().testPath ?? '';
+      state.testPath = filename;
+
+      const bootstrapDir = path.dirname(state.bootstrappedAt);
+      const filenameWithoutExt = filename.split('.').slice(0, -1).join('.');
+      const relative = path.relative(bootstrapDir, filenameWithoutExt);
+      const testPath = `./${relative}`;
+      return testPath;
+    };
 
     const attempt = getRetryAttempt();
 
@@ -180,7 +183,7 @@ export async function render(
             if (type === 'GET_INFO') {
               const info = {
                 testName: state.activeTest,
-                testPath,
+                testPath: getFilePath(),
                 retryAttempt: attempt,
               };
               const hooks = safetest_internal.hooks;
@@ -302,6 +305,22 @@ export async function render(
       }
     });
 
+    page._safetest_internal.hooks.afterTest.push(async () => {
+      const errors: Error[] = [];
+      for (const [key, value] of Object.entries(state.pendingExpects)) {
+        if (value)
+          errors.push(
+            new Error(
+              `Expected ${value} ${key}() calls to be awaited, but they were not.`
+            )
+          );
+      }
+      state.pendingExpects = {};
+      if (errors.length) {
+        throw new Error(errors.map((e) => e.message).join('\n'));
+      }
+    });
+
     const failDir = page._safetest_internal.failureScreenshotDir;
     if (failDir) {
       page._safetest_internal.hooks.afterTest.push(async () => {
@@ -388,7 +407,7 @@ export async function render(
         console.log(`Go to ${debugUrl} to debug this test`);
         return debugUrl;
       },
-      { testName: state.activeTest, testPath }
+      { testName: state.activeTest, testPath: getFilePath() }
     );
 
     if (isDebugging) {

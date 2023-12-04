@@ -13,7 +13,7 @@ export default defineConfig({
     outputFile: 'results.json',
     setupFiles: ['setup-safetest'],
     include: ['**/*.safetest.?(c|m)[jt]s?(x)'],
-    singleThread: process.env.CI ? false : true,
+    threads: process.env.CI ? true : false,
     inspect: process.env.CI ? false : true,
   },
 });
