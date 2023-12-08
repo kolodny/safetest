@@ -22,7 +22,6 @@ export const collectArtifacts = async () => {
       string,
       Array<{ type: typeof state.artifacts[number]['type']; path: string }>
     > = {};
-    const fs = safeRequire('fs');
 
     for (const artifact of artifacts) {
       // Videos take a few ms to write to disk but we know they'll be there, hack to get around that race condition
@@ -33,7 +32,10 @@ export const collectArtifacts = async () => {
       }
     }
 
-    const json = { artifacts: { [testPath]: byTest } };
+    const json = {
+      artifacts: { [testPath]: byTest },
+      bootstrappedAt: state.bootstrappedAt,
+    };
     try {
       const contents = fs.readFileSync(path.resolve(file), 'utf-8');
       const existing = JSON.parse(contents);
