@@ -32,10 +32,9 @@ export const collectArtifacts = async () => {
       }
     }
 
-    const json = {
-      artifacts: { [testPath]: byTest },
-      bootstrappedAt: state.bootstrappedAt,
-    };
+    const bootstrappedAt = path.relative(process.cwd(), state.bootstrappedAt);
+
+    const json = { artifacts: { [testPath]: byTest }, bootstrappedAt };
     try {
       const contents = fs.readFileSync(path.resolve(file), 'utf-8');
       const existing = JSON.parse(contents);
