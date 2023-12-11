@@ -56,7 +56,7 @@ The following instructions assume you're using `create-react-app`. Look in the e
    {
      "scripts": {
        "safetest": "OPT_URL=${OPT_URL:-http://localhost:3000/} vitest --config vite.safetest.config",
-       "safetest:ci:test": "OPT_URL=https://safetest-two.vercel.app OPT_CI=1 OPT_DOCKER=1 OPT_ARTIFACTS=artifacts.json npm run safetest -- --run --bail=5",
+       "safetest:ci:test": "rm -f artifacts.json && OPT_URL=https://safetest-two.vercel.app OPT_CI=1 OPT_DOCKER=1 OPT_ARTIFACTS=artifacts.json npm run safetest -- --run --bail=5",
        "safetest:regenerate-screenshots": "OPT_DOCKER=1 npm run safetest -- --run --update",
        "process:ci": "node -e 'require(\"safetest/process-action\")' -- --results=results.json --artifacts=artifacts --url=DEPLOYED_URL --build-url=. --bootstrapped-dir=src"
      }

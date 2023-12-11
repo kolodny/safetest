@@ -9,10 +9,10 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "safetest": "OPT_URL=${OPT_URL:-http://localhost:3000/vite-react-ts/} vitest --config vite.safetest.config",
-    "safetest:ci:test": "OPT_URL=https://safetest-two.vercel.app/vite-react-ts OPT_CI=1 OPT_DOCKER=1 OPT_ARTIFACTS=artifacts.json npm run safetest -- --run --bail=5",
+    "safetest:ci:test": "rm -f artifacts.json && OPT_URL=https://safetest-two.vercel.app/vite-react-ts OPT_CI=1 OPT_DOCKER=1 OPT_ARTIFACTS=artifacts.json npm run safetest -- --run --bail=5",
     "safetest:ci": "(npm run safetest:ci:test || true)",
     "safetest:regenerate-screenshots": "OPT_DOCKER=1 npm run safetest -- --run --update",
-    "process:ci": "npx safetest merge-json results.json artifacts.json && cp results.json ../../build/vite-react-ts/results.json"
+    "process:ci": "npx safetest add-artifact-info artifacts.json results.json && cp results.json ../../build/vite-react-ts/results.json"
   },
   "dependencies": {
     "react": "^18.2.0",

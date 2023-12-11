@@ -4,6 +4,7 @@ import { Command } from 'commander';
 import { buildDocker } from './docker';
 import { readdir, writeFile } from 'fs/promises';
 import { dirname, resolve } from 'path';
+import { mergeArtifacts } from './artifacts';
 
 const pkg = require('../package.json');
 
@@ -22,18 +23,16 @@ program
   .action(buildDocker);
 
 program
-  .command('merge-json')
-  .description('Merge multiple json objects')
-  .argument('<destination>', 'existing file to merge into')
-  .argument('<jsons...>', 'json source you want to add to destination')
-  .action(async (dest, jsons) => {
-    const existing = require(resolve(dest));
-    for (const json of jsons) {
-      const data = require(resolve(json));
-      Object.assign(existing, data);
-    }
+  .command('add-artifact-info')
+  .description('Adds artifact info to a json results file')
+  .argument('<artifactsJson>', 'json source you want to add to destination')
+  .argument('<resultsJson>', 'existing json results file to add to')
+  .action(async (artifactsJson, resultsJson) => {
+    const artifacts = require(resolve(artifactsJson));
+    mergeArtifacts(artifacts.bootstrappedAt, artifacts.artifacts, resultsJson);
+    // Object.assign(existing, artifacts);
 
-    await writeFile(dest, JSON.stringify(existing, null, 2));
+    // await writeFile(results, JSON.stringify(results, null, 2));
   });
 
 program.parse();

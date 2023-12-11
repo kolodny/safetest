@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 
-<!-- jest-report.html#results=https://safetest-two.vercel.app/cra/artifacts/results.json&artifacts=https://safetest-two.vercel.app/cra/artifacts/artifacts-info.json -->
+<!-- report.html#results=https://safetest-two.vercel.app/cra/artifacts/results.json&artifacts=https://safetest-two.vercel.app/cra/artifacts/artifacts-info.json -->
 
 <!-- python3 -m http.server 9000 -  -->
-<!-- http://localhost:9000/jest-report.html#results=%2Fexamples%2Fcra%2Fresults.json&base=https://safetest-two.vercel.app/cra/ -->
-<!-- http://localhost:9000/jest-report.html#results=%2Fexamples%2Fvite-react-ts%2Fresults.json&base=https://safetest-two.vercel.app/vite-react-ts/ -->
+<!-- http://localhost:9000/report.html#results=%2Fexamples%2Fcra%2Fresults.json&base=https://safetest-two.vercel.app/cra/ -->
+<!-- http://localhost:9000/report.html#results=%2Fexamples%2Fvite-react-ts%2Fresults.json&base=https://safetest-two.vercel.app/vite-react-ts/ -->
 
 <!-- https://safetest-two.vercel.app/report.html#results=cra%2Fartifacts%2Fresults.json&base=https%3A%2F%2Fsafetest-two.vercel.app%2Fcra%2F -->
 
@@ -120,21 +120,8 @@
                   f.fullName.trim() === fullName.trim()
               );
 
-              const fileEntries = artifactsEntries.find((e) =>
-                filename.endsWith(e[0])
-              );
-
-              const cleanedArtifacts = Object.fromEntries(
-                Object.entries(fileEntries[1]).map(([k, v]) => [
-                  hasFilename ? k.split(' > ').slice(1).join(' ').trim() : k,
-                  v,
-                ])
-              );
-
-              const artifacts = cleanedArtifacts[fullName];
-
               if (!item.tests) item.tests = [];
-              item.tests.push({ result, artifacts });
+              item.tests.push(result);
               const icons = {
                 passed: '✅',
                 failed: '❌',
@@ -144,42 +131,37 @@
                 todo: '📝',
                 disabled: '🚫',
               };
-              const byType = {};
-              if (artifacts) {
-                for (const artifact of artifacts) {
-                  byType[artifact.type] = byType[artifact.type] || [];
-                  byType[artifact.type].push(artifact);
-                }
-              }
+              const artifacts = result.artifacts ?? {};
+
               children.push(
                 html`<details>
                   <summary>${result.fullName} ${icons[result.status]}</summary>
                   <div style="display: flex; gap: 12px">
-                    ${byType['video']?.map(
+                    ${artifacts['video']?.map(
                       (a) =>
                         html`<details style="display: inline-flex">
                           <summary>Video</summary>
                           <video
                             style="border: 1px solid"
-                            src="${base}${a.path}"
+                            src="${base}${a}"
                             controls
                           ></video>
                         </details>`
                     )}
-                    ${byType['snapshot']?.map(
+                    ${artifacts['snapshot']?.map(
                       (a) =>
                         html`<details style="display: inline-flex">
                           <summary>Snapshot</summary>
                           <img
                             style="border: 1px solid"
-                            src="${base}artifacts/${a.path}"
+                            src="${base}artifacts/${a}"
                           />
                         </details>`
                     )}
-                    ${byType['trace']?.map(
+                    ${artifacts['trace']?.map(
                       (a) =>
                         html`<a target="_blank" href="${base}artifacts/trace/index.html?trace=${absolute(
-                          `${base}${a.path}`
+                          `${base}${a}`
                         )}">Trace</a`
                     )}
                   </div>
