@@ -1,5 +1,6 @@
 import { isInNode } from './is-in-node';
 export { setOptions, getOptions } from './set-options';
+export { MergedResults } from './artifacts';
 
 const isInBrowser = !isInNode;
 export { isInNode, isInBrowser };

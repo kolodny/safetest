@@ -19,6 +19,18 @@ type ArtifactType = typeof state.artifacts[number]['type'];
 type Group = Partial<Record<ArtifactType, string[]>>;
 type Grouped = Record<string, Group>;
 
+type TestResults = FormattedTestResults['testResults'];
+type FormattedTestResult = TestResults[number];
+type AssertionResult = FormattedTestResult['assertionResults'][number];
+export type MergedResults = Omit<FormattedTestResults, 'testResults'> & {
+  testResults: Array<
+    Omit<FormattedTestResult, 'assertionResults'> & {
+      filename: string;
+      assertionResults: Array<AssertionResult & { artifacts?: Group }>;
+    }
+  >;
+};
+
 export const collectArtifacts = async () => {
   const file = state.artifactsJson;
   const bootstrappedAt = path.dirname(require.resolve(state.bootstrappedAt));
@@ -72,7 +84,7 @@ export const mergeArtifacts = (
   artifacts: Record<string, Grouped>,
   resultsJson: string
 ) => {
-  const results: FormattedTestResults = require(path.resolve(resultsJson));
+  const results: MergedResults = require(path.resolve(resultsJson));
   const resultsFilenames = results.testResults.map((r) => r.name);
   const artifactsFilenames = Object.keys(artifacts ?? {});
   const prefix = resultsFilenames
@@ -80,7 +92,7 @@ export const mergeArtifacts = (
     ?.slice(0, -(artifactsFilenames[0]?.length ?? 0));
   for (const file of results.testResults) {
     const filename = file.name.slice(prefix?.length ?? 0);
-    (file as any).filename = filename;
+    file.filename = filename;
 
     const actuallyBootstrappedAt = path.resolve(bootstrappedAt);
     const relativeBootstrappedAt = path.relative('.', actuallyBootstrappedAt);
@@ -96,7 +108,7 @@ export const mergeArtifacts = (
       const fileArtifacts = artifacts[filename];
       const testArtifacts = fileArtifacts?.[full1] ?? fileArtifacts?.[full2];
       if (testArtifacts) {
-        (assertionResult as any).artifacts = testArtifacts;
+        assertionResult.artifacts = testArtifacts;
       }
     }
   }
