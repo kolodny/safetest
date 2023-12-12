@@ -88,8 +88,13 @@ export const mergeArtifacts = (
   const resultsFilenames = results.testResults.map((r) => r.name);
   const artifactsFilenames = Object.keys(artifacts ?? {});
   const prefix = resultsFilenames
-    .find((f) => f.endsWith(artifactsFilenames[0]!))
-    ?.slice(0, -(artifactsFilenames[0]?.length ?? 0));
+    .flatMap((f) =>
+      artifactsFilenames.map((a) =>
+        f.endsWith(a) ? f.slice(0, -a.length) : null
+      )
+    )
+    .filter(Boolean)[0];
+
   for (const file of results.testResults) {
     const filename = file.name.slice(prefix?.length ?? 0);
     file.filename = filename;
