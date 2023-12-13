@@ -1,6 +1,6 @@
 {
   "name": "safetest",
-  "version": "0.0.0-alpha-29",
+  "version": "0.0.0-alpha-31",
   "description": "Safetest is a powerful UI testing library that combines Playwright, Jest, and React for a powerful end-to-end testing solution for applications and component testing. With Safetest, you can easily test the functionality and appearance of your application, ensuring that it works as expected and looks great on all devices.",
   "main": "lib/index.js",
   "bin": "./lib/cli.js",

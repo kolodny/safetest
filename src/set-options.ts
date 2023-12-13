@@ -28,6 +28,7 @@ export const setOptions = (
         customDiffDir: `${usingArtifactsDir}/image_diffs`,
         storeReceivedOnFailure: true,
         customReceivedDir: `${usingArtifactsDir}/updated_snapshots`,
+        customReceivedPostfix: '',
         failureThreshold: 0,
       },
     };

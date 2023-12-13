@@ -48,6 +48,7 @@ export interface RenderOptions extends LaunchOptions, BrowserContextOptions {
          *       customDiffDir: `${ARTIFACTS_DIR}/image_diffs`,
          *       storeReceivedOnFailure: true,
          *       customReceivedDir: `${ARTIFACTS_DIR}/updated_snapshots`,
+         *       customReceivedPostfix: '',
          *       failureThreshold: 0,
          *     }
          */
@@ -132,12 +133,7 @@ export async function render(
     'http://localhost:3000';
 
   if (options.subPath) {
-    const subPathSeparates = ['/', '?', '#', '&'].includes(
-      options.subPath[0] ?? ''
-    );
-    const urlParts = new URL(url);
-    const needsSlash = !urlParts.pathname.endsWith('/') && !subPathSeparates;
-    url += (needsSlash ? '/' : '') + options.subPath;
+    url = `${new URL(options.subPath, options.url)}`;
   }
 
   if (isInNode) {
