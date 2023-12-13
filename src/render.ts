@@ -132,11 +132,10 @@ export async function render(
       : 'http://localhost:3000') ??
     'http://localhost:3000';
 
-  if (options.subPath) {
-    url = `${new URL(options.subPath, options.url)}`;
-  }
-
   if (isInNode) {
+    if (options.subPath) {
+      url = `${new URL(options.subPath, options.url)}`;
+    }
     const console = safeRequire('console');
     let page = state.browserContextInstance?.pages()[0] as SafePage;
 
