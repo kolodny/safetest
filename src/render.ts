@@ -372,7 +372,7 @@ export async function render(
           const href = await page
             .evaluate(() => window.location.href)
             .catch(() => page.url());
-          if (href !== url) defer.reject(error);
+          if (new URL(href).origin !== new URL(url).origin) defer.reject(error);
         })
         .then(() => page._safetest_internal.renderIsReadyDeferred?.promise)
         .then(() => defer.resolve());
