@@ -150,9 +150,9 @@ export async function render(
 
       const bootstrapDir = path.dirname(state.bootstrappedAt);
       const filenameWithoutExt = filename.split('.').slice(0, -1).join('.');
-      const relative = path.relative(bootstrapDir, filenameWithoutExt);
-      const testPath = `./${relative}`;
-      return testPath;
+      let relative = path.relative(bootstrapDir, filenameWithoutExt);
+      if (!relative.startsWith('.')) relative = `./${relative}`;
+      return relative;
     };
 
     const attempt = getRetryAttempt();

@@ -137,6 +137,9 @@ export default defineConfig({
    +  // Vite:
    +  // importGlob: isDev && import.meta.glob('./**/*.safetest.{j,t}s{,x}'),
    +
+   +  // Using the `npx safetest generate-import-map src/Bootstrap.tsx src > src/imports.tsx` syntax:
+   +  // imports, // Where imports is defined as `import imports from './imports';`
+   +
    +  // Other:
    +  // import: isDev && async (s) => import(`${s.replace(/.*src/, '.').replace(/\.safetest$/, '')}.safetest`),
    +

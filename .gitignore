@@ -3,3 +3,5 @@ node_modules
 build
 /lib
 results.json
+artifacts.json
+artifacts/

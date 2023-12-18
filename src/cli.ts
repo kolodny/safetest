@@ -2,8 +2,8 @@
 
 import { Command } from 'commander';
 import { buildDocker } from './docker';
-import { readdir, writeFile } from 'fs/promises';
-import { dirname, resolve } from 'path';
+import { sync } from 'glob';
+import { dirname, relative, resolve } from 'path';
 import { mergeArtifacts } from './artifacts';
 
 const pkg = require('../package.json');
@@ -21,6 +21,34 @@ program
     'Builds the safetest docker image so that it will be cached when running tests'
   )
   .action(buildDocker);
+
+program
+  .command('generate-import-map')
+  .description(
+    'Generates the import map for safetest spec files for build systems without globbing support'
+  )
+  .argument('<bootstrappedAt>', 'source file that safetest is bootstrapped at')
+  .argument('<folder>', 'folder to search for spec files')
+  .argument(
+    '[glob]',
+    'glob to use for searching for spec files',
+    '**/*.safetest.{j,t}s{,x}'
+  )
+  .action(async (bootstrappedAt, folder, glob) => {
+    const relativeBootstrappedAt = resolve(process.cwd(), bootstrappedAt);
+    const bootstrappedDir = dirname(relativeBootstrappedAt);
+    const files = sync(glob, { cwd: folder, absolute: true });
+
+    let imports = 'export const imports = {\n';
+    for (const file of files) {
+      const relativeFile = relative(bootstrappedDir, file);
+      let name = `${relativeFile.replace(/\.m?[tj]sx?/, '')}`;
+      if (!name.startsWith('.')) name = `./${name}`;
+      imports += `  '${name}': () => import('${name}'),\n`;
+    }
+    imports += '};\n';
+    console.log(imports);
+  });
 
 program
   .command('add-artifact-info')

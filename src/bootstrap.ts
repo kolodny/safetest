@@ -6,16 +6,16 @@ export type Importer =
   | {
       webpackContext:
         | false
-        | {
-            keys(): Array<string>;
-            (dependency: string): Promise<unknown>;
-          };
+        | { keys(): Array<string>; (dependency: string): Promise<unknown> };
     }
   | {
       importGlob: false | Record<string, () => Promise<unknown>>;
     }
   | {
       import: false | ((s: string) => Promise<unknown>);
+    }
+  | {
+      imports: false | Record<string, () => Promise<unknown>>;
     };
 
 type BootstrapArgs = Importer & {
@@ -35,7 +35,19 @@ export const bootstrap = async (args: BootstrapArgs): Promise<any> => {
     if (args.importGlob === false) return args.defaultRender();
     const mappedGlob = _.mapKeys(args.importGlob, (v, k) => mapper(k));
     known = [...new Set(Object.keys(mappedGlob).map(mapper))];
-    importer = (s: string) => mappedGlob[s]!();
+    importer = (s) => mappedGlob[s]!();
+  } else if ('imports' in args) {
+    importer = (s) => {
+      const entries = Object.entries(args.imports);
+      const entriesMapped = entries.map(([k, v]) => [mapper(k), v] as const);
+      known = entriesMapped.map(([k]) => k);
+      const fixedImports = Object.fromEntries(entriesMapped);
+      const imported = fixedImports[mapper(s)];
+      if (!imported) {
+        throw new Error(`Test "${s}" not found, known tests are: ${known}`);
+      }
+      return imported();
+    };
   } else {
     if (args.import === false) return args.defaultRender();
     importer = args.import;
@@ -62,7 +74,11 @@ export const bootstrap = async (args: BootstrapArgs): Promise<any> => {
       console.groupEnd();
     }
   } else if (testPath && !testName) {
-    await importer(testPath);
+    try {
+      await importer(testPath);
+    } catch {
+      console.log(`Test "${testPath}" not found, known tests are:`, known);
+    }
     const tests = Object.keys(state.tests).map((test) => {
       const url = new URL(location.href);
       const append = url.search.includes('?') ? '&' : '?';
@@ -82,10 +98,23 @@ export const bootstrap = async (args: BootstrapArgs): Promise<any> => {
       (await (window as any)[SAFETEST_INTERFACE]?.('GET_INFO')) ?? {});
   }
   if (testName && testPath) {
-    await importer(testPath);
+    try {
+      await importer(testPath);
+    } catch (error) {
+      console.log(`Test "${testPath}" not found, known tests are:`, known);
+      throw error;
+    }
     if (state.browserState) state.browserState.retryAttempt = retryAttempt;
     await (window as any).waitForSafetestReady;
-    state.tests[testName]!();
+    if (typeof state.tests[testName] !== 'function') {
+      const availableTests = Object.keys(state.tests);
+      console.log(
+        `Test "${testName}" not found, known tests are:`,
+        availableTests
+      );
+    } else {
+      state.tests[testName]!();
+    }
   } else {
     return args.defaultRender();
   }

@@ -1,0 +1,30 @@
+{
+  "name": "next-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "generate-map": "npx safetest generate-import-map src/app/Bootstrap.tsx src > src/app/imports.tsx",
+    "safetest": "OPT_URL=${OPT_URL:-http://localhost:3000/next-app/} vitest --config vite.safetest.config.mts",
+    "safetest:ci:test": "rm -f artifacts.json && OPT_URL=https://safetest-two.vercel.app/next-app/ OPT_CI=1 OPT_DOCKER=1 OPT_ARTIFACTS=artifacts.json npm run safetest -- --run --bail=5",
+    "safetest:ci": "(npm run safetest:ci:test || true)",
+    "process:ci": "npx safetest add-artifact-info artifacts.json results.json && cp results.json ../../build/next-app/results.json"
+  },
+  "dependencies": {
+    "next": "14.0.4",
+    "react": "^18",
+    "react-dom": "^18",
+    "safetest": "file:../.."
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@vitejs/plugin-react": "^4.2.1",
+    "typescript": "^5",
+    "vitest": "^1.0.4"
+  }
+}

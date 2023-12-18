@@ -3,14 +3,17 @@ import { bootstrap as bootstrapCommon, Importer } from './bootstrap';
 import { state } from './state';
 import { isInNode } from './is-in-node';
 import { configureCreateOverride } from 'react-override';
+import React from 'react';
 
 export { Override } from 'react-override';
 
-export const createOverride = configureCreateOverride(isInNode ? false : true);
+export const createOverride = configureCreateOverride(false);
 
 export async function render(
-  elementToRender: JSX.Element | ((app: JSX.Element) => JSX.Element) = state
-    .browserState?.renderElement.value,
+  elementToRender:
+    | React.ReactNode
+    | ((app: React.ReactNode) => React.ReactNode) = state.browserState
+    ?.renderElement.value,
   options: RenderOptions = {}
 ) {
   if (!isInNode && typeof elementToRender === 'function') {
@@ -32,9 +35,9 @@ export async function render(
 }
 
 type BootstrapArgs = Importer & {
-  element: JSX.Element;
+  element: React.ReactNode;
   container: HTMLElement | null;
-  render: (e: JSX.Element, c: HTMLElement) => void;
+  render: (e: React.ReactNode, c: HTMLElement) => void;
 };
 
 export const bootstrap = async (args: BootstrapArgs): Promise<void> => {
@@ -50,4 +53,26 @@ export const bootstrap = async (args: BootstrapArgs): Promise<void> => {
     defaultRender: () =>
       state.browserState?.renderFn!(args.element, args.container!),
   });
+};
+
+export const Bootstrap: React.FunctionComponent<
+  React.PropsWithChildren<
+    {
+      /** Note that using this in SSR mode this will cause the page to start with the loading component before the page is ready. */
+      loading?: React.ReactNode;
+    } & Importer
+  >
+> = (props) => {
+  const initial = props.loading ?? props.children;
+  const [child, setChild] = React.useState<React.ReactNode>(initial);
+  React.useLayoutEffect(() => {
+    bootstrap({
+      ...props,
+      container: null,
+      element: props.children,
+      render: (element) => setChild(element),
+    });
+  }, [props.children]);
+
+  return child || props.children;
 };
