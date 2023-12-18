@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'safetest/vitest';
 import { render } from 'safetest/react';
-import { MainPageFileOverride } from './app/page';
+import { MainPageFileOverride } from './app/Overrides';
 
 describe('app test', () => {
   it('works', async () => {

@@ -2,9 +2,7 @@
 
 import Image from 'next/image';
 import styles from './page.module.css';
-import { createOverride } from 'react-override';
-
-export const MainPageFileOverride = createOverride('src/app/page.tsx');
+import { MainPageFileOverride } from './Overrides';
 
 export default function Home() {
   const mainPage = MainPageFileOverride.useValue();
