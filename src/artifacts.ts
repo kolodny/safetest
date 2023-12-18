@@ -85,18 +85,11 @@ export const mergeArtifacts = (
   resultsJson: string
 ) => {
   const results: MergedResults = require(path.resolve(resultsJson));
-  const resultsFilenames = results.testResults.map((r) => r.name);
-  const artifactsFilenames = Object.keys(artifacts ?? {});
-  const prefix = resultsFilenames
-    .flatMap((f) =>
-      artifactsFilenames.map((a) =>
-        f.endsWith(a) ? f.slice(0, -a.length) : null
-      )
-    )
-    .filter(Boolean)[0];
+  const dir = path.dirname(require.resolve(path.resolve(bootstrappedAt)));
 
   for (const file of results.testResults) {
-    const filename = file.name.slice(prefix?.length ?? 0);
+    const absoluteFilename = path.resolve(dir, file.name);
+    const filename = path.relative(dir, absoluteFilename);
     file.filename = filename;
 
     const actuallyBootstrappedAt = path.resolve(bootstrappedAt);
