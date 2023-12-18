@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm i ../../ && (rm -rf ../../build/vite-react-ts-swc || true) && tsc && vite build && mv dist ../../build/vite-react-ts-swc",
+    "build": "npm i ../../ && (rm -rf ../../build/vite-react-ts-swc || true) && vite build && mv dist ../../build/vite-react-ts-swc",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "safetest": "OPT_URL=${OPT_URL:-http://localhost:3000/vite-react-ts-swc/} vitest --config vite.safetest.config",

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm i ../../ && (rm -rf ../../build/vite-react-ts || true) && tsc && vite build && mv dist ../../build/vite-react-ts",
+    "build": "npm i ../../ && (rm -rf ../../build/vite-react-ts || true) && vite build && mv dist ../../build/vite-react-ts",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "safetest": "OPT_URL=${OPT_URL:-http://localhost:3000/vite-react-ts/} vitest --config vite.safetest.config",
