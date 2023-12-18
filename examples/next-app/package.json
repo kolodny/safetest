@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && (rm -rf ../../build/next-app || true) && mv build ../../build/next-app",
     "start": "next start",
     "lint": "next lint",
     "generate-map": "npx safetest generate-import-map src/app/Bootstrap.tsx src > src/app/imports.tsx",
