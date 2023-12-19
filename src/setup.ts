@@ -12,7 +12,7 @@ type Options = RenderOptions & { bootstrappedAt: string };
 
 export const setup = (options: Options) => {
   if (!options.bootstrappedAt) throw new Error('bootstrappedAt is required');
-  state.bootstrappedAt = options.bootstrappedAt;
+  state.bootstrappedAt = require.resolve(options.bootstrappedAt);
   let argv = process.argv;
   if (typeof vitest !== 'undefined') {
     const processes = getTree();

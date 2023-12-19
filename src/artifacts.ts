@@ -61,14 +61,10 @@ export const collectArtifacts = async () => {
       }
     }
 
-    const relativeBootstrappedAt = path.relative(
-      process.cwd(),
-      state.bootstrappedAt
-    );
-
     const json = {
       artifacts: { [testPath]: grouped },
-      bootstrappedAt: relativeBootstrappedAt,
+      bootstrappedAt: state.bootstrappedAt,
+      cwd: process.cwd(),
     };
     try {
       const contents = fs.readFileSync(path.resolve(file), 'utf-8');
@@ -81,20 +77,19 @@ export const collectArtifacts = async () => {
 
 export const mergeArtifacts = (
   bootstrappedAt: string,
+  cwd: string,
   artifacts: Record<string, Grouped>,
   resultsJson: string
 ) => {
   const results: MergedResults = require(path.resolve(resultsJson));
-  const dir = path.dirname(require.resolve(path.resolve(bootstrappedAt)));
+  const dir = path.dirname(bootstrappedAt);
+  const relativeBootstrapDir = path.relative(cwd, dir);
 
   for (const file of results.testResults) {
     const absoluteFilename = path.resolve(dir, file.name);
     const filename = path.relative(dir, absoluteFilename);
     file.filename = filename;
 
-    const actuallyBootstrappedAt = path.resolve(bootstrappedAt);
-    const relativeBootstrappedAt = path.relative('.', actuallyBootstrappedAt);
-    const relativeBootstrapDir = path.dirname(relativeBootstrappedAt);
     const relativeFilename = path.join(relativeBootstrapDir, filename);
 
     for (const assertionResult of file.assertionResults) {

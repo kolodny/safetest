@@ -57,7 +57,12 @@ program
   .argument('<resultsJson>', 'existing json results file to add to')
   .action(async (artifactsJson, resultsJson) => {
     const artifacts = require(resolve(artifactsJson));
-    mergeArtifacts(artifacts.bootstrappedAt, artifacts.artifacts, resultsJson);
+    mergeArtifacts(
+      artifacts.bootstrappedAt,
+      artifacts.cwd,
+      artifacts.artifacts,
+      resultsJson
+    );
     // Object.assign(existing, artifacts);
 
     // await writeFile(results, JSON.stringify(results, null, 2));

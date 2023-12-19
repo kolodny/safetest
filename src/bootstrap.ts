@@ -101,7 +101,10 @@ export const bootstrap = async (args: BootstrapArgs): Promise<any> => {
     try {
       await importer(testPath);
     } catch (error) {
-      console.log(`Test "${testPath}" not found, known tests are:`, known);
+      console.log(
+        `file "${testPath}" could not be imported, known files are:`,
+        known
+      );
       throw error;
     }
     if (state.browserState) state.browserState.retryAttempt = retryAttempt;

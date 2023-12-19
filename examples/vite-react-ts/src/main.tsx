@@ -5,16 +5,15 @@ import App from './App.tsx';
 import { bootstrap } from 'safetest/react';
 import './index.css';
 
-// console.log(321);
+const container = document.getElementById('root')!;
 
 bootstrap({
-  container: document.getElementById('root'),
+  container,
   element: (
     <React.StrictMode>
       <App />
     </React.StrictMode>
   ),
   importGlob: import.meta.glob('./**/*.safetest.{j,t}s{,x}'),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  render: (e, c) => ReactDOM.createRoot(c).render(e),
+  render: (element) => ReactDOM.createRoot(container).render(element),
 });

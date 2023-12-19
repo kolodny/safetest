@@ -464,6 +464,29 @@ export async function render(
     if (!state.browserState) {
       throw new Error('App was not bootstrapped to use safetest correctly');
     }
+    if (options.subPath) {
+      try {
+        const dummyUrl = new URL(options.subPath, 'http://localhost:3000');
+        const pathname = dummyUrl.pathname;
+        const dummyUrl2 = new URL(options.subPath, dummyUrl);
+        const different = pathname !== dummyUrl2.pathname;
+
+        // subPath is something like `foo/` and every page reload we'll end up adding another `foo/` to the url incorrectly.
+        // This is detects and breaks out of that loop.
+        const skip = different && location.pathname.includes(pathname);
+
+        if (!skip) {
+          const url = new URL(options.subPath, location.href);
+          const search = new URLSearchParams([
+            ...url.searchParams,
+            ...[...new URLSearchParams(location.search)],
+          ]).toString();
+          url.search = search;
+          url.hash = location.hash;
+          history.pushState(null, '', `${url}`);
+        }
+      } catch {}
+    }
     await howToRender(element, state.browserState.renderContainer.value as any);
 
     const bridge: any = (state.bridge = (passed: any, callback: any) => {
