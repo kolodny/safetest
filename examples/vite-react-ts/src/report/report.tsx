@@ -8,10 +8,7 @@ export const UrlContext = React.createContext<string | null>(null);
 
 export const Report: React.FunctionComponent = () => {
   const [resultsLocation, setResultsLocation] = useHashState('results', '');
-  const [url] = useHashState(
-    'url',
-    'https://safetest-two.vercel.app/next-app/'
-  );
+  const [url] = useHashState('url', '');
   const results = useFetching<MergedResults>(resultsLocation, {
     enabled: !!resultsLocation,
   });
