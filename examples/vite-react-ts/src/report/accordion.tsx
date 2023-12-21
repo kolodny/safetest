@@ -2,8 +2,8 @@ import React from 'react';
 import { Expandable } from './expandable';
 
 const borderColor = '#e2e2e2';
-const backgroundColorOpen = '#fafafa';
-const backgroundColorClosed = '#fff';
+const backgroundColorOpen = '#f7f7f7';
+const backgroundColorClosed = '#fafafa';
 
 export const Accordion: React.FunctionComponent<
   React.PropsWithChildren<{
@@ -24,7 +24,7 @@ export const Accordion: React.FunctionComponent<
     <div style={{ border: `1px solid #${borderColor}` }}>
       <div
         onClick={() => setOpen(!open)}
-        style={{ cursor: 'pointer', padding: 8, background }}
+        style={{ cursor: 'pointer', padding: 10, margin: 2, background }}
       >
         <span
           style={{

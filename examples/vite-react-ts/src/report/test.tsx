@@ -43,6 +43,16 @@ const SmartVideo: React.FunctionComponent<{ src: string }> = ({ src }) => (
 
 const getAttempt = (url: string) => url.match(/-attempt-(\d+)/)?.[1];
 
+const statuses = {
+  passed: '✅',
+  failed: '❌',
+  pending: '⏱',
+  skipped: '⏭',
+  todo: '📝',
+  disabled: '🚫',
+  empty: '📭',
+};
+
 export const Test: React.FunctionComponent<
   React.PropsWithChildren<{ test: TestType }>
 > = ({ test }) => {
@@ -145,10 +155,9 @@ export const Test: React.FunctionComponent<
 
   return (
     <Accordion
-      defaultOpen
       summary={
         <>
-          <Label>{test.status}</Label> {test.title} {link}
+          <Label>{statuses[test.status]}</Label> {test.title} {link}
         </>
       }
     >
