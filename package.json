@@ -20,7 +20,8 @@
   "scripts": {
     "build": "tsc",
     "build:reporter": "cd examples/vite-react-ts && npm run report:build && cp dist/report.html ../../",
-    "prepublish": "npm run build:reporter && npm run build",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run build:reporter && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
