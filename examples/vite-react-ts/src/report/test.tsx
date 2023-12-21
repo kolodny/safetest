@@ -43,7 +43,6 @@ export const Test: React.FunctionComponent<
   const filename = React.useContext(FilenameContext);
   const url = React.useContext(UrlContext);
   const getTestUrl = () => {
-    console.log({ url, filename });
     if (!url || !filename) return null;
     const filePrefix = filename.startsWith('.') ? '' : './';
     const fixedFile = `${filePrefix}${filename}`.replace(/\.[jt]sx?$/g, '');

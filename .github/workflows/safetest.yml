@@ -31,7 +31,7 @@ jobs:
       - name: Build deploy artifacts
         run: node build.js
       - name: Build test reporter
-        run: cd examples/vite-react-ts && npm run report:build && cp dist/report.html ../../build/vite-react-ts/
+        run: cd examples/vite-react-ts && npm run report:build && cp dist/report.html ../../build/
       - name: Deploy Project deploy artifacts to Vercel
         run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
       - name: 'Cache docker build for Safetest'

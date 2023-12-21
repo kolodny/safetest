@@ -5,3 +5,4 @@ build
 results.json
 artifacts.json
 artifacts/
+report.html
