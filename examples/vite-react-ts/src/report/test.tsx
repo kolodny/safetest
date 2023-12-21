@@ -7,19 +7,24 @@ import { FilenameContext, UrlContext } from './report';
 
 const Link: React.FunctionComponent<
   React.PropsWithChildren<{ href: string }>
-> = ({ href, children }) => (
-  <a
-    target="_blank"
-    href={href}
-    onClick={(e) => e.stopPropagation()}
-    style={{
-      textDecoration: 0,
-      color: '#228800',
-    }}
-  >
-    {children}
-  </a>
-);
+> = ({ href, children }) => {
+  const [hover, setHover] = React.useState(false);
+  return (
+    <a
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      target="_blank"
+      href={href}
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        textDecoration: 0,
+        color: hover ? '#a0541a' : '#008800',
+      }}
+    >
+      {children}
+    </a>
+  );
+};
 
 const SmartVideo: React.FunctionComponent<{ src: string }> = ({ src }) => (
   <video
@@ -31,6 +36,7 @@ const SmartVideo: React.FunctionComponent<{ src: string }> = ({ src }) => (
     width="800"
     height="450"
     src={src}
+    style={{ border: '1px solid #e2e2e2' }}
     controls
   />
 );
@@ -58,17 +64,24 @@ export const Test: React.FunctionComponent<
       tabs.push({
         title: 'Trace',
         content: artifacts.trace.map((trace) => {
-          const traceUrl = `${url}${trace}`;
+          const aElement = document.createElement('a');
+          aElement.href = `${url}${trace}`;
+          const traceUrl = aElement.href;
           const viewerUrl = traceUrl.split('/traces/')[0];
           const fullUrl = `${viewerUrl}/?trace=${traceUrl}`;
           const attempt = getAttempt(traceUrl);
           let attemptText = '';
           if (+attempt! > 1) attemptText = ` (attempt ${attempt})`;
           return (
-            <Link key={fullUrl} href={fullUrl}>
-              View Trace
-              {attemptText}
-            </Link>
+            <div
+              key={fullUrl}
+              style={{ display: 'inline-block', paddingRight: 8 }}
+            >
+              <Link href={fullUrl}>
+                View Trace
+                {attemptText}
+              </Link>
+            </div>
           );
         }),
       });

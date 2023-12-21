@@ -9,9 +9,6 @@ export const UrlContext = React.createContext<string | null>(null);
 export const Report: React.FunctionComponent = () => {
   const [resultsLocation, setResultsLocation] = useHashState('results', '');
   const [url] = useHashState('url', '/');
-  const aElement = document.createElement('a');
-  aElement.href = url;
-
   const results = useFetching<MergedResults>(resultsLocation, {
     enabled: !!resultsLocation,
   });

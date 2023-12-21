@@ -28,7 +28,7 @@ export const Tabs: React.FunctionComponent<{ tabs: Tab[] }> = ({ tabs }) => {
           </button>
         ))}
       </div>
-      <div className="tab-content">{tabs[selected]?.content}</div>
+      <div style={{ padding: 8 }}>{tabs[selected]?.content}</div>
     </>
   );
 };
