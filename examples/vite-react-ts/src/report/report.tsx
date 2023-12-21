@@ -3,10 +3,19 @@ import { useFetching, useHashState } from './hooks';
 import { MergedResults } from 'safetest';
 import { File } from './file';
 
+export const FilenameContext = React.createContext<string | null>(null);
+export const UrlContext = React.createContext<string | null>(null);
+
 export const Report: React.FunctionComponent = () => {
-  const [url, setUrl] = useHashState('results', '');
-  const results = useFetching<MergedResults>(url, { enabled: !!url });
-  if (!url)
+  const [resultsLocation, setResultsLocation] = useHashState('results', '');
+  const [url] = useHashState(
+    'url',
+    'https://safetest-two.vercel.app/next-app/'
+  );
+  const results = useFetching<MergedResults>(resultsLocation, {
+    enabled: !!resultsLocation,
+  });
+  if (!resultsLocation)
     return (
       <>
         <h1>Test Report</h1>
@@ -16,7 +25,7 @@ export const Report: React.FunctionComponent = () => {
           placeholder="Results URL"
           onKeyUp={(e) => {
             if (e.key === 'Enter') {
-              setUrl((e.target as HTMLInputElement).value);
+              setResultsLocation((e.target as HTMLInputElement).value);
             }
           }}
         />
@@ -28,7 +37,11 @@ export const Report: React.FunctionComponent = () => {
       <h1>Test Report</h1>
       {results.loading && <p>Loading...</p>}
       {results.data?.testResults.map((file) => (
-        <File key={file.filename} file={file} />
+        <FilenameContext.Provider key={file.filename} value={file.filename}>
+          <UrlContext.Provider value={url}>
+            <File file={file} />
+          </UrlContext.Provider>
+        </FilenameContext.Provider>
       ))}
     </>
   );

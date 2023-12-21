@@ -49,7 +49,7 @@ export const File: React.FunctionComponent<{ file: File }> = ({ file }) => {
   const suite = React.useMemo(() => createNestedSuite(file), [file]);
   console.log(suite);
   return (
-    <Accordion summary={suite.filename}>
+    <Accordion summary={suite.filename} defaultOpen>
       <Suite suite={suite.suite} />
     </Accordion>
   );
