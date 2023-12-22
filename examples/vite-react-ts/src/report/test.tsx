@@ -30,6 +30,7 @@ const Link: React.FunctionComponent<
 const SmartVideo: React.FunctionComponent<{ src: string }> = ({ src }) => (
   <video
     autoPlay
+    preload="none"
     onLoadedMetadata={({ currentTarget: video }) => {
       video.width = video.videoWidth;
       video.height = video.videoHeight;
@@ -43,6 +44,12 @@ const SmartVideo: React.FunctionComponent<{ src: string }> = ({ src }) => (
 );
 
 const getAttempt = (url: string) => url.match(/-attempt-(\d+)/)?.[1];
+const getAttemptText = (artifacts: string[], index: number) => {
+  const hasMultipleAttempts = artifacts.some((t) => +getAttempt(t)! > 0);
+  if (!hasMultipleAttempts) return '';
+  const attempt = getAttempt(artifacts[index]);
+  return `Attempt #${+attempt! + 1}`;
+};
 
 export const Test: React.FunctionComponent<
   React.PropsWithChildren<{ test: TestType }>
@@ -61,57 +68,71 @@ export const Test: React.FunctionComponent<
   const tabs: Tab[] = [];
   const artifacts = test.artifacts;
   if (artifacts) {
-    if (artifacts.trace) {
-      tabs.push({
-        title: 'Trace',
-        content: artifacts.trace.map((trace) => {
-          const aElement = document.createElement('a');
-          aElement.href = `${url}${trace}`;
-          const traceUrl = aElement.href;
-          const viewerUrl = traceUrl.split('/traces/')[0];
-          const fullUrl = `${viewerUrl}/?trace=${traceUrl}`;
-          const attempt = getAttempt(traceUrl);
-          let attemptText = '';
-          if (+attempt! > 1) attemptText = ` (attempt ${attempt})`;
-          return (
-            <div
-              key={fullUrl}
-              style={{ display: 'inline-block', paddingRight: 8 }}
-            >
-              <Link href={fullUrl}>
-                View Trace
-                {attemptText}
-              </Link>
-            </div>
-          );
-        }),
-      });
-    }
+    const renderArtifacts = (
+      artifacts: string[],
+      callback: (artifact: string) => React.ReactNode
+    ) => {
+      if (artifacts.length === 0) return null;
+      if (artifacts.length === 1) return callback(artifacts[0]);
+      const subTabs: Tab[] = [];
+      for (const [index, artifact] of Object.entries(artifacts)) {
+        subTabs.push({
+          title: getAttemptText(artifacts, +index),
+          content: callback(artifact),
+        });
+      }
+      return <Tabs tabs={subTabs} />;
+    };
 
-    for (const video of artifacts.video ?? []) {
-      const attempt = getAttempt(video);
-      let attemptText = '';
-      if (+attempt! > 1) attemptText = ` (attempt ${attempt})`;
-      tabs.push({
-        title: `Video${attemptText}`,
-        content: <SmartVideo key={video} src={`${url}${video}`} />,
-      });
-    }
+    tabs.push({
+      title: `Trace${(artifacts.video?.length ?? 0) > 1 ? 's' : ''}`,
+      content: renderArtifacts(artifacts.trace ?? [], (trace) => {
+        const aElement = document.createElement('a');
+        aElement.href = `${url}${trace}`;
+        const traceUrl = aElement.href;
+        const viewerUrl = traceUrl.split('/traces/')[0];
+        const fullUrl = `${viewerUrl}/?trace=${traceUrl}`;
+        return (
+          <div style={{ paddingRight: 8 }}>
+            <iframe
+              style={{
+                width: '100%',
+                minHeight: 700,
+                height: 'calc(100vh - 80px)',
+              }}
+              src={fullUrl}
+              loading="lazy"
+            ></iframe>
+          </div>
+        );
+      }),
+    });
+
+    tabs.push({
+      title: `Video${(artifacts.video?.length ?? 0) > 1 ? 's' : ''}`,
+      content: renderArtifacts(artifacts.video ?? [], (video) => {
+        return <SmartVideo key={video} src={`${url}${video}`} />;
+      }),
+    });
 
     if (artifacts.diff) {
       tabs.push({
         title: 'Diff',
-        content: artifacts.diff.map((img) => (
+        content: artifacts.diff.map((img, index) => (
           <div
-            key={img}
+            key={index}
             style={{
-              border: '1px solid',
+              marginBottom: 8,
               display: 'flex',
               width: 'fit-content',
             }}
           >
-            <Link href={img}>
-              <img style={{ maxWidth: '80vw' }} alt="" src={img} />
+            <Link href={`${url}${img}`}>
+              <img
+                style={{ maxWidth: '80vw', border: '1px solid #e2e2e2' }}
+                alt=""
+                src={`${url}${img}`}
+              />
             </Link>
           </div>
         )),
@@ -120,18 +141,22 @@ export const Test: React.FunctionComponent<
 
     if (artifacts.received) {
       tabs.push({
-        title: 'Diff',
-        content: artifacts.received.map((img) => (
+        title: 'Updated Golden',
+        content: artifacts.received.map((img, index) => (
           <div
-            key={img}
+            key={index}
             style={{
-              border: '1px solid',
+              marginBottom: 8,
               display: 'flex',
               width: 'fit-content',
             }}
           >
-            <Link href={img}>
-              <img style={{ maxWidth: '80vw' }} alt="" src={img} />
+            <Link href={`${url}${img}`}>
+              <img
+                style={{ maxWidth: '80vw', border: '1px solid #e2e2e2' }}
+                alt=""
+                src={`${url}${img}`}
+              />
             </Link>
           </div>
         )),
@@ -146,6 +171,7 @@ export const Test: React.FunctionComponent<
 
   return (
     <Accordion
+      // onChange={(open) => console.log({ open })}
       summary={
         <>
           <Label>{statusMap[test.status]}</Label> {test.title} {link}

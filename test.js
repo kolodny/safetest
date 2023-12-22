@@ -10,7 +10,7 @@ for (const example of examples) {
   const cwd = `examples/${example}`;
   const stat = fs.statSync(cwd);
   if (stat.isDirectory()) {
-    console.log(`running build for examples/${example}`);
+    console.log(`running test for examples/${example}`);
     const options = { cwd, stdio: 'inherit' };
     spawnSync('npm', ['install'], options);
     spawnSync('npm', ['run', 'safetest:ci', '--if-present'], options);

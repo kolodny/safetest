@@ -10,8 +10,9 @@ export const Accordion: React.FunctionComponent<
     summary: React.ReactNode;
     open?: boolean;
     defaultOpen?: boolean;
+    onChange?: (open: boolean) => void;
   }>
-> = ({ children, summary, open: propOpen, defaultOpen }) => {
+> = ({ children, summary, open: propOpen, defaultOpen, onChange }) => {
   const [open, setOpen] = React.useState(defaultOpen ?? !!propOpen);
 
   React.useEffect(() => {
@@ -23,7 +24,10 @@ export const Accordion: React.FunctionComponent<
   return (
     <div style={{ border: `1px solid #${borderColor}` }}>
       <div
-        onClick={() => setOpen(!open)}
+        onClick={() => {
+          setOpen(!open);
+          onChange?.(!open);
+        }}
         style={{ cursor: 'pointer', padding: 10, margin: 2, background }}
       >
         <span

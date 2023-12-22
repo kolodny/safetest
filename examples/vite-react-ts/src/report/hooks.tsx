@@ -1,36 +1,68 @@
 import React from 'react';
 
-const hash = new URLSearchParams(location.hash.slice(1));
 export const useHashState = <T,>(name: string, defaultValue: T) => {
   const isString = (obj: unknown): obj is string => typeof obj === 'string';
   const isNumber = (obj: unknown): obj is string => typeof obj === 'number';
   const stringOrNumber = (obj: unknown) => isString(obj) || isNumber(obj);
   const stringify = (v: T) => (stringOrNumber(v) ? v : JSON.stringify(v));
   const defaultValueString = stringify(defaultValue);
-  const [state, setState] = React.useState(() => {
-    let value = defaultValue;
-    if (hash.has(name)) {
-      const hashValue = hash.get(name)!;
-      if (isNumber(defaultValue)) value = +hashValue as T;
-      else if (isString(defaultValue)) value = hashValue as T;
-      else {
-        try {
-          value = JSON.parse(hashValue);
-        } catch (e) {
-          console.error(e);
+  const getValue = React.useCallback(
+    (hash: URLSearchParams) => {
+      let value = defaultValue;
+      if (hash.has(name)) {
+        const hashValue = hash.get(name)!;
+        if (isNumber(defaultValue)) value = +hashValue as T;
+        else if (isString(defaultValue)) value = hashValue as T;
+        else {
+          try {
+            value = JSON.parse(hashValue);
+          } catch (e) {
+            console.error(e);
+          }
         }
       }
-    }
-    return value;
+      return value;
+    },
+    [defaultValue, name]
+  );
+  const [state, setState] = React.useState(() => {
+    return getValue(new URLSearchParams(location.hash.slice(1)));
   });
   const setWrapped = (value: T) => {
+    const hash = new URLSearchParams(location.hash.slice(1));
     const valueString = stringify(value) as string;
     setState(value);
     const same = valueString === defaultValueString;
     if (same) hash.delete(name);
     else hash.set(name, valueString);
-    location.hash = decodeURIComponent(`${hash}`);
+    const url = new URL(location.href);
+    const oldHash = new URLSearchParams(location.hash.slice(1));
+    const newHashValues = Object.fromEntries([
+      ...new URLSearchParams([...oldHash, ...[...new URLSearchParams(hash)]]),
+    ]);
+
+    url.hash = '';
+    const nextHash = `${new URLSearchParams(newHashValues)}`;
+    const nextUrl = `${url}#${decodeURIComponent(nextHash)}`;
+    history.replaceState(null, '', nextUrl);
   };
+
+  React.useEffect(() => {
+    const listener = ({ newURL, oldURL }: HashChangeEvent) => {
+      const newHash = new URLSearchParams(new URL(newURL).hash.slice(1));
+      const oldHash = new URLSearchParams(new URL(oldURL).hash.slice(1));
+      if (newHash.get(name) !== oldHash.get(name)) {
+        const newValue = getValue(newHash);
+        if (newValue !== state) {
+          setState(newValue);
+        }
+      }
+    };
+
+    window.addEventListener('hashchange', listener);
+    return () => window.removeEventListener('hashchange', listener);
+  }, [getValue, name, state]);
+
   return [state, setWrapped] as const;
 };
 
