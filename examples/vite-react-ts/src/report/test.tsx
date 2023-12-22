@@ -4,6 +4,7 @@ import { Accordion } from './accordion';
 import { Tab, Tabs } from './tabs';
 import { Label } from './label';
 import { FilenameContext, UrlContext } from './report';
+import { statusMap } from './suite';
 
 const Link: React.FunctionComponent<
   React.PropsWithChildren<{ href: string }>
@@ -42,16 +43,6 @@ const SmartVideo: React.FunctionComponent<{ src: string }> = ({ src }) => (
 );
 
 const getAttempt = (url: string) => url.match(/-attempt-(\d+)/)?.[1];
-
-const statuses = {
-  passed: '✅',
-  failed: '❌',
-  pending: '⏱',
-  skipped: '⏭',
-  todo: '📝',
-  disabled: '🚫',
-  empty: '📭',
-};
 
 export const Test: React.FunctionComponent<
   React.PropsWithChildren<{ test: TestType }>
@@ -157,7 +148,7 @@ export const Test: React.FunctionComponent<
     <Accordion
       summary={
         <>
-          <Label>{statuses[test.status]}</Label> {test.title} {link}
+          <Label>{statusMap[test.status]}</Label> {test.title} {link}
         </>
       }
     >

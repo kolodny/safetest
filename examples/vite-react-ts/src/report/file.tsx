@@ -1,7 +1,7 @@
 import React from 'react';
 import { MergedResults } from 'safetest';
 import { Accordion } from './accordion';
-import { Suite } from './suite';
+import { Suite, getSuiteStatuses } from './suite';
 
 type File = MergedResults['testResults'][number];
 
@@ -47,9 +47,15 @@ const createNestedSuite = (file: File) => {
 
 export const File: React.FunctionComponent<{ file: File }> = ({ file }) => {
   const suite = React.useMemo(() => createNestedSuite(file), [file]);
-  console.log(suite);
   return (
-    <Accordion summary={suite.filename} defaultOpen>
+    <Accordion
+      summary={
+        <>
+          <small>{getSuiteStatuses(suite.suite)}</small> {suite.filename}
+        </>
+      }
+      defaultOpen
+    >
       <Suite suite={suite.suite} />
     </Accordion>
   );
