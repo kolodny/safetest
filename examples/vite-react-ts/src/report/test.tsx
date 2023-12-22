@@ -17,7 +17,7 @@ const Link: React.FunctionComponent<
       href={href}
       onClick={(e) => e.stopPropagation()}
       style={{
-        textDecoration: 0,
+        textDecoration: hover ? 'underline' : 0,
         color: hover ? '#a0541a' : '#008800',
       }}
     >
