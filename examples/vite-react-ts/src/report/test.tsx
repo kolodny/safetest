@@ -6,6 +6,8 @@ import { Label } from './label';
 import { FilenameContext, UrlContext } from './report';
 import { statusMap } from './suite';
 
+const css = String.raw;
+
 const Link: React.FunctionComponent<
   React.PropsWithChildren<{ href: string }>
 > = ({ href, children }) => {
@@ -165,16 +167,40 @@ export const Test: React.FunctionComponent<
   }
 
   const testUrl = getTestUrl();
-  const link = !!testUrl && (
-    <Link href={testUrl}>Open tested component in new tab</Link>
-  );
+
+  if (testUrl) {
+    tabs.push({
+      title: (
+        <span
+          style={{ padding: 8 }}
+          onClick={(e) => {
+            window.open(testUrl, '_blank');
+            e.stopPropagation();
+          }}
+        >
+          Open tested component in new tab{' '}
+          <svg viewBox="0 0 1024 1024" height="1em" width="1em">
+            <path d="M 345.6 172.7985 L 345.6 287.9994 L 115.2 288 L 115.2 864 L 691.2 864 L 691.2 633.5994 L 806.3982 633.5994 L 806.4 979.2 L 0 979.2 L 0 172.8 L 345.6 172.7985 Z M 979.2 0 L 979.2 460.8 L 864 460.8 L 864 196.6545 L 386.3294 674.3293 L 304.8706 592.8706 L 782.541 115.1982 L 518.4 115.2 L 518.4 0 L 979.2 0 Z" />
+          </svg>
+          <style>{css`
+            @scope {
+              :scope:hover {
+                background: #c0c0c0;
+              }
+            }
+          `}</style>
+        </span>
+      ),
+      content: null,
+    });
+  }
 
   return (
     <Accordion
       // onChange={(open) => console.log({ open })}
       summary={
         <>
-          <Label>{statusMap[test.status]}</Label> {test.title} {link}
+          <Label>{statusMap[test.status]}</Label> {test.title}
         </>
       }
     >
