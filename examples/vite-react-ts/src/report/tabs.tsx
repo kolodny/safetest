@@ -1,5 +1,5 @@
 import React from 'react';
-import { Radio } from './radio';
+import { ComponentsContext } from './report';
 
 export interface Tab {
   title: React.ReactNode;
@@ -8,6 +8,7 @@ export interface Tab {
 
 export const Tabs: React.FunctionComponent<{ tabs: Tab[] }> = ({ tabs }) => {
   const [selected, setSelected] = React.useState(0);
+  const { Radio } = React.useContext(ComponentsContext);
   return (
     <>
       <div style={{ padding: '0 8px' }}>

@@ -10,6 +10,7 @@
     "./browser-mock": "./lib/browser-mock.js",
     "./jest": "./lib/jest.js",
     "./react": "./lib/react.js",
+    "./report": "./lib/report",
     "./ng": "./lib/ng.js",
     "./vitest": "./lib/vitest.js",
     "./svelte": "./lib/svelte.js",
@@ -19,7 +20,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "build:reporter": "cd examples/vite-react-ts && npm run report:build && cp dist/report.html ../../",
+    "build:reporter": "cd examples/vite-react-ts && npm run report:build && cp dist/report.html ../../ && mv report ../../lib",
     "prepare": "npm run build",
     "prepublishOnly": "npm run build:reporter && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"

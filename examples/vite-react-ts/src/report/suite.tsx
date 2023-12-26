@@ -1,29 +1,27 @@
 import React from 'react';
-import { Suite as SuiteType } from './file';
-import { Accordion } from './accordion';
-import { Test } from './test';
-import { Test as TestType } from './file';
-import { Label } from './label';
-import { StateContext } from './report';
-import { Chip } from './chip';
+import { type Suite as SuiteType } from './file';
+import { ComponentsContext, StateContext } from './report';
+import { type Test as TestType } from './file';
 
 export type Status = TestType['status'];
 type Statuses = Partial<Record<Status, number>>;
 
-export const getSuiteStatuses = (suite: SuiteType) => {
+export const SuiteStatuses: React.FunctionComponent<{ suite: SuiteType }> = ({
+  suite,
+}) => {
+  const { Chip } = React.useContext(ComponentsContext);
   const statuses = getStatusesCount(suite);
   return (
     <div style={{ display: 'inline-flex', alignItems: 'center' }}>
-      {getStatusesText(statuses)}
+      {getStatusesText(statuses).map((label) => (
+        <Chip key={label} label={label} />
+      ))}
     </div>
   );
 };
 const getStatusesText = (statuses: Statuses) =>
   Object.entries(statuses).map(([status, count]) => {
-    const label = `${count > 1 ? `${count}x ` : ''}${
-      statusMap[status as Status]
-    }`;
-    return <Chip key={label} label={label} />;
+    return `${count > 1 ? `${count}x ` : ''}${statusMap[status as Status]}`;
   });
 const getTestStatuses = (tests: TestType[], statuses: Statuses = {}) => {
   for (const test of tests) {
@@ -66,6 +64,7 @@ const showSuite = (suite: SuiteType, showing?: string) => {
 export const Suite: React.FunctionComponent<
   React.PropsWithChildren<{ suite: SuiteType }>
 > = ({ suite }) => {
+  const { Accordion, Label, Test } = React.useContext(ComponentsContext);
   const suites = Object.values(suite.suites);
   const tests = Object.values(suite.tests);
   const showing = React.useContext(StateContext).viewing;
@@ -81,7 +80,7 @@ export const Suite: React.FunctionComponent<
             key={subSuite.name}
             summary={
               <>
-                <Label>Suite</Label> {getSuiteStatuses(subSuite)}
+                <Label>Suite</Label> <SuiteStatuses suite={subSuite} />
                 {subSuite.name}
               </>
             }

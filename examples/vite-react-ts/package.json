@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "report:dev": "vite --config vite.report.config",
-    "report:build": "vite build --config vite.report.config",
+    "report:build": "npx tsc --project tsconfig.report.json && vite build --config vite.report.config",
     "build": "npm i ../../ && (rm -rf ../../build/vite-react-ts || true) && vite build && mv dist ../../build/vite-react-ts",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",

@@ -9,6 +9,15 @@
   </head>
   <body>
     <div id="container"></div>
-    <script type="module" src="/src/report/index.tsx"></script>
+    <script type="module">
+      import React from 'react';
+      import ReactDOM from 'react-dom/client';
+
+      import { Report } from '/src/report/index.tsx';
+
+      const container = document.getElementById('container');
+      const root = ReactDOM.createRoot(container);
+      root.render(React.createElement(Report, null));
+    </script>
   </body>
 </html>

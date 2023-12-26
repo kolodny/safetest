@@ -1,11 +1,8 @@
 import React from 'react';
-import { Test as TestType } from './file';
-import { Accordion } from './accordion';
-import { Tab, Tabs } from './tabs';
-import { Label } from './label';
-import { FilenameContext, UrlContext } from './report';
+import { type Test as TestType } from './file';
+import { type Tab } from './tabs';
+import { ComponentsContext, FilenameContext, UrlContext } from './report';
 import { statusMap } from './suite';
-import { Chip } from './chip';
 
 const Link: React.FunctionComponent<
   React.PropsWithChildren<{ href: string }>
@@ -55,6 +52,7 @@ const getAttemptText = (artifacts: string[], index: number) => {
 export const Test: React.FunctionComponent<
   React.PropsWithChildren<{ test: TestType }>
 > = ({ test }) => {
+  const { Accordion, Label, Tabs, Chip } = React.useContext(ComponentsContext);
   const filename = React.useContext(FilenameContext);
   const url = React.useContext(UrlContext);
   const getTestUrl = () => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Expandable } from './expandable';
+import { ComponentsContext } from './report';
 
 const borderColor = '#e2e2e2';
 const backgroundColorOpen = '#f7f7f7';
@@ -13,6 +13,7 @@ export const Accordion: React.FunctionComponent<
     onChange?: (open: boolean) => void;
   }>
 > = ({ children, summary, open: propOpen, defaultOpen, onChange }) => {
+  const { Expandable } = React.useContext(ComponentsContext);
   const [open, setOpen] = React.useState(defaultOpen ?? !!propOpen);
 
   React.useEffect(() => {

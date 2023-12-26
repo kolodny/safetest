@@ -1,10 +1,20 @@
 import React from 'react';
-import { useFetching, useHashState } from './hooks';
+import {
+  useFetching as myUseFetching,
+  useHashState as myUseHashState,
+} from './hooks';
 import { MergedResults } from 'safetest';
-import { File } from './file';
-import { Radio } from './radio';
 import { Status } from './suite';
 import { upperFirst } from 'lodash';
+import { Accordion as MyAccordion } from './accordion';
+import { Chip as MyChip } from './chip';
+import { Expandable as MyExpandable } from './expandable';
+import { File as MyFile } from './file';
+import { Label as MyLabel } from './label';
+import { Radio as MyRadio } from './radio';
+import { Suite as MySuite } from './suite';
+import { Tabs as MyTabs } from './tabs';
+import { Test as MyTest } from './test';
 
 export const FilenameContext = React.createContext<string | null>(null);
 export const UrlContext = React.createContext<string | null>(null);
@@ -23,10 +33,41 @@ const statusMap: Record<Status, boolean> = {
 };
 const statuses = Object.keys(statusMap) as Status[];
 
-export const Report: React.FunctionComponent = () => {
-  const [resultsLocation, setResultsLocation] = useHashState('results', '');
-  const [url] = useHashState('url', '/');
-  const [showing, setShowing] = useHashState<'all' | Status | undefined>(
+type Components = {
+  Accordion: typeof MyAccordion;
+  Chip: typeof MyChip;
+  Expandable: typeof MyExpandable;
+  File: typeof MyFile;
+  Label: typeof MyLabel;
+  Radio: typeof MyRadio;
+  Suite: typeof MySuite;
+  Tabs: typeof MyTabs;
+  Test: typeof MyTest;
+};
+
+export const ComponentsContext = React.createContext<Components>({} as never);
+
+interface Props extends Partial<Components> {
+  useState?: typeof myUseHashState;
+  useFetching?: typeof myUseFetching;
+}
+
+export const Report: React.FunctionComponent<Props> = ({
+  useFetching = myUseFetching,
+  useState = myUseHashState,
+  Accordion = MyAccordion,
+  Chip = MyChip,
+  Expandable = MyExpandable,
+  File = MyFile,
+  Label = MyLabel,
+  Radio = MyRadio,
+  Suite = MySuite,
+  Tabs = MyTabs,
+  Test = MyTest,
+} = {}) => {
+  const [resultsLocation, setResultsLocation] = useState('results', '');
+  const [url] = useState('url', '/');
+  const [showing, setShowing] = useState<'all' | Status | undefined>(
     'status',
     'all'
   );
@@ -64,7 +105,19 @@ export const Report: React.FunctionComponent = () => {
   const statusFilters = ['all', ...statuses];
 
   return (
-    <>
+    <ComponentsContext.Provider
+      value={{
+        Accordion,
+        Chip,
+        Expandable,
+        File,
+        Label,
+        Radio,
+        Suite,
+        Tabs,
+        Test,
+      }}
+    >
       <h1>Test Report</h1>
       {results.loading && <p>Loading...</p>}
       {results.data && (
@@ -99,6 +152,6 @@ export const Report: React.FunctionComponent = () => {
           </UrlContext.Provider>
         </FilenameContext.Provider>
       ))}
-    </>
+    </ComponentsContext.Provider>
   );
 };
