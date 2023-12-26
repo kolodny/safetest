@@ -4,21 +4,26 @@ import { Accordion } from './accordion';
 import { Test } from './test';
 import { Test as TestType } from './file';
 import { Label } from './label';
+import { StateContext } from './report';
 
-type Status = TestType['status'];
+export type Status = TestType['status'];
 type Statuses = Partial<Record<Status, number>>;
 
 export const getSuiteStatuses = (suite: SuiteType) => {
-  const statuses = getStatusesInner(suite);
-  return getStatusesText(statuses);
+  const statuses = getStatusesCount(suite);
+  return (
+    <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+      {getStatusesText(statuses)}
+    </div>
+  );
 };
 const getStatusesText = (statuses: Statuses) =>
-  Object.entries(statuses)
-    .map(
-      ([status, count]) =>
-        `${count > 1 ? `${count}x ` : ''}${statusMap[status as Status]}`
-    )
-    .join(', ');
+  Object.entries(statuses).map(([status, count]) => {
+    const label = `${count > 1 ? `${count}x ` : ''}${
+      statusMap[status as Status]
+    }`;
+    return <Chip key={label} label={label} />;
+  });
 const getTestStatuses = (tests: TestType[], statuses: Statuses = {}) => {
   for (const test of tests) {
     const status = test.status;
@@ -26,7 +31,7 @@ const getTestStatuses = (tests: TestType[], statuses: Statuses = {}) => {
   }
   return getStatusesText(statuses);
 };
-const getStatusesInner = (suite: SuiteType, statuses: Statuses = {}) => {
+const getStatusesCount = (suite: SuiteType, statuses: Statuses = {}) => {
   const suites = Object.values(suite.suites);
   const tests = Object.values(suite.tests);
   for (const test of tests) {
@@ -34,7 +39,7 @@ const getStatusesInner = (suite: SuiteType, statuses: Statuses = {}) => {
     statuses[status] = (statuses[status] || 0) + 1;
   }
   for (const suite of suites) {
-    getStatusesInner(suite, statuses);
+    getStatusesCount(suite, statuses);
   }
   return statuses;
 };
@@ -49,38 +54,68 @@ export const statusMap = {
   empty: '📭',
 };
 
+const showSuite = (suite: SuiteType, showing?: string) => {
+  const counts = getStatusesCount(suite);
+  if (showing !== 'all' && !counts[showing as 'passed']) {
+    return false;
+  }
+  return true;
+};
+
+const Chip: React.FunctionComponent<{ label: string }> = ({ label }) => {
+  return (
+    <div
+      style={{
+        display: 'inline-block',
+        padding: '2px 4px',
+        marginRight: 8,
+        border: '1px solid',
+        height: 16,
+        fontSize: 12,
+        lineHeight: '18px',
+      }}
+    >
+      {label}
+    </div>
+  );
+};
+
 export const Suite: React.FunctionComponent<
   React.PropsWithChildren<{ suite: SuiteType }>
 > = ({ suite }) => {
   const suites = Object.values(suite.suites);
   const tests = Object.values(suite.tests);
+  const showing = React.useContext(StateContext).viewing;
+  if (!showSuite(suite, showing)) return null;
+
   return (
     <>
-      {suites.map((suite) => (
-        <Accordion
-          defaultOpen
-          key={suite.name}
-          summary={
-            <>
-              <Label>Suite</Label>{' '}
-              <small>
-                <Label>{getSuiteStatuses(suite)}</Label>
-              </small>{' '}
-              {suite.name}
-            </>
-          }
-        >
-          <Suite key={suite.id} suite={suite} />
-        </Accordion>
-      ))}
+      {suites
+        .filter((subSuite) => showSuite(subSuite, showing))
+        .map((subSuite) => (
+          <Accordion
+            defaultOpen
+            key={subSuite.name}
+            summary={
+              <>
+                <Label>Suite</Label> {getSuiteStatuses(subSuite)}
+                {subSuite.name}
+              </>
+            }
+          >
+            <Suite key={subSuite.id} suite={subSuite} />
+          </Accordion>
+        ))}
       {tests.length > 0 && (
         <Accordion
           defaultOpen
           summary={<Label>{getTestStatuses(tests)} Tests</Label>}
         >
-          {tests.map((test) => (
-            <Test key={test.id} test={test} />
-          ))}
+          {tests
+            .filter((t) => (showing === 'all' ? true : t.status === showing))
+            .map((test) => (
+              <Test key={test.id} test={test} />
+            ))}
         </Accordion>
       )}
     </>

@@ -32,14 +32,14 @@ export const useHashState = <T,>(name: string, defaultValue: T) => {
     const hash = new URLSearchParams(location.hash.slice(1));
     const valueString = stringify(value) as string;
     setState(value);
-    const same = valueString === defaultValueString;
-    if (same) hash.delete(name);
-    else hash.set(name, valueString);
+    hash.set(name, valueString);
     const url = new URL(location.href);
     const oldHash = new URLSearchParams(location.hash.slice(1));
     const newHashValues = Object.fromEntries([
       ...new URLSearchParams([...oldHash, ...[...new URLSearchParams(hash)]]),
     ]);
+
+    if (valueString === defaultValueString) delete newHashValues[name];
 
     url.hash = '';
     const nextHash = `${new URLSearchParams(newHashValues)}`;

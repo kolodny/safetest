@@ -2,10 +2,13 @@ import React from 'react';
 import { MergedResults } from 'safetest';
 import { Accordion } from './accordion';
 import { Suite, getSuiteStatuses } from './suite';
+import { useHashState } from './hooks';
+import { StateContext } from './report';
 
 type File = MergedResults['testResults'][number];
 
 type Result = File['assertionResults'][number];
+type Status = Result['status'];
 
 export type Test = Result & { id: string; parent: Suite };
 
@@ -20,7 +23,7 @@ export type Suite = {
 const createNestedSuite = (file: File) => {
   const filename = file.filename;
   const suitesById: Record<string, Suite> = {};
-  const testIds: string[] = [];
+  const statuses: Record<string, Status> = {};
   const suites: Record<string, Suite> = {};
   const tests: Record<string, Test> = {};
   const fileSuite: Suite = { id: filename, name: filename, suites, tests };
@@ -40,18 +43,36 @@ const createNestedSuite = (file: File) => {
     const id = `${suite.id} > ${result.title}`;
     const test = { ...result, id, parent: suite };
     suite.tests[title] = test;
-    testIds.push(id);
+    statuses[id] = test.status;
   }
-  return { filename, suite: fileSuite, suiteIds: Object.keys(tests), testIds };
+  // const grouped: Partial<Record<Status, string[]>> = {};
+  // for (const [id, status] of Object.entries(statuses)) {
+  //   (grouped[status] ??= []).push(id);
+  // }
+  return {
+    filename,
+    suite: fileSuite,
+    suiteIds: Object.keys(suitesById),
+    statuses,
+  };
 };
 
 export const File: React.FunctionComponent<{ file: File }> = ({ file }) => {
   const suite = React.useMemo(() => createNestedSuite(file), [file]);
+  const showing = React.useContext(StateContext).viewing;
+  let isViewing = false;
+  for (const status of Object.values(suite.statuses)) {
+    if (showing === 'all' || showing === status) {
+      isViewing = true;
+      break;
+    }
+  }
+  if (!isViewing) return null;
   return (
     <Accordion
       summary={
         <>
-          <small>{getSuiteStatuses(suite.suite)}</small> {suite.filename}
+          {getSuiteStatuses(suite.suite)} {suite.filename}
         </>
       }
       defaultOpen
