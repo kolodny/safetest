@@ -5,6 +5,7 @@ import { Tab, Tabs } from './tabs';
 import { Label } from './label';
 import { FilenameContext, UrlContext } from './report';
 import { statusMap } from './suite';
+import { Chip } from './chip';
 
 const Link: React.FunctionComponent<
   React.PropsWithChildren<{ href: string }>
@@ -98,7 +99,8 @@ export const Test: React.FunctionComponent<
               style={{
                 width: '100%',
                 minHeight: 700,
-                height: 'calc(100vh - 80px)',
+                height: 'calc(100vh - 150px)',
+                border: '1px solid #e2e2e2',
               }}
               src={fullUrl}
               loading="lazy"
@@ -196,7 +198,10 @@ export const Test: React.FunctionComponent<
       // onChange={(open) => console.log({ open })}
       summary={
         <>
-          <Label>{statusMap[test.status]}</Label> {test.title}
+          <Label>
+            <Chip label={statusMap[test.status]} />
+          </Label>{' '}
+          {test.title}
         </>
       }
     >

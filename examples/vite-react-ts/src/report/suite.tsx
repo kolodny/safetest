@@ -5,6 +5,7 @@ import { Test } from './test';
 import { Test as TestType } from './file';
 import { Label } from './label';
 import { StateContext } from './report';
+import { Chip } from './chip';
 
 export type Status = TestType['status'];
 type Statuses = Partial<Record<Status, number>>;
@@ -60,24 +61,6 @@ const showSuite = (suite: SuiteType, showing?: string) => {
     return false;
   }
   return true;
-};
-
-const Chip: React.FunctionComponent<{ label: string }> = ({ label }) => {
-  return (
-    <div
-      style={{
-        display: 'inline-block',
-        padding: '2px 4px',
-        marginRight: 8,
-        border: '1px solid',
-        height: 16,
-        fontSize: 12,
-        lineHeight: '18px',
-      }}
-    >
-      {label}
-    </div>
-  );
 };
 
 export const Suite: React.FunctionComponent<

@@ -10,7 +10,7 @@ export const Tabs: React.FunctionComponent<{ tabs: Tab[] }> = ({ tabs }) => {
   const [selected, setSelected] = React.useState(0);
   return (
     <>
-      <div style={{ padding: 8 }}>
+      <div style={{ padding: '0 8px' }}>
         <Radio
           defaultIndex={0}
           options={tabs.map((t) => t.title)}

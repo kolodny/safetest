@@ -23,7 +23,7 @@ export const Radio: React.FunctionComponent<Props> = (props) => {
         <style>{css`
           @scope {
             :scope label:hover {
-              background: #c0c0c0 !important;
+              background: #ddd !important;
             }
           }
         `}</style>

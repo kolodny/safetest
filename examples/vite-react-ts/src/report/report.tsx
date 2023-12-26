@@ -72,7 +72,7 @@ export const Report: React.FunctionComponent = () => {
           style={{
             marginBottom: 16,
             padding: 8,
-            border: '1px solid',
+            border: '1px solid #bbb',
           }}
         >
           Showing:

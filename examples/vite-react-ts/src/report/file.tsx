@@ -2,7 +2,6 @@ import React from 'react';
 import { MergedResults } from 'safetest';
 import { Accordion } from './accordion';
 import { Suite, getSuiteStatuses } from './suite';
-import { useHashState } from './hooks';
 import { StateContext } from './report';
 
 type File = MergedResults['testResults'][number];
