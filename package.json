@@ -1,6 +1,6 @@
 {
   "name": "safetest",
-  "version": "0.0.0-alpha-34",
+  "version": "0.0.0-alpha-36",
   "description": "Safetest is a powerful UI testing library that combines Playwright, Jest, and React for a powerful end-to-end testing solution for applications and component testing. With Safetest, you can easily test the functionality and appearance of your application, ensuring that it works as expected and looks great on all devices.",
   "main": "lib/index.js",
   "bin": "./lib/cli.js",
@@ -20,7 +20,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "build:reporter": "cd examples/vite-react-ts && npm run report:build && cp dist/report.html ../../ && mv report ../../lib",
+    "build:reporter": "cd examples/vite-react-ts && npm run report:build && cp dist/report.html ../../ && rm -rf ../../lib/report && mv report ../../lib",
     "prepare": "npm run build",
     "prepublishOnly": "npm run build:reporter && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
