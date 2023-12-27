@@ -1,24 +1,9 @@
 import React from 'react';
-import { MergedResults } from 'safetest';
 import { SuiteStatuses } from './suite';
 import { ComponentsContext, StateContext } from './report';
+import { File as FileType, Status, Suite, Test } from './types';
 
-type File = MergedResults['testResults'][number];
-
-type Result = File['assertionResults'][number];
-type Status = Result['status'];
-
-export type Test = Result & { id: string; parent: Suite };
-
-export type Suite = {
-  name: string;
-  id: string;
-  suites: Record<string, Suite>;
-  tests: Record<string, Test>;
-  parent?: Suite;
-};
-
-const createNestedSuite = (file: File) => {
+const createNestedSuite = (file: FileType) => {
   const filename = file.filename;
   const suitesById: Record<string, Suite> = {};
   const statuses: Record<string, Status> = {};
@@ -43,10 +28,7 @@ const createNestedSuite = (file: File) => {
     suite.tests[title] = test;
     statuses[id] = test.status;
   }
-  // const grouped: Partial<Record<Status, string[]>> = {};
-  // for (const [id, status] of Object.entries(statuses)) {
-  //   (grouped[status] ??= []).push(id);
-  // }
+
   return {
     filename,
     suite: fileSuite,
@@ -55,7 +37,7 @@ const createNestedSuite = (file: File) => {
   };
 };
 
-export const File: React.FunctionComponent<{ file: File }> = ({ file }) => {
+export const File: React.FunctionComponent<{ file: FileType }> = ({ file }) => {
   const suite = React.useMemo(() => createNestedSuite(file), [file]);
   const { Accordion, Suite } = React.useContext(ComponentsContext);
   const showing = React.useContext(StateContext).viewing;

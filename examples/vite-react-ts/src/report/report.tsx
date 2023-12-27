@@ -3,8 +3,6 @@ import {
   useFetching as myUseFetching,
   useHashState as myUseHashState,
 } from './hooks';
-import { MergedResults } from 'safetest';
-import { Status } from './suite';
 import { upperFirst } from 'lodash';
 import { Accordion as MyAccordion } from './accordion';
 import { Chip as MyChip } from './chip';
@@ -15,9 +13,11 @@ import { Radio as MyRadio } from './radio';
 import { Suite as MySuite } from './suite';
 import { Tabs as MyTabs } from './tabs';
 import { Test as MyTest } from './test';
+import { Link } from './link';
+import { SmartVideo } from './smart-video';
+import { ArtifactType, MergedResults, Status } from './types';
 
 export const FilenameContext = React.createContext<string | null>(null);
-export const UrlContext = React.createContext<string | null>(null);
 export const StateContext = React.createContext<{
   viewing?: string;
   id?: string;
@@ -45,12 +45,20 @@ type Components = {
   Test: typeof MyTest;
 };
 
-export const ComponentsContext = React.createContext<Components>({} as never);
+export const ComponentsContext = React.createContext<Required<Props>>(
+  {} as never
+);
 
-interface Props extends Partial<Components> {
-  useState?: typeof myUseHashState;
-  useFetching?: typeof myUseFetching;
-}
+export type Props = Partial<Components> &
+  Partial<{
+    useState: typeof myUseHashState;
+    useFetching: typeof myUseFetching;
+    getTestUrl: (filename: string, test: string) => string | undefined;
+    renderArtifactUrl: (
+      type: ArtifactType,
+      artifact: string
+    ) => React.ReactNode;
+  }>;
 
 export const Report: React.FunctionComponent<Props> = ({
   useFetching = myUseFetching,
@@ -64,6 +72,8 @@ export const Report: React.FunctionComponent<Props> = ({
   Suite = MySuite,
   Tabs = MyTabs,
   Test = MyTest,
+  getTestUrl,
+  renderArtifactUrl,
 } = {}) => {
   const [resultsLocation, setResultsLocation] = useState('results', '');
   const [url] = useState('url', '/');
@@ -88,7 +98,6 @@ export const Report: React.FunctionComponent<Props> = ({
   if (!resultsLocation)
     return (
       <>
-        <h1>Test Report</h1>
         <p>No results URL provided.</p>
         <input
           type="text"
@@ -104,6 +113,62 @@ export const Report: React.FunctionComponent<Props> = ({
 
   const statusFilters = ['all', ...statuses];
 
+  const myGetTestUrl =
+    getTestUrl ??
+    ((filename, test) => {
+      if (!url || !filename) return '';
+      const filePrefix = filename.startsWith('.') ? '' : './';
+      const fixedFile = `${filePrefix}${filename}`.replace(/\.[jt]sx?$/g, '');
+      const testName = test.trim().replace(/ /g, '+');
+      const search = `?test_path=${fixedFile}&test_name=${testName}`;
+      return `${url}${search}`;
+    });
+
+  const myRenderArtifactUrl =
+    renderArtifactUrl ??
+    ((type, artifact) => {
+      if (type === 'trace') {
+        const aElement = document.createElement('a');
+        aElement.href = `${url}${artifact}`;
+        const traceUrl = aElement.href;
+        const viewerUrl = traceUrl.split('/traces/')[0];
+        const fullUrl = `${viewerUrl}/?trace=${traceUrl}`;
+        return (
+          <iframe
+            style={{
+              width: '100%',
+              minHeight: 700,
+              height: 'calc(100vh - 150px)',
+              border: '1px solid #e2e2e2',
+            }}
+            src={fullUrl}
+            loading="lazy"
+          />
+        );
+      }
+      if (type === 'video') {
+        return <SmartVideo src={`${url}${artifact}`} />;
+      }
+      if (type === 'snapshot') return null;
+      return (
+        <div
+          style={{
+            display: 'flex',
+            width: 'fit-content',
+          }}
+        >
+          <Link href={`${url}${artifact}`}>
+            <img
+              style={{ maxWidth: '80vw', border: '1px solid #e2e2e2' }}
+              alt=""
+              src={`${url}${artifact}`}
+            />
+          </Link>
+        </div>
+      );
+      return `${url}${artifact}`;
+    });
+
   return (
     <ComponentsContext.Provider
       value={{
@@ -116,9 +181,12 @@ export const Report: React.FunctionComponent<Props> = ({
         Suite,
         Tabs,
         Test,
+        getTestUrl: myGetTestUrl,
+        renderArtifactUrl: myRenderArtifactUrl,
+        useState,
+        useFetching,
       }}
     >
-      <h1>Test Report</h1>
       {results.loading && <p>Loading...</p>}
       {results.data && (
         <div
@@ -145,11 +213,9 @@ export const Report: React.FunctionComponent<Props> = ({
       )}
       {results.data?.testResults.map((file) => (
         <FilenameContext.Provider key={file.filename} value={file.filename}>
-          <UrlContext.Provider value={url}>
-            <StateContext.Provider value={{ viewing: showing }}>
-              <File file={file} />
-            </StateContext.Provider>
-          </UrlContext.Provider>
+          <StateContext.Provider value={{ viewing: showing }}>
+            <File file={file} />
+          </StateContext.Provider>
         </FilenameContext.Provider>
       ))}
     </ComponentsContext.Provider>

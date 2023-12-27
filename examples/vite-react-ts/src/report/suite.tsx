@@ -1,7 +1,6 @@
 import React from 'react';
-import { type Suite as SuiteType } from './file';
 import { ComponentsContext, StateContext } from './report';
-import { type Test as TestType } from './file';
+import { type Test as TestType, type Suite as SuiteType } from './types';
 
 export type Status = TestType['status'];
 type Statuses = Partial<Record<Status, number>>;
