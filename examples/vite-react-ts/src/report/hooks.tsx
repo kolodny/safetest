@@ -1,17 +1,20 @@
 import React from 'react';
 
-export const useHashState = <T,>(name: string, defaultValue: T) => {
+export const useHashState = <T extends string>(
+  name: string,
+  defaultValue: string
+) => {
   const isString = (obj: unknown): obj is string => typeof obj === 'string';
   const isNumber = (obj: unknown): obj is string => typeof obj === 'number';
   const stringOrNumber = (obj: unknown) => isString(obj) || isNumber(obj);
-  const stringify = (v: T) => (stringOrNumber(v) ? v : JSON.stringify(v));
+  const stringify = (v: string) => (stringOrNumber(v) ? v : JSON.stringify(v));
   const defaultValueString = stringify(defaultValue);
   const getValue = React.useCallback(
     (hash: URLSearchParams) => {
       let value = defaultValue;
       if (hash.has(name)) {
         const hashValue = hash.get(name)!;
-        if (isNumber(defaultValue)) value = +hashValue as T;
+        if (isNumber(defaultValue)) value = +hashValue as never;
         else if (isString(defaultValue)) value = hashValue as T;
         else {
           try {

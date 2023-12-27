@@ -20,7 +20,7 @@ export const Radio: React.FunctionComponent<Props> = (props) => {
     <>
       <div className="radio" style={{ display: 'flex' }}>
         {options.map((option, index) => (
-          <Hover>
+          <Hover key={index}>
             {(hover) => (
               <div
                 key={index}

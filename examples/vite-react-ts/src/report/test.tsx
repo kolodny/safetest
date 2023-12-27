@@ -16,60 +16,60 @@ const getAttemptText = (artifacts: string[], index: number) => {
 export const Test: React.FunctionComponent<
   React.PropsWithChildren<{ test: TestType }>
 > = ({ test }) => {
-  const { Accordion, Label, Tabs, Chip, renderArtifactUrl, getTestUrl } =
+  const { Accordion, Label, Tabs, Chip, renderArtifact, getTestUrl } =
     React.useContext(ComponentsContext);
   const filename = React.useContext(FilenameContext);
 
   const tabs: Tab[] = [];
   const artifacts = test.artifacts;
   if (artifacts) {
-    const renderArtifacts = (
-      artifacts: string[],
-      callback: (artifact: string) => React.ReactNode
-    ) => {
-      if (artifacts.length === 0) return null;
-      if (artifacts.length === 1) return callback(artifacts[0]);
-      const subTabs: Tab[] = [];
-      for (const [index, artifact] of Object.entries(artifacts)) {
-        subTabs.push({
-          title: getAttemptText(artifacts, +index) || `Trace #${+index + 1}`,
-          content: callback(artifact),
-        });
+    for (const type of ['trace', 'video'] as const) {
+      const rendered = (artifacts[type] ?? [])
+        .map((trace, index) => {
+          const item = renderArtifact(type, trace);
+          if (!item) return null;
+          const title =
+            getAttemptText(artifacts[type]!, index) || `${type} #${+index + 1}`;
+          return { title, item };
+        })
+        .filter(Boolean);
+
+      if (rendered.length) {
+        if (rendered.length === 1) {
+          tabs.push({
+            title: upperFirst(type),
+            content: rendered[0]?.item,
+          });
+        } else if (rendered?.length) {
+          const subTabs: Tab[] = [];
+          for (const render of rendered) {
+            subTabs.push({
+              title: upperFirst(render?.title),
+              content: render?.item,
+            });
+          }
+          tabs.push({
+            title: upperFirst(type),
+            content: <Tabs tabs={subTabs} />,
+          });
+        }
       }
-      return <Tabs tabs={subTabs} />;
-    };
-
-    tabs.push({
-      title: `Trace${(artifacts.video?.length ?? 0) > 1 ? 's' : ''}`,
-      content: renderArtifacts(artifacts.trace ?? [], (trace) => {
-        return (
-          <div style={{ paddingRight: 8 }}>
-            {renderArtifactUrl('trace', trace)}
-          </div>
-        );
-      }),
-    });
-
-    tabs.push({
-      title: `Video${(artifacts.video?.length ?? 0) > 1 ? 's' : ''}`,
-      content: renderArtifacts(artifacts.video ?? [], (video) => {
-        return <div>{renderArtifactUrl('video', video)}</div>;
-      }),
-    });
+    }
 
     for (const key of ['diff', 'received', 'snapshot'] as const) {
       const title = key === 'received' ? 'Updated Golden' : upperFirst(key);
       if (artifacts[key]?.length) {
         const content = artifacts[key]
-          ?.map((img, index) => (
-            <div key={index} style={{ marginBottom: 8 }}>
-              {renderArtifactUrl(key, img)}
-            </div>
-          ))
+          ?.map((img) => renderArtifact(key, img))
           .filter(Boolean);
 
         if (content?.length) {
-          tabs.push({ title, content });
+          tabs.push({
+            title,
+            content: content.map((child, i) => (
+              <div key={i} style={{ marginBottom: 8 }} children={child} />
+            )),
+          });
         }
       }
     }

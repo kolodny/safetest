@@ -54,10 +54,7 @@ export type Props = Partial<Components> &
     useState: typeof myUseHashState;
     useFetching: typeof myUseFetching;
     getTestUrl: (filename: string, test: string) => string | undefined;
-    renderArtifactUrl: (
-      type: ArtifactType,
-      artifact: string
-    ) => React.ReactNode;
+    renderArtifact: (type: ArtifactType, artifact: string) => React.ReactNode;
   }>;
 
 export const Report: React.FunctionComponent<Props> = ({
@@ -73,14 +70,11 @@ export const Report: React.FunctionComponent<Props> = ({
   Tabs = MyTabs,
   Test = MyTest,
   getTestUrl,
-  renderArtifactUrl,
+  renderArtifact,
 } = {}) => {
   const [resultsLocation, setResultsLocation] = useState('results', '');
   const [url] = useState('url', '/');
-  const [showing, setShowing] = useState<'all' | Status | undefined>(
-    'status',
-    'all'
-  );
+  const [showing, setShowing] = useState<'all' | Status>('status', 'all');
   const results = useFetching<MergedResults>(resultsLocation, {
     enabled: !!resultsLocation,
   });
@@ -124,8 +118,8 @@ export const Report: React.FunctionComponent<Props> = ({
       return `${url}${search}`;
     });
 
-  const myRenderArtifactUrl =
-    renderArtifactUrl ??
+  const myRenderArtifact =
+    renderArtifact ??
     ((type, artifact) => {
       if (type === 'trace') {
         const aElement = document.createElement('a');
@@ -182,7 +176,7 @@ export const Report: React.FunctionComponent<Props> = ({
         Tabs,
         Test,
         getTestUrl: myGetTestUrl,
-        renderArtifactUrl: myRenderArtifactUrl,
+        renderArtifact: myRenderArtifact,
         useState,
         useFetching,
       }}
@@ -205,7 +199,7 @@ export const Report: React.FunctionComponent<Props> = ({
               })}
               defaultIndex={statusFilters.indexOf(showing!)}
               onChange={(e) => {
-                setShowing(statusFilters[e ?? 0] as Status | undefined);
+                setShowing(statusFilters[e ?? 0] as Status);
               }}
             />
           </div>
