@@ -671,7 +671,7 @@ Note that part of the report is a link to the test in the deployed environment. 
 
 <details>
   <summary>Video</summary>
-  <video controls src="https://safetest-two.vercel.app/vite-react-ts/artifacts/videos/src__nother_safetest_tsx_Main2_can_do_many_interactions_fast-attempt-0.webm"></video>
+  <video src="https://safetest-two.vercel.app/vite-react-ts/artifacts/videos/src__nother_safetest_tsx_Main2_can_do_many_interactions_fast-attempt-0.webm"></video>
 </details>
 
 ## How Safetest works
