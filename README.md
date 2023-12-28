@@ -642,7 +642,30 @@ Safetest published an HTML Test Reporter that can be used to view the results of
 npx safetest add-artifact-info artifacts.json results.json
 ```
 
-Now you can either publish the report.html standalone html file in the root of the project or import the `Report` component from `safetest/report` and use it in your application. Here's an [example of the vite-react example app report](https://safetest-two.vercel.app/report.html#results=vite-react-ts/artifacts/results.json&url=vite-react-ts/)
+Now you can either publish the `node_modules/safetest/report.html` standalone html file or import the `Report` component from `safetest/report` and use it in your application.
+
+```tsx
+import { Report } from 'safetest/report';
+
+export const MyReport: React.FunctionComponent = () => {
+  return (
+    <Report
+      getTestUrl={(filename, test) => {
+        const relativeFile = `./${filename}`.replace(/\.[jt]sx?$/g, '');
+        const testName = test.trim().replace(/ /g, '+');
+        return `${process.env.DEPLOYED_URL}?test_path=${relativeFile}&test_name=${testName}`;
+      }}
+      renderArtifact={(type, path) => {
+        if (type === 'video')
+          return <video src={`${process.env.DEPLOYED_URL}${path}`} controls />;
+        // etc
+      }}
+    />
+  );
+};
+```
+
+Here's an [example of the vite-react example app report](https://safetest-two.vercel.app/report.html#results=vite-react-ts/artifacts/results.json&url=vite-react-ts/)
 
 ## How Safetest works
 

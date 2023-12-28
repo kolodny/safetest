@@ -20,14 +20,16 @@ type CreateAppFunction<HostElement> = (
 
 type Renderable = Component;
 
-let renderFn: (element: Renderable) => Promise<ComponentPublicInstance>;
-const assertAndRender = (element: Renderable) => {
-  if (!renderFn) {
-    throw new Error(
-      'App is not bootstrapped, did you forget to call `bootstrap({ /* ... */ })`?'
-    );
-  }
-  return renderFn(element);
+type RenderFn = (
+  element: Renderable,
+  options?: Record<string, any>
+) => Promise<ComponentPublicInstance>;
+
+let renderFn: RenderFn;
+const errorMessage = `App is not bootstrapped, did you forget to call \`bootstrap({ /* ... */ })\`?`;
+const assertAndRender: RenderFn = (element: Renderable, options) => {
+  if (!renderFn) throw new Error(errorMessage);
+  return renderFn(element, options);
 };
 
 const defaultRender = (app: Renderable) => app;
@@ -48,7 +50,7 @@ export async function render(
   return renderCommon(
     { __isRenderable: true, thing: elementToRender },
     options,
-    async (e) => assertAndRender(e.thing) // createApp(e.thing, options.props).mount(c as any)
+    async (e) => assertAndRender(e.thing, options.props)
   );
 }
 
@@ -57,7 +59,8 @@ type BootstrapElement<Element> = Parameters<CreateAppFunction<Element>>[0];
 type BootstrapArgs<Element> = Importer & {
   element: BootstrapElement<Element>;
   container: Element | string;
-  render: (e: Renderable) => Promise<ComponentPublicInstance>;
+  render: RenderFn;
+  options?: VueRenderOptions;
 };
 
 export const bootstrap = async <Element>(
@@ -71,6 +74,6 @@ export const bootstrap = async <Element>(
 
   return bootstrapCommon({
     ...args,
-    defaultRender: () => assertAndRender(args.element),
+    defaultRender: () => assertAndRender(args.element, args.options?.props),
   });
 };
