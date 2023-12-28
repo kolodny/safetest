@@ -1,19 +1,21 @@
 # Safetest: Next Generation UI Testing Library
 
-Safetest is a powerful UI testing library that combines Playwright, Jest, and React for a powerful end-to-end testing solution for applications and component testing. With Safetest, you can easily test the functionality and appearance of your application, ensuring that it works as expected and looks great on all devices.
+Safetest is a powerful UI testing library that combines Playwright, Jest/Vitest, and React for a powerful end-to-end testing solution for applications and component testing. With Safetest, you can easily test the functionality and appearance of your application, ensuring that it works as expected and looks great on all devices.
 
 Safetest provides a seamless testing experience by integrating with your existing development environment and offering a familiar, easy-to-use API for creating and managing tests.
 
 ## Features
 
-- **Playwright Integration**: Run your tests on real browsers using Playwright. Safetest automatically handles browser management, so you can focus on what's important: writing tests.
+- **Playwright Integration**: Run your tests on real browsers using Playwright. Safetest automatically handles browser management, so you can focus on just writing tests.
   - Screenshot diffing via [jest-image-snapshot](https://github.com/americanexpress/jest-image-snapshot)
   - [Video recording](https://playwright.dev/docs/videos)
   - [Trace Viewer](https://playwright.dev/docs/trace-viewer)
   - [Full control over network layer](https://playwright.dev/docs/network#handle-requests)
+  - [Powerful overrides for complex test cases](#overrides)
 - **Jest Integration**: Safetest leverages the Jest test runner. Write your tests using familiar Jest syntax and benefit from its powerful assertion library and mocking capabilities.
 - **Vitest Integration**: Safetest can also use the Vitest runner. If you have a `vite` project you'll probably want to use this
 - **React Support**: Safetest is designed with React applications in mind, so you can easily test your components and their interactions. This allows for focused testing of individual components, for Example testing that `<Header admin={true}>` behaves as expected.
+- **Framework agnostic**: Safetest also works with other frameworks like Vue, Svelte, and Angular. See the [examples](./examples/) folder for more details. Safetest even works to [component test a NextJS](https://github.com/kolodny/safetest/blob/main/examples/next-app/src/spec.safetest.tsx) application
 - **Easy Setup**: Safetest is easy to set up and configure, so you can start writing tests in no time. No need to worry about complex configurations or dependencies; Safetest takes care of it all.
 - **Easy Auth Hooks**: If your app is testing an authenticated application, Safetest provides hooks to handles the auth flow in a reusable method across all your tests.
 
@@ -42,12 +44,16 @@ The following instructions assume you're using `create-react-app`. Look in the e
    ```json
    {
      "scripts": {
-       "safetest": "react-scripts --inspect test --runInBand --url=${TARGET_URL:-http://localhost:3000} --testMatch '**/*.safetest.{j,t}s{,x}' --setupFilesAfterEnv ./setup-safetest.tsx",
-       "safetest:ci": "npm run safetest -- --watchAll=false --ci=1 --docker=1 --url=DEPLOYED_URL --json --outputFile=results.json",
-       "safetest:regenerate-screenshots": "npm run safetest -- --watchAll=false --docker=1 --update-snapshot"
+       "safetest": "OPT_URL=${TARGET_URL:-http://localhost:3000} react-scripts --inspect test --runInBand --testMatch '**/*.safetest.{j,t}s{,x}' --setupFilesAfterEnv ./setup-safetest.tsx",
+       "safetest:ci": "rm -f artifacts.json && OPT_URL=${DEPLOYED_URL} OPT_CI=1 OPT_DOCKER=1 npm run safetest -- --watchAll=false --ci=1 --json --outputFile=results.json",
+       "safetest:regenerate-screenshots": "OPT_DOCKER=1 npm run safetest -- --watchAll=false --update-snapshot"
      }
    }
    ```
+
+   The preceding script runs the default runner (`react-scripts`) with a couple of flags and environment variables to make sure Safetest is loaded and run with jest, and that all `.safetest.tsx` test files are tested. You may need to adjust based on your specific setup for example using `craco` or `react-app-rewired` instead.
+
+   ***
 
    If you're using Vitest you'd use these scripts instead:
 
@@ -55,13 +61,15 @@ The following instructions assume you're using `create-react-app`. Look in the e
    {
      "scripts": {
        "safetest": "OPT_URL=${OPT_URL:-http://localhost:3000/} vitest --config vite.safetest.config",
-       "safetest:ci:test": "rm -f artifacts.json && OPT_URL=https://safetest-two.vercel.app OPT_CI=1 OPT_DOCKER=1 OPT_ARTIFACTS=artifacts.json npm run safetest -- --run --bail=5",
+       "safetest:ci": "rm -f artifacts.json && OPT_URL=${DEPLOYED_URL} OPT_CI=1 OPT_DOCKER=1 OPT_ARTIFACTS=artifacts.json npm run safetest -- --run --bail=5",
        "safetest:regenerate-screenshots": "OPT_DOCKER=1 npm run safetest -- --run --update"
      }
    }
    ```
 
-   The preceding script runs the default runner (`react-scripts`) with a couple of flags and environment variables to make sure Safetest is loaded and run with jest, and that all `.safetest.tsx` test files are tested. You may need to adjust based on your specific setup for example using `craco` or `react-app-rewired` instead.
+   ***
+
+   <small>A note about the `OPT_URL` and similar variables. This is used to pass flags to Safetest which will flow through different testing frameworks spawning threads or any other mechanism that would make command line flag passing practically impossible</s,all>
 
 1. ### Add `setup-safetest.tsx` file:
 
@@ -72,33 +80,32 @@ The following instructions assume you're using `create-react-app`. Look in the e
 
    setup({
      bootstrappedAt: require.resolve('./src/main.tsx'),
-     // ciOptions: { usingArtifactsDir: 'artifacts' },
    });
    ```
 
    This file is the minimal setup required to get Safetest working with your project. It's also where you can configure Safetest by specifying options to the `setup` function.
 
-1. If you're using vitest you'll need to add a vitest.safetest.config.ts file with the following config:
+   If you're using vitest you'll need to add a vitest.safetest.config.ts file with the following config:
 
-```ts
-/// <reference types="vitest" />
+   ```ts
+   /// <reference types="vitest" />
 
-import { defineConfig } from 'vite';
+   import { defineConfig } from 'vite';
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  test: {
-    globals: true,
-    testTimeout: 30000,
-    reporters: ['basic', 'json'],
-    outputFile: 'results.json',
-    setupFiles: ['setup-safetest'],
-    include: ['**/*.safetest.?(c|m)[jt]s?(x)'],
-    singleThread: true,
-    inspectBrk: true,
-  },
-});
-```
+   // https://vitejs.dev/config/
+   export default defineConfig({
+     test: {
+       globals: true,
+       testTimeout: 30000,
+       reporters: ['basic', 'json'],
+       outputFile: 'results.json',
+       setupFiles: ['setup-safetest'],
+       include: ['**/*.safetest.?(c|m)[jt]s?(x)'],
+       threads: process.env.CI ? true : false,
+       inspect: process.env.CI ? false : true,
+     },
+   });
+   ```
 
 1. ### Bootstrapping your application
 
@@ -204,7 +211,7 @@ Now when you create a PR you'll get a bunch of CI goodies like a detailed report
 - Video of test execution
 - Ability to open tested component in the deployed environment
 
-[See here](https://safetest-kolodnygithub-gmailcom.vercel.app/) for a the reports (and apps) of each the [example projects](https://github.com/kolodny/safetest/tree/main/examples).
+[See here](https://safetest-two.vercel.app/) for a the reports (and apps) of each the [example projects](https://github.com/kolodny/safetest/tree/main/examples).
 
 ## Writing Tests
 
@@ -266,7 +273,7 @@ There is also a `mask` option you can pass to `page.screenshot({ mask: ... })`, 
 #### Deterministic snapshots
 
 Due to hardware and platform differences between dev machines and CI environments, there will be slight rendering differences between snapshots generated locally and in CI. To solve this problem and to ensure that a consistent and reproducible test setup is used, Safetest can run your tests in a docker container. This should be used in CI by default (via the `safetest:ci` script). To run your tests in docker locally or to generate updated snapshots which will match CI, you can run:  
-`npm run safetest -- --docker=1` and `yarn safetest:regenerate-screenshots` respectively.
+`OPT_DOCKER=1 npm run safetest` and `yarn safetest:regenerate-screenshots` respectively.
 
 Note that you can also run this on "headed" mode, which will open a browser window connected to the debugPort within the docker container as show below:
 
@@ -350,7 +357,7 @@ export const Records = () => {
 };
 ```
 
-We can now override the `useGetRecordsQuery` hook to simulate an error:
+Here's how to create and use an override for the `useGetRecordsQuery` hook to simulate an error:
 
 ```diff
  // Records.tsx
@@ -410,7 +417,7 @@ This isn't limited to overriding a hook or a service, we can override anything w
 
 #### Targeted Injecting in App
 
-Since Safetest is bootstrapped within the application, we can also anything into the application. This ensures that even seemingly complex use cases can be tested.
+Since Safetest is bootstrapped within the application, we can test anything into the application. This ensures that even seemingly complex use cases can be tested.
 Here are some examples of this:
 
 - Our app makes a bunch of GPRC calls and we want to test that if one of them fails the page doesn't crash. This isn't feasible using attempting to override the network calls unless we can understand binary.
@@ -459,23 +466,23 @@ Here are some examples of this:
   ```
 
   ```diff
-  // Updated Page.tsx
-  // ... snip
-  + export const UseGrpc = createOverride(useGrpc);
+   // Updated Page.tsx
+   // ... snip
+  +export const UseGrpc = createOverride(useGrpc);
 
-  export const Page = () => {
+   export const Page = () => {
   +  const useGrpc = UseGrpc.useValue();
-    const settingsPanel = useGrpc('settings');
-    const alertsPanel = useGrpc('alerts');
-    const todosPanel = useGrpc('todos');
-    return (
-      <Grid>
-        <Settings settings={settingsPanel} />
-        <Alerts alerts={alertsPanel} />
-        <Todos todos={todosPanel} />
-      </Grid>
-    );
-  };
+     const settingsPanel = useGrpc('settings');
+     const alertsPanel = useGrpc('alerts');
+     const todosPanel = useGrpc('todos');
+     return (
+       <Grid>
+         <Settings settings={settingsPanel} />
+         <Alerts alerts={alertsPanel} />
+         <Todos todos={todosPanel} />
+       </Grid>
+     );
+   };
   ```
 
   ```tsx
@@ -520,7 +527,7 @@ Here are some examples of this:
 - We want to test that an absolutely positioned element set to the users width preference doesn't cover over a clickable element.
 <!-- TODO demonstration -->
 
-With the tools above we can test pretty much any scenario we can think of. The motto of Safetest is to make any test possible, no matter how complex and involved the test is.
+With the tools above we can test pretty much any scenario we can think of. The guiding principle of Safetest is to make any test possible, no matter how complex or involved the test is.
 
 ### Providers and Contexts
 
@@ -608,7 +615,34 @@ setup({
 
 Safetest takes advantage of playwright and jest to provide a lot of debugging and troubleshooting tools. Here are some of the most useful ones. The script copied in the package.json file will open a debug port that you can connect to with the node inspector. You can just add a `debugger` statement in your test and the node-inspector will just catch it. Alternately to can add a `launch.json` file with [**these run properties**](TODO) and have vscode auto-attach to the process.
 
-The `render` also returns a `pause` method that will pause the execution of the page and allow you to inspect the page in the browser and to continue to use the playwright `page` object. See [this video for a demo](TODO).
+The `render` also returns a `pause` method that will pause the execution of the page and allow you to inspect the page in the browser and to continue to use the playwright `page` object.
+
+```tsx
+it('can pause', async () => {
+  const { page, pause } = await render();
+  debugger;
+  await pause();
+  await expect(page.locator('text=Welcome to The App')).toBeVisible();
+});
+```
+
+![Debugger](safetest-debugger.png)
+
+We can even run code live against this test!
+
+![Paused](safetest-paused.png)
+
+<!-- See [this video for a demo](TODO). -->
+
+## Reporting
+
+Safetest published an HTML Test Reporter that can be used to view the results of your tests. To use it, you just need to process the results json to include information about the artifact, you can use the cli command that safetest provides:
+
+```bash
+npx safetest add-artifact-info artifacts.json results.json
+```
+
+Now you can either publish the report.html standalone html file in the root of the project or import the `Report` component from `safetest/report` and use it in your application. Here's an [example of the vite-react example app report](https://safetest-two.vercel.app/report.html#results=vite-react-ts/artifacts/results.json&url=vite-react-ts/)
 
 ## How Safetest works
 
@@ -616,7 +650,7 @@ Safetest is a combination of a few different technologies glued together intelli
 
 - A test runner (this can be Jest or Vitest, feel free to open a PR for other test runners, it's pretty [easy](src/jest.ts) to [add](src/vitest.ts))
 - A browser automation library (`Playwright` is the default and only one used currently, this will be a bit harder to extend)
-- A UI framework (`React` is the main example used in this Readme, but there are adapters for [vue](src/vue.ts), [svelte](src/svelte.ts), and [angular](src/angular.ts) all work as well, feel free to open a PR for other frameworks)
+- A UI framework (`React` is the main example used in this Readme, but there are adapters for [vue](src/vue.ts), [svelte](src/svelte.ts), and [angular](src/angular.ts), feel free to open a PR for other frameworks)
 
 Take a look at the [examples](./examples/) folder to see different combinations of these technologies. Please feel free to open a PR with more examples.
 
@@ -677,30 +711,3 @@ On the browser side of things, when the call to bootstrap is called the followin
   Back in node...
 
 - The await `render(...)` call now resolves and we can continue with the test.
-
----
-
-By running in both node and the browser we gain some unique abilities. For example we can enable powerful two way communication between the two environments. This allows us to do things like assert that spies on the component side of things were called as expected. It also allows us to do things like pause the execution of the test and inspect the page in the browser. This is done by calling the `pause` function returned from `render`. This will pause the execution of the test and open a browser window with the page loaded. You can now inspect the page and continue to use the `page` object to interact with the page. This is useful for debugging and troubleshooting.
-
-We can pass nodejs data to the browser and have the browser pass data back to assert on. For a silly example, we can have nodejs make an api call to some non CORs enabled service, or check for the existence of a file in a directory, have the browser so some processing with that data and then pass it back to nodejs. Here's a silly example of just passing some simple data back and forth:
-
-```tsx
-it('passes data', async () => {
-  const { page, bridge } = await render();
-
-  const bridged = await bridge(
-    { fromNode: !!require('os').platform() },
-    (passed) => {
-      return {
-        ...passed,
-        fromBrowser: !!document.location.href.length,
-      };
-    }
-  );
-
-  expect(bridged).toEqual({
-    fromNode: true,
-    fromBrowser: true,
-  });
-});
-```
