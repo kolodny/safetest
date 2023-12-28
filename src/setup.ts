@@ -4,7 +4,6 @@ import { RenderOptions } from './render';
 import { state } from './state';
 import { set } from 'lodash';
 import { getViewUrl, openLocalBrowser, startServer } from './redirect-server';
-import { getTree } from './ps';
 import { safeRequire } from './safe-require';
 import { collectArtifacts } from './artifacts';
 
@@ -13,15 +12,6 @@ type Options = RenderOptions & { bootstrappedAt: string };
 export const setup = (options: Options) => {
   if (!options.bootstrappedAt) throw new Error('bootstrappedAt is required');
   state.bootstrappedAt = require.resolve(options.bootstrappedAt);
-  let argv = process.argv;
-  if (typeof vitest !== 'undefined') {
-    const processes = getTree();
-    let current = processes[process.pid];
-    while (current && !current.argv.join(' ').includes('.bin/vitest')) {
-      current = processes[current.ppid];
-    }
-    argv = current?.argv!;
-  }
 
   const parse = (s: string) => {
     try {

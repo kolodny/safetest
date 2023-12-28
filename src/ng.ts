@@ -128,7 +128,6 @@ export const bootstrap = async (args: BootstrapArgs) => {
   state.browserState = {
     retryAttempt: 0,
     renderElement: { __type: 'renderElement', value: args.Module },
-    renderContainer: { __type: 'renderContainer', value: undefined },
   };
 
   return bootstrapCommon({

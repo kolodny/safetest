@@ -1,9 +1,11 @@
-import { createApp } from 'vue';
-
 import { state } from './state';
 import { RenderOptions, render as renderCommon } from './render';
 import { Importer, bootstrap as bootstrapCommon } from './bootstrap';
-import type { App, Component } from '@vue/runtime-core';
+import type {
+  App,
+  Component,
+  ComponentPublicInstance,
+} from '@vue/runtime-core';
 
 interface VueRenderOptions extends RenderOptions {
   /** Props passed to the Vue component to render */
@@ -17,6 +19,16 @@ type CreateAppFunction<HostElement> = (
 ) => App<HostElement>;
 
 type Renderable = Component;
+
+let renderFn: (element: Renderable) => Promise<ComponentPublicInstance>;
+const assertAndRender = (element: Renderable) => {
+  if (!renderFn) {
+    throw new Error(
+      'App is not bootstrapped, did you forget to call `bootstrap({ /* ... */ })`?'
+    );
+  }
+  return renderFn(element);
+};
 
 const defaultRender = (app: Renderable) => app;
 
@@ -36,7 +48,7 @@ export async function render(
   return renderCommon(
     { __isRenderable: true, thing: elementToRender },
     options,
-    async (e, c) => createApp(e.thing, options.props).mount(c as any)
+    async (e) => assertAndRender(e.thing) // createApp(e.thing, options.props).mount(c as any)
   );
 }
 
@@ -45,20 +57,20 @@ type BootstrapElement<Element> = Parameters<CreateAppFunction<Element>>[0];
 type BootstrapArgs<Element> = Importer & {
   element: BootstrapElement<Element>;
   container: Element | string;
+  render: (e: Renderable) => Promise<ComponentPublicInstance>;
 };
 
 export const bootstrap = async <Element>(
   args: BootstrapArgs<Element>
 ): Promise<Component> => {
+  renderFn = args.render;
   state.browserState = {
     retryAttempt: 0,
     renderElement: { __type: 'renderElement', value: args.element },
-    renderContainer: { __type: 'renderContainer', value: args.container },
   };
 
   return bootstrapCommon({
     ...args,
-    defaultRender: () =>
-      createApp(args.element as any).mount(args.container as any),
+    defaultRender: () => assertAndRender(args.element),
   });
 };

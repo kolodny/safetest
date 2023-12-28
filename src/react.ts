@@ -9,6 +9,16 @@ export { Override } from 'react-override';
 
 export const createOverride = configureCreateOverride(false);
 
+let renderFn: (element: React.ReactNode) => void;
+const assertAndRender = (element: React.ReactNode) => {
+  if (!renderFn) {
+    throw new Error(
+      'App is not bootstrapped, did you forget to call `bootstrap({ /* ... */ })`?'
+    );
+  }
+  return renderFn(element);
+};
+
 export async function render(
   elementToRender:
     | React.ReactNode
@@ -26,8 +36,8 @@ export async function render(
   return renderCommon(
     { __isRenderable: true, thing: elementToRender },
     options,
-    async (e, c) => {
-      const rendered = state.browserState!.renderFn!(e.thing, c as any);
+    async (e) => {
+      const rendered = assertAndRender(e.thing);
       await new Promise((r) => setTimeout(r, 0));
       return rendered;
     }
@@ -36,22 +46,19 @@ export async function render(
 
 type BootstrapArgs = Importer & {
   element: React.ReactNode;
-  container: HTMLElement | null;
-  render: (e: React.ReactNode, c: HTMLElement) => void;
+  render: (e: React.ReactNode) => void;
 };
 
 export const bootstrap = async (args: BootstrapArgs): Promise<void> => {
+  renderFn = args.render;
   state.browserState = {
     retryAttempt: 0,
     renderElement: { __type: 'renderElement', value: args.element },
-    renderContainer: { __type: 'renderContainer', value: args.container },
-    renderFn: args.render,
   };
 
   return bootstrapCommon({
     ...args,
-    defaultRender: () =>
-      state.browserState?.renderFn!(args.element, args.container!),
+    defaultRender: () => assertAndRender(args.element),
   });
 };
 
@@ -68,7 +75,6 @@ export const Bootstrap: React.FunctionComponent<
   React.useLayoutEffect(() => {
     bootstrap({
       ...props,
-      container: null,
       element: props.children,
       render: (element) => setChild(element),
     });

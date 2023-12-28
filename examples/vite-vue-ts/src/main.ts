@@ -1,4 +1,4 @@
-// import { createApp } from 'vue';
+import { createApp } from 'vue';
 import { bootstrap } from 'safetest/vue';
 
 import './style.css';
@@ -11,4 +11,5 @@ bootstrap({
   element: App,
   container: '#app',
   importGlob: import.meta.glob('./**/*.safetest.{j,t}s{,x}'),
+  render: async (element) => createApp(element).mount('#app'),
 });

@@ -47,10 +47,7 @@ export interface State {
   browserState?: {
     retryAttempt: number;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    renderContainer: { __type: 'renderContainer'; value: any };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     renderElement: { __type: 'renderElement'; value: any };
-    renderFn?: (...args: any[]) => any;
   };
 }
 

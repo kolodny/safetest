@@ -104,10 +104,7 @@ const IGNORE_CONSOLE_MESSAGES = [
 export async function render(
   element: RenderableThing,
   options: RenderOptions,
-  howToRender: (
-    element: RenderableThing,
-    container: HTMLElement | string
-  ) => Promise<any>
+  howToRender: (element: RenderableThing) => Promise<any>
 ): Promise<RenderReturn> {
   if (state.options) {
     options = merge(state.options, options);
@@ -487,7 +484,7 @@ export async function render(
         }
       } catch {}
     }
-    await howToRender(element, state.browserState.renderContainer.value as any);
+    await howToRender(element);
 
     const bridge: any = (state.bridge = (passed: any, callback: any) => {
       if (!callback) callback = passed;

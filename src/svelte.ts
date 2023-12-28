@@ -14,6 +14,16 @@ interface RenderReturn {
 
 type Renderable = typeof SvelteComponent;
 
+let renderFn: (element: Renderable) => Promise<SvelteComponent>;
+const assertAndRender = (element: Renderable) => {
+  if (!renderFn) {
+    throw new Error(
+      'App is not bootstrapped, did you forget to call `bootstrap({ /* ... */ })`?'
+    );
+  }
+  return renderFn(element);
+};
+
 export async function render(
   elementToRender: Renderable | ((app: Renderable) => Renderable),
   options: RenderOptions = {}
@@ -32,28 +42,26 @@ export async function render(
   return renderCommon(
     { __isRenderable: true, thing: elementToRender },
     options,
-    async (e, c) => new e.thing(c)
+    async (e) => assertAndRender(e.thing)
   );
 }
 
-type BootstrapOptions = ConstructorParameters<typeof SvelteComponent>[0];
-
 type BootstrapArgs = Importer & {
   element: typeof SvelteComponent;
-  options: BootstrapOptions;
+  render: (e: Renderable) => Promise<SvelteComponent>;
 };
 
 export const bootstrap = async (
   args: BootstrapArgs
 ): Promise<SvelteComponent> => {
+  renderFn = args.render;
   state.browserState = {
     retryAttempt: 0,
     renderElement: { __type: 'renderElement', value: args.element },
-    renderContainer: { __type: 'renderContainer', value: args.options },
   };
 
   return bootstrapCommon({
     ...args,
-    defaultRender: () => new args.element(args.options),
+    defaultRender: () => assertAndRender(args.element),
   });
 };
