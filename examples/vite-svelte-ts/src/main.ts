@@ -4,8 +4,6 @@ import { bootstrap } from 'safetest/svelte';
 
 const target = document.getElementById('app')!;
 
-const myApp = new App({ target });
-
 const app = bootstrap({
   element: App,
   importGlob: import.meta.glob('./**/*.safetest.{j,t}s{,x}'),
