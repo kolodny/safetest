@@ -1,5 +1,9 @@
 # Safetest: Next Generation UI Testing Library
 
+[![NPM version][npm-image]][npm-url]
+[![Build status][build-image]][build-url]
+[![Downloads][downloads-image]][downloads-url]
+
 Safetest is a powerful UI testing library that combines Playwright, Jest/Vitest, and React for a powerful end-to-end testing solution for applications and component testing. With Safetest, you can easily test the functionality and appearance of your application, ensuring that it works as expected and looks great on all devices.
 
 Safetest provides a seamless testing experience by integrating with your existing development environment and offering a familiar, easy-to-use API for creating and managing tests.
@@ -738,3 +742,10 @@ On the browser side of things, when the call to bootstrap is called the followin
   Back in node...
 
 - The await `render(...)` call now resolves and we can continue with the test.
+
+[npm-image]: https://img.shields.io/npm/v/safetest.svg?style=flat-square
+[npm-url]: https://npmjs.org/package/safetest
+[build-image]: https://github.com/kolodny/safetest/actions/workflows/safetest.yml/badge.svg
+[build-url]: https://github.com/kolodny/safetest/actions
+[downloads-image]: http://img.shields.io/npm/dm/safetest.svg?style=flat-square
+[downloads-url]: https://npmjs.org/package/safetest
