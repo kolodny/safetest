@@ -26,6 +26,8 @@ const container = document.getElementById('root');
 //     </Provider>
 // );
 
+const root = createRoot(container);
+
 bootstrap({
     container,
     element: (
@@ -35,11 +37,7 @@ bootstrap({
             </BrowserRouter>
         </Provider>
     ),
-    render: (e, c) => {
-        const root = createRoot(c);
-        root.render(e);
-        return root;
-    },
+    render: (element) => root.render(element),
     webpackContext: import.meta.webpackContext('.', {
         recursive: true,
         regExp: /\.safetest$/,
