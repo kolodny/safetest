@@ -24,8 +24,10 @@ const assertAndRender = (element: Renderable) => {
   return renderFn(element);
 };
 
+const id = (any: any) => any;
+
 export async function render(
-  elementToRender: Renderable | ((app: Renderable) => Renderable),
+  elementToRender: Renderable | ((app: Renderable) => Renderable) = id,
   options: RenderOptions = {}
 ): Promise<RenderReturn> {
   if (
