@@ -39,7 +39,7 @@ export const Radio: React.FunctionComponent<Props> = (props) => {
                   cursor: 'pointer',
                 }}
               >
-                <label>
+                <label style={{ cursor: 'pointer' }}>
                   <input
                     style={{ display: 'none' }}
                     type="radio"
