@@ -1,6 +1,12 @@
 import { SafePage } from './safepage';
 import { state } from './state';
 
+const tryFn = async (fn: () => any) => {
+  try {
+    return await fn();
+  } catch {}
+};
+
 export const cleanupBrowser = async (): Promise<void> => {
   const context = state.browserContextInstance;
   const browser = context?.browser();
@@ -11,16 +17,11 @@ export const cleanupBrowser = async (): Promise<void> => {
   for (const page of pages as SafePage[]) {
     const hooks = page._safetest_internal?.hooks;
     for (const beforeClose of hooks?.beforeClose ?? []) {
-      await beforeClose(page);
+      await tryFn(() => beforeClose(page));
     }
-    await page.close();
+    await tryFn(() => page.close());
   }
-  await browser?.close();
-  if (!closed) {
-    try {
-      await context.close();
-    } catch {}
-  }
-
+  await tryFn(() => context?.close());
+  if (!closed) await tryFn(() => browser?.close());
   delete state.browserContextInstance;
 };
