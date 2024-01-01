@@ -1,4 +1,4 @@
-import { mkdtempSync, writeFileSync, readFileSync } from 'fs';
+import { mkdtempSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import cp from 'child_process';
@@ -25,10 +25,7 @@ const spawn = (command: string, args: string[], resolveOnOutput?: boolean) => {
   });
 };
 
-const pkg = JSON.parse(
-  readFileSync(join(__dirname, '../package.json'), 'utf8')
-);
-const playwrightVersion = pkg.dependencies.playwright.match(/(\d|\.)+/)[0];
+const playwrightVersion = require('playwright/package.json').version;
 let GUID = Math.random().toString(36).substring(2, 15);
 let imageName = `safetest-image-${playwrightVersion}-${GUID}`;
 let containerName = `safetest-server-${playwrightVersion}-${GUID}`;

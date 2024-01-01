@@ -64,6 +64,8 @@ export interface RenderOptions extends LaunchOptions, BrowserContextOptions {
   ignoreConsoleMessages?: RegExp[];
   /** The default timeout. See {@link Page.setDefaultTimeout} */
   defaultTimeout?: number;
+  /** The timeout for the first page render in case there are some network auth handshakes that take a while. */
+  initialNavigationTimeout?: number;
   /** The default timeout for navigation. See {@link Page.setDefaultNavigationTimeout} */
   defaultNavigationTimeout?: number;
   matchImageSnapshotOptions?: MatchImageSnapshotOptions;
@@ -362,23 +364,39 @@ export async function render(
       : options.defaultNavigationTimeout ?? 30000;
     const gotoTestUrl: () => Promise<void> = async () => {
       const defer = deferred();
+      const rejectForTimeout = () => defer.reject(new PageReadyTimeoutError());
+
+      const changedMessage = 'ERR_NETWORK_CHANGED';
+      let hasNetworkChanged = false;
+      const initTimeout = options.initialNavigationTimeout ?? 500;
+      page.on('requestfailed', (request) => {
+        const errorText = request.failure()?.errorText;
+        if (errorText?.includes(changedMessage)) hasNetworkChanged = true;
+      });
+      page
+        .waitForLoadState('networkidle')
+        .then(() => {
+          // Network was idle and renderIsReadyDeferred wasn't resolved yet, may need to retry.
+          if (hasNetworkChanged) timeout(initTimeout).then(rejectForTimeout);
+        })
+        .catch(() => {});
       page
         .goto(url, { waitUntil: 'commit', timeout: 500 })
         .catch(async (error) => {
-          const changed = error.message.includes('net::ERR_NETWORK_CHANGED');
+          const changed = error.message.includes(changedMessage);
           if (changed) return defer.reject(error);
 
-          // Invoking evaluate kicks off the page navigation in case it failed.
           const href = await page
             .evaluate(() => window.location.href)
             .catch(() => page.url());
 
-          if (new URL(href).origin !== new URL(url).origin) defer.reject(error);
+          const halted = new URL(href).origin !== new URL(url).origin;
+
+          if (halted) defer.reject(error);
         })
         .then(() => page._safetest_internal.renderIsReadyDeferred?.promise)
         .then(() => defer.resolve());
 
-      const rejectForTimeout = () => defer.reject(new PageReadyTimeoutError());
       timeout(navigationTimeout).then(rejectForTimeout);
       return defer.promise.catch((error) => {
         const shouldRetry = gotoAttempts-- > 0;

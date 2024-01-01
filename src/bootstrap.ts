@@ -44,7 +44,7 @@ export const bootstrap = async (args: BootstrapArgs): Promise<any> => {
       const fixedImports = Object.fromEntries(entriesMapped);
       const imported = fixedImports[mapper(s)];
       if (!imported) {
-        throw new Error(`Test "${s}" not found, known tests are: ${known}`);
+        throw new Error(`File "${s}" not found, known files are: ${known}`);
       }
       return imported();
     };
@@ -61,17 +61,26 @@ export const bootstrap = async (args: BootstrapArgs): Promise<any> => {
   let testName = searchParams?.get('test_name');
   let testPath = searchParams?.get('test_path');
   if (window.location.hash.includes('safetest')) {
-    const urls = known.map((k) => {
-      const url = new URL(location.href);
-      const append = url.search.includes('?') ? '&' : '?';
-      url.search = `${url.search}${append}test_path=${k}`;
-      url.hash = '';
-      return url.href;
-    });
     if (known.length) {
-      console.group('Known tests files');
-      for (const url of urls) console.info(url);
-      console.groupEnd();
+      Promise.resolve().then(async () => {
+        for (const k of known) {
+          state.tests = {};
+          await importer(k);
+          const tests = Object.keys(state.tests);
+          console.group(`Tests for ${k} (${tests.length} total)`);
+          for (const test of tests) {
+            const url = new URL(location.href);
+            const append = url.search.includes('?') ? '&' : '?';
+            const testName = test.trim().replace(/ /g, '+');
+            url.search = `${url.search}${append}test_path=${k}&test_name=${testName}`;
+            url.hash = '';
+            console.log(url.href);
+          }
+          console.groupEnd();
+        }
+      });
+    } else {
+      console.log('No known tests');
     }
   } else if (testPath && !testName) {
     try {
@@ -87,7 +96,7 @@ export const bootstrap = async (args: BootstrapArgs): Promise<any> => {
       return url.href;
     });
     if (tests.length) {
-      console.groupCollapsed('Known tests files');
+      console.groupCollapsed('Known test files');
       for (const test of tests) console.info(test);
       console.groupEnd();
     }
