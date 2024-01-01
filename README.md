@@ -25,37 +25,26 @@ Safetest provides a seamless testing experience by integrating with your existin
 
 ## Why Safetest?
 
-Fundamentally UI tests come in two flavors: Integration test and E2E test.
+Fundamentally UI tests come in two flavors: **Integration** test and **E2E** test.
 
-Integration tests are usually run via react-testing-library or similar. They are fast, easy to write, and test the components within an application. However they are limited in that they don't actually run the application or render actual items to a screen so regressions like having a bad z-index that caused the submit button to be un-clickable won't be caught by these tests. Another common issue is that while it's easy to write the setup for the test, it's hard to write the events needed to cause things on the page to happen, a common example is to display a fancy <Dropdown /> isn't as simple as just calling `fireEvent.click('select')` since the js-dom doesn't perfectly match the real browser so you end up needing to mouseover the label and then click the select, etc. Figuring out the exact incantation to make this happen is hard and brittle. Debugging why something stopped working is also hard since you can't just open the browser and see what's going on.
+Integration tests are usually run via react-testing-library or similar. They are fast, easy to write, and test the components within an application. However they are limited in that they don't actually run the application or render actual items to a screen so regressions like having a bad z-index that caused the submit button to be un-clickable won't be caught by these tests. Another common issue is that while it's easy to write the setup for the test, it's hard to write the events needed to cause things on the page to happen, a common example is to display a fancy `<Dropdown />` isn't as simple as just calling `fireEvent.click('select')` since the js-dom doesn't perfectly match the real browser so you end up needing to mouseover the label and then click the select, etc. Along the same lines figuring out how to enter text on a smart `<Input />` has a similar battle. Figuring out the exact incantation to make this happen is hard and brittle. Debugging why something stopped working is also hard since you can't just open the browser and see what's going on.
 
 E2E tests like Cypress and Playwright are great for testing the actual application. The use a real browser and run against the actual application. They're able to test things like z-index issues, etc. However they lack the ability to test components in isolation, which is why some teams will end up having a Storybook adjacent build to point the E2E test at. Another issue is that it's hard to setup the different test fixtures, for example if you want to test that an admin user has an edit button on the page while a regular doesn't you'll some way to override the auth service to return different results, similarly component testing isn't possible when we have external service dependencies like OAuth since Cypress and Playwright component testing doesn't run against an actual instance of the app so any auth gating can make rendering components impossible.
 
-Essentially we end up with a breakdown similar to this:
+Essentially we end up with this breakdown:
 
-#### Integration
-
-| Pros       | Cons                                |
-| ---------- | ----------------------------------- |
-| Easy setup | Hard to drive                       |
-| Fast       | Hard to debug                       |
-|            | Can't test click-ability of element |
-|            | No screenshot testing               |
-|            | No video recording                  |
-|            | No trace viewer                     |
-
----
-
-#### E2E
-
-| Pros                              | Cons          |
-| --------------------------------- | ------------- |
-| Easy to drive                     | Hard to setup |
-| Easy to debug                     | Slow          |
-| Can test click-ability of element |               |
-| Screenshot testing                |               |
-| Video recording                   |               |
-| Trace viewer                      |               |
+| Integration Tests Pros      | Integration Test Cons                 | E2E Test Pros                     | E2E Test Cons                 |
+| --------------------------- | ------------------------------------- | --------------------------------- | ----------------------------- |
+| Easy setup                  | Hard to drive                         | Easy to drive                     | Hard to setup                 |
+| Fast                        | Hard to debug                         | Easy to debug                     | Slow                          |
+| Mock services               | Hard to override network              | Easy to override network          | No service mocking            |
+|                             | Can't test click-ability of element   | Can test click-ability of element |                               |
+|                             | Can't test z-index                    | Can test z-index                  |                               |
+|                             | Can't easily set value on `<Input />` | Easy to set value on `<Input />`  |                               |
+|                             | No screenshot testing                 | Screenshot testing                |                               |
+|                             | No video recording                    | Video recording                   |                               |
+|                             | No trace viewer                       | Trace viewer                      |                               |
+| No confidence app works E2E | Confidence components work            | Confidence app works E2E          | No confidence components work |
 
 It's almost like the two are complementary. If only there was a way to combine the two...
 
@@ -287,7 +276,7 @@ To get started with Safetest, follow these steps:
    OPT_CI=1 OPT_DOCKER=1 OPT_URL=https://my-app.com npm run safetest -- --watchAll=false --ci=1 --json --outputFile=results.json
    ```
 
-Now when you create a PR you'll get a bunch of CI goodies like a detailed report of what pass/failed as well as links to:
+See the [Reporting](#reporting) section about how to get an HTML report of the results with links to:
 
 - Trace viewer of each test
 - Video of test execution
