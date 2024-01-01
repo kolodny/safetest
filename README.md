@@ -116,7 +116,7 @@ To get started with Safetest, follow these steps:
    yarn add --dev safetest
    ```
 
-The following instructions assume you're using `create-react-app`. Look in the examples folder for other setup configurations.
+   The following instructions assume you're using `create-react-app`. Look in the examples folder for other setup configurations.
 
 1. ### Add run command to `package.json` scripts:
 
