@@ -5,10 +5,7 @@ const ignoreError = (promise?: Promise<any>) => promise?.catch(() => {});
 
 export const cleanupBrowser = async (): Promise<void> => {
   const context = state.browserContextInstance;
-  const browser = context?.browser();
   if (!context) return;
-  let closed = false;
-  context.once('close', () => (closed = true));
   const pages = context.pages() ?? [];
   for (const page of pages as SafePage[]) {
     const hooks = page._safetest_internal?.hooks;
@@ -18,6 +15,9 @@ export const cleanupBrowser = async (): Promise<void> => {
     await ignoreError(page.close());
   }
   await ignoreError(context?.close());
-  if (!closed) await ignoreError(browser?.close());
+
+  const browser = context.browser();
+  if (browser?.isConnected()) ignoreError(browser?.close());
+
   delete state.browserContextInstance;
 };
