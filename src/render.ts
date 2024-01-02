@@ -103,6 +103,8 @@ const IGNORE_CONSOLE_MESSAGES = [
   /^Download the Apollo DevTools/,
 ];
 
+const backoffMs = (attempt: number, base: number) => base * 2 ** attempt;
+
 export async function render(
   element: RenderableThing,
   options: RenderOptions,
@@ -355,53 +357,46 @@ export async function render(
     }
 
     // Workaround issue where Playwright sometimes doesn't goto the url after a call to page.goto()
-    let gotoAttempts = 5;
+    const gotoAttempts = 5;
+    let attemptsLeft = gotoAttempts;
     class PageReadyTimeoutError extends Error {
       override name = 'PageReadyTimeoutError';
     }
-    const navigationTimeout = options.debugTests
-      ? 60 * 60 * 1000
-      : options.defaultNavigationTimeout ?? 30000;
+
     const gotoTestUrl: () => Promise<void> = async () => {
       const defer = deferred();
       const rejectForTimeout = () => defer.reject(new PageReadyTimeoutError());
 
-      const changedMessage = 'ERR_NETWORK_CHANGED';
-      let hasNetworkChanged = false;
-      const initTimeout = options.initialNavigationTimeout ?? 500;
-      page.on('requestfailed', (request) => {
-        const errorText = request.failure()?.errorText;
-        if (errorText?.includes(changedMessage)) hasNetworkChanged = true;
-      });
+      const getUrl = () => {
+        return page.evaluate(() => location.href).catch(() => page.url());
+      };
+      const initialNavigationTimeout =
+        options.initialNavigationTimeout ??
+        options.defaultNavigationTimeout ??
+        backoffMs(gotoAttempts - attemptsLeft, 125);
+
+      setTimeout(async () => {
+        const halted = new URL(await getUrl()).origin !== new URL(url).origin;
+        if (halted) return rejectForTimeout();
+
+        // If the page has no pending network requests and didn't resolve `renderIsReadyDeferred`, try again.
+        page.waitForLoadState('networkidle').then(rejectForTimeout, () => {});
+      }, initialNavigationTimeout);
+
       page
-        .waitForLoadState('networkidle')
-        .then(() => {
-          // Network was idle and renderIsReadyDeferred wasn't resolved yet, may need to retry.
-          if (hasNetworkChanged) timeout(initTimeout).then(rejectForTimeout);
-        })
-        .catch(() => {});
-      page
-        .goto(url, { waitUntil: 'commit', timeout: 500 })
+        .goto(url, { waitUntil: 'commit', timeout: 100 })
         .catch(async (error) => {
-          const changed = error.message.includes(changedMessage);
-          if (changed) return defer.reject(error);
-
-          const href = await page
-            .evaluate(() => window.location.href)
-            .catch(() => page.url());
-
-          const halted = new URL(href).origin !== new URL(url).origin;
+          const halted = new URL(await getUrl()).origin !== new URL(url).origin;
 
           if (halted) defer.reject(error);
         })
         .then(() => page._safetest_internal.renderIsReadyDeferred?.promise)
         .then(() => defer.resolve());
 
-      timeout(navigationTimeout).then(rejectForTimeout);
       return defer.promise.catch((error) => {
-        const shouldRetry = gotoAttempts-- > 0;
+        const shouldRetry = attemptsLeft-- > 0;
         const plan = shouldRetry
-          ? `retrying (attempts left: ${gotoAttempts + 1})...`
+          ? `retrying (attempts left: ${attemptsLeft + 1})...`
           : 'giving up';
         console.log(
           `page.goto error: ${error.name} on "${state.activeTest}" ${plan}`
