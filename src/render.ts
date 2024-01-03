@@ -373,18 +373,21 @@ export async function render(
       const initialNavigationTimeout =
         options.initialNavigationTimeout ??
         options.defaultNavigationTimeout ??
-        backoffMs(gotoAttempts - attemptsLeft, 125);
+        backoffMs(gotoAttempts - attemptsLeft, 200);
+
+      console.log({ initialNavigationTimeout });
 
       setTimeout(async () => {
+        // Sometimes the page.goto doesn't register, this will detect that.
         const halted = new URL(await getUrl()).origin !== new URL(url).origin;
         if (halted) return rejectForTimeout();
 
-        // If the page has no pending network requests and didn't resolve `renderIsReadyDeferred`, try again.
+        // The page has no pending network requests and didn't resolve `renderIsReadyDeferred`.
         page.waitForLoadState('networkidle').then(rejectForTimeout, () => {});
       }, initialNavigationTimeout);
 
       page
-        .goto(url, { waitUntil: 'commit', timeout: 100 })
+        .goto(url, { waitUntil: 'commit', timeout: 500 })
         .catch(async (error) => {
           const halted = new URL(await getUrl()).origin !== new URL(url).origin;
 
