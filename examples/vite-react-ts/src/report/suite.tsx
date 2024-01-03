@@ -20,7 +20,7 @@ export const SuiteStatuses: React.FunctionComponent<{ suite: SuiteType }> = ({
 };
 const getStatusesText = (statuses: Statuses) =>
   Object.entries(statuses).map(([status, count]) => {
-    return `${count > 1 ? `${count}x ` : ''}${statusMap[status as Status]}`;
+    return `${count > 1 ? `${count}x ` : ''}${statusIcons[status as Status]}`;
   });
 const getTestStatuses = (tests: TestType[], statuses: Statuses = {}) => {
   for (const test of tests) {
@@ -42,7 +42,7 @@ const getStatusesCount = (suite: SuiteType, statuses: Statuses = {}) => {
   return statuses;
 };
 
-export const statusMap = {
+export const statusIcons = {
   passed: '✅',
   failed: '❌',
   pending: '⏱',
@@ -69,24 +69,30 @@ export const Suite: React.FunctionComponent<
   const showing = React.useContext(StateContext).viewing;
   if (!showSuite(suite, showing)) return null;
 
+  const subSuites = suites.filter((subSuite) => showSuite(subSuite, showing));
+
+  if (!subSuites.length) {
+    return tests
+      .filter((t) => (showing === 'all' ? true : t.status === showing))
+      .map((test) => <Test key={test.id} test={test} />);
+  }
+
   return (
     <>
-      {suites
-        .filter((subSuite) => showSuite(subSuite, showing))
-        .map((subSuite) => (
-          <Accordion
-            defaultOpen
-            key={subSuite.name}
-            summary={
-              <>
-                <Label>Suite</Label> <SuiteStatuses suite={subSuite} />
-                {subSuite.name}
-              </>
-            }
-          >
-            <Suite key={subSuite.id} suite={subSuite} />
-          </Accordion>
-        ))}
+      {subSuites.map((subSuite) => (
+        <Accordion
+          defaultOpen
+          key={subSuite.name}
+          summary={
+            <>
+              <SuiteStatuses suite={subSuite} /> <Label>Suite: </Label>
+              {subSuite.name}
+            </>
+          }
+        >
+          <Suite key={subSuite.id} suite={subSuite} />
+        </Accordion>
+      ))}
       {tests.length > 0 && (
         <Accordion
           defaultOpen

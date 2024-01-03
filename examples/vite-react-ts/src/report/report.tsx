@@ -10,7 +10,7 @@ import { Expandable as MyExpandable } from './expandable';
 import { File as MyFile } from './file';
 import { Label as MyLabel } from './label';
 import { Radio as MyRadio } from './radio';
-import { Suite as MySuite } from './suite';
+import { Suite as MySuite, statusIcons } from './suite';
 import { Tabs as MyTabs } from './tabs';
 import { Test as MyTest } from './test';
 import { Link } from './link';
@@ -191,11 +191,15 @@ export const Report: React.FunctionComponent<Props> = ({
           }}
         >
           Showing:
-          <div style={{ display: 'inline-block', paddingLeft: 8 }}>
+          <div
+            style={{ display: 'inline-block', paddingLeft: 8, lineHeight: 1 }}
+          >
             <Radio
               options={statusFilters.map((s) => {
                 const label = upperFirst(s);
-                return `${label} (${statusCounts[s] ?? 0})`;
+                return `${statusIcons[s as 'passed'] ?? ''} ${label} (${
+                  statusCounts[s] ?? 0
+                })`;
               })}
               defaultIndex={statusFilters.indexOf(showing!)}
               onChange={(e) => {

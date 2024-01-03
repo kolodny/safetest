@@ -1,7 +1,7 @@
 import React from 'react';
 import { type Tab } from './tabs';
 import { ComponentsContext, FilenameContext } from './report';
-import { statusMap } from './suite';
+import { statusIcons } from './suite';
 import { upperFirst } from 'lodash';
 import { Test as TestType } from './types';
 
@@ -108,7 +108,7 @@ export const Test: React.FunctionComponent<
       summary={
         <>
           <Label>
-            <Chip label={statusMap[test.status]} />
+            <Chip label={statusIcons[test.status]} />
           </Label>{' '}
           {test.title}
         </>

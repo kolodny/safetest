@@ -18,7 +18,7 @@ export const Radio: React.FunctionComponent<Props> = (props) => {
   const selectedValue = controls ? controls.index : uncontrolled;
   return (
     <>
-      <div className="radio" style={{ display: 'flex' }}>
+      <div className="radio" style={{ display: 'inline-flex' }}>
         {options.map((option, index) => (
           <Hover key={index}>
             {(hover) => (

@@ -39,7 +39,7 @@ const createNestedSuite = (file: FileType) => {
 
 export const File: React.FunctionComponent<{ file: FileType }> = ({ file }) => {
   const suite = React.useMemo(() => createNestedSuite(file), [file]);
-  const { Accordion, Suite } = React.useContext(ComponentsContext);
+  const { Accordion, Suite, Label } = React.useContext(ComponentsContext);
   const showing = React.useContext(StateContext).viewing;
   let isViewing = false;
   for (const status of Object.values(suite.statuses)) {
@@ -53,7 +53,8 @@ export const File: React.FunctionComponent<{ file: FileType }> = ({ file }) => {
     <Accordion
       summary={
         <>
-          {<SuiteStatuses suite={suite.suite} />} {suite.filename}
+          <SuiteStatuses suite={suite.suite} /> <Label>File: </Label>
+          {suite.filename}
         </>
       }
       defaultOpen
