@@ -375,8 +375,6 @@ export async function render(
         options.defaultNavigationTimeout ??
         backoffMs(gotoAttempts - attemptsLeft, 200);
 
-      console.log({ initialNavigationTimeout });
-
       setTimeout(async () => {
         // Sometimes the page.goto doesn't register, this will detect that.
         const halted = new URL(await getUrl()).origin !== new URL(url).origin;
