@@ -1,15 +1,17 @@
-import _ from 'lodash';
+import { mapKeys } from 'lodash';
 import { SAFETEST_INTERFACE } from './render';
 import { state } from './state';
 
+// @ts-ignore
+import type { ImportGlobFunction } from 'vite';
+
 export type Importer =
   | {
-      webpackContext:
-        | false
-        | { keys(): Array<string>; (dependency: string): Promise<unknown> };
+      // @ts-ignore
+      webpackContext: false | webpack.Context;
     }
   | {
-      importGlob: false | Record<string, () => Promise<unknown>>;
+      importGlob: false | ReturnType<ImportGlobFunction>;
     }
   | {
       import: false | ((s: string) => Promise<unknown>);
@@ -23,35 +25,34 @@ type BootstrapArgs = Importer & {
 };
 
 export const bootstrap = async (args: BootstrapArgs): Promise<any> => {
-  const mapper = (dep: string) =>
-    dep.replace(/\.m?[tj]sx?/, '').replace(/^\.(src)?/, '.');
+  const mapper = (dep: string) => {
+    const noExt = dep.replace(/\.m?[tj]sx?/, '');
+    return noExt.startsWith('.') ? noExt : `./${noExt}`;
+  };
   let known: string[] = [];
-  let importer: (s: string) => Promise<any>;
+  let importer: (s: string) => unknown;
   if ('webpackContext' in args) {
     if (args.webpackContext === false) return args.defaultRender();
     known = [...new Set(args.webpackContext.keys().map(mapper))];
     importer = args.webpackContext;
   } else if ('importGlob' in args) {
     if (args.importGlob === false) return args.defaultRender();
-    const mappedGlob = _.mapKeys(args.importGlob, (v, k) => mapper(k));
-    known = [...new Set(Object.keys(mappedGlob).map(mapper))];
-    importer = (s) => mappedGlob[s]!();
+    const entries = Object.entries(args.importGlob);
+    const entriesMapped = entries.map(([k, v]) => [mapper(k), v] as const);
+    const fixedImports = Object.fromEntries(entriesMapped);
+    known = entriesMapped.map(([k]) => k);
+    importer = (s) => (fixedImports[mapper(s)] as any)();
   } else if ('imports' in args) {
-    importer = (s) => {
-      const entries = Object.entries(args.imports);
-      const entriesMapped = entries.map(([k, v]) => [mapper(k), v] as const);
-      known = entriesMapped.map(([k]) => k);
-      const fixedImports = Object.fromEntries(entriesMapped);
-      const imported = fixedImports[mapper(s)];
-      if (!imported) {
-        throw new Error(`File "${s}" not found, known files are: ${known}`);
-      }
-      return imported();
-    };
+    const entries = Object.entries(args.imports);
+    const entriesMapped = entries.map(([k, v]) => [mapper(k), v] as const);
+    const fixedImports = Object.fromEntries(entriesMapped);
+    known = entriesMapped.map(([k]) => k);
+    importer = (s) => fixedImports[mapper(s)]();
   } else {
     if (args.import === false) return args.defaultRender();
     importer = args.import;
   }
+
   let searchParams: URLSearchParams | undefined;
 
   try {

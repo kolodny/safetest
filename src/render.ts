@@ -103,7 +103,7 @@ const IGNORE_CONSOLE_MESSAGES = [
   /^Download the Apollo DevTools/,
 ];
 
-const backoffMs = (attempt: number, base: number) => base * 2 ** attempt;
+const backoffMs = [500, 750, 1000, 2000] as const;
 
 export async function render(
   element: RenderableThing,
@@ -370,12 +370,15 @@ export async function render(
       const getUrl = () => {
         return page.evaluate(() => location.href).catch(() => page.url());
       };
+      const attempt = gotoAttempts - attemptsLeft;
       const initialNavigationTimeout =
         options.initialNavigationTimeout ??
         options.defaultNavigationTimeout ??
-        backoffMs(gotoAttempts - attemptsLeft, 200);
+        backoffMs[attempt] ??
+        5000;
 
       setTimeout(async () => {
+        if (gotoAttempts - attemptsLeft !== attempt) return;
         // Sometimes the page.goto doesn't register, this will detect that.
         const halted = new URL(await getUrl()).origin !== new URL(url).origin;
         if (halted) return rejectForTimeout();
@@ -385,7 +388,7 @@ export async function render(
       }, initialNavigationTimeout);
 
       page
-        .goto(url, { waitUntil: 'commit', timeout: 500 })
+        .goto(url, { waitUntil: 'commit', timeout: initialNavigationTimeout })
         .catch(async (error) => {
           const halted = new URL(await getUrl()).origin !== new URL(url).origin;
 
