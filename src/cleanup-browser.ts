@@ -33,8 +33,6 @@ export const cleanupBrowser = async (): Promise<void> => {
     }).then(async () => isConnected() && (await ignoreError(browser?.close())));
 
     if (forceWait) await manualClose;
-
-    if (isConnected()) await ignoreError(browser?.close());
   }
 
   delete state.browserContextInstance;
