@@ -20,7 +20,10 @@ export const cleanupBrowser = async (): Promise<void> => {
   }
   await ignoreError(context?.close());
 
-  if (connected && browser?.isConnected()) await ignoreError(browser?.close());
+  const docker = state.options.useDocker;
+  if (!docker && connected && browser?.isConnected()) {
+    await ignoreError(browser?.close());
+  }
 
   delete state.browserContextInstance;
 };
