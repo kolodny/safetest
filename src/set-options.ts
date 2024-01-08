@@ -42,22 +42,18 @@ export const setOptions = (
   }
   const recordTraces = options?.recordTraces;
   if (recordTraces) {
-    const { cpSync, mkdirSync } = safeRequire('fs');
+    const { cpSync, mkdirSync, existsSync } = safeRequire('fs');
     const { dirname, resolve } = safeRequire('path');
     // eslint-disable-next-line no-eval
     const r = eval('require');
     const playwrightDir = dirname(r.resolve('playwright-core/package.json'));
     const traceWebpack = resolve(playwrightDir, 'lib/webpack/traceViewer');
     const traceVite = resolve(playwrightDir, 'lib/vite/traceViewer');
+    const traceDir = existsSync(traceWebpack) ? traceWebpack : traceVite;
     try {
-      cpSync(traceWebpack, recordTraces, { recursive: true });
+      cpSync(traceDir, recordTraces, { recursive: true });
       mkdirSync(`${recordTraces}/traces`);
-    } catch {
-      try {
-        cpSync(traceVite, recordTraces, { recursive: true });
-        mkdirSync(`${recordTraces}/traces`);
-      } catch {}
-    } // This may already exist
+    } catch {} // This may already exist
   }
   if (options?.afterAllDone) {
     state.afterAllsDone.push(options.afterAllDone);
