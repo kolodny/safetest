@@ -21,7 +21,6 @@ export const cleanupBrowser = async (): Promise<void> => {
   const isConnected = () => connected && browser?.isConnected();
   browser?.once('disconnected', () => (connected = false));
   if (isConnected()) {
-    console.log('still connected');
     let forceWait = false;
     const manualClose = new Promise((r) => {
       const timeout = setTimeout(r, 250);
@@ -30,7 +29,12 @@ export const cleanupBrowser = async (): Promise<void> => {
         // Jest will not wait for the timeout to finish, it also doesn't expose unref on timeouts.
         forceWait = true;
       }
-    }).then(async () => isConnected() && (await ignoreError(browser?.close())));
+    }).then(async () => {
+      if (isConnected()) {
+        console.log('still connected');
+        await ignoreError(browser?.close());
+      }
+    });
 
     if (forceWait) await manualClose;
   }

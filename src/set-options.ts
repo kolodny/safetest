@@ -50,11 +50,11 @@ export const setOptions = (
     const traceWebpack = resolve(playwrightDir, 'lib/webpack/traceViewer');
     const traceVite = resolve(playwrightDir, 'lib/vite/traceViewer');
     try {
-      cpSync(traceWebpack, recordTraces, { recursive: true });
+      cpSync(traceVite, recordTraces, { recursive: true });
       mkdirSync(`${recordTraces}/traces`);
     } catch {
       try {
-        cpSync(traceVite, recordTraces, { recursive: true });
+        cpSync(traceWebpack, recordTraces, { recursive: true });
         mkdirSync(`${recordTraces}/traces`);
       } catch {}
     } // This may already exist
