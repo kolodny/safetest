@@ -111,6 +111,30 @@ export const Test: React.FunctionComponent<
             <Chip label={statusIcons[test.status]} />
           </Label>{' '}
           {test.title}
+          <span style={{ position: 'relative' }}>
+            <span
+              style={{
+                color: 'transparent',
+                position: 'absolute',
+                right: 0,
+                top: 0,
+                whiteSpace: 'pre',
+              }}
+            >
+              {test.id}
+            </span>
+            <span
+              style={{
+                color: 'transparent',
+                position: 'absolute',
+                right: 0,
+                top: 0,
+                whiteSpace: 'pre',
+              }}
+            >
+              {test.id.replace(/ > /g, ' ')}
+            </span>
+          </span>
         </>
       }
     >

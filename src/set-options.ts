@@ -47,11 +47,17 @@ export const setOptions = (
     // eslint-disable-next-line no-eval
     const r = eval('require');
     const playwrightDir = dirname(r.resolve('playwright-core/package.json'));
-    const trace = resolve(playwrightDir, 'lib/webpack/traceViewer');
+    const traceWebpack = resolve(playwrightDir, 'lib/webpack/traceViewer');
+    const traceVite = resolve(playwrightDir, 'lib/vite/traceViewer');
     try {
-      cpSync(trace, recordTraces, { recursive: true });
+      cpSync(traceWebpack, recordTraces, { recursive: true });
       mkdirSync(`${recordTraces}/traces`);
-    } catch {} // This may already exist
+    } catch {
+      try {
+        cpSync(traceVite, recordTraces, { recursive: true });
+        mkdirSync(`${recordTraces}/traces`);
+      } catch {}
+    } // This may already exist
   }
   if (options?.afterAllDone) {
     state.afterAllsDone.push(options.afterAllDone);
