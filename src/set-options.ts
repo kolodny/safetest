@@ -49,12 +49,13 @@ export const setOptions = (
     const playwrightDir = dirname(r.resolve('playwright-core/package.json'));
     const traceWebpack = resolve(playwrightDir, 'lib/webpack/traceViewer');
     const traceVite = resolve(playwrightDir, 'lib/vite/traceViewer');
-    mkdirSync(`${recordTraces}/traces`);
     try {
       cpSync(traceWebpack, recordTraces, { recursive: true });
+      mkdirSync(`${recordTraces}/traces`);
     } catch {
       try {
         cpSync(traceVite, recordTraces, { recursive: true });
+        mkdirSync(`${recordTraces}/traces`);
       } catch {}
     } // This may already exist
   }
