@@ -110,8 +110,8 @@ export const Test: React.FunctionComponent<
           <Label>
             <Chip label={statusIcons[test.status]} />
           </Label>{' '}
-          {test.title}
-          <span style={{ position: 'relative' }}>
+          <span style={{ position: 'relative', zIndex: 1 }}>{test.title}</span>
+          <span style={{ position: 'relative', zIndex: 0, userSelect: 'none' }}>
             <span
               style={{
                 color: 'transparent',
