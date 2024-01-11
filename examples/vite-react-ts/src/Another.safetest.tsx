@@ -1,10 +1,9 @@
 import React from 'react';
+import { setOptions } from 'safetest';
 import { render } from 'safetest/react';
-import { setup } from 'safetest/setup';
 import { describe, it, expect } from 'safetest/vitest';
 
-setup({
-  bootstrappedAt: require.resolve('./main.tsx'),
+setOptions({
   args: ['--show-layer-animation-bounds', '--show-layout-shift-regions']
 })
 
