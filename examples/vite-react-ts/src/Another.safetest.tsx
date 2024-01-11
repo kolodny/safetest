@@ -4,7 +4,7 @@ import { setup } from 'safetest/setup';
 import { describe, it, expect } from 'safetest/vitest';
 
 setup({
-  bootstrappedAt: require.resolve('./src/main.tsx'),
+  bootstrappedAt: require.resolve('./main.tsx'),
   args: ['--show-layer-animation-bounds', '--show-layout-shift-regions']
 })
 
