@@ -1,11 +1,6 @@
 import React from 'react';
-import { setOptions } from 'safetest';
 import { render } from 'safetest/react';
 import { describe, it, expect } from 'safetest/vitest';
-
-setOptions({
-  args: ['--show-layer-animation-bounds', '--show-layout-shift-regions']
-})
 
 describe('Main2', () => {
   it('hey loads a simple div', async () => {
