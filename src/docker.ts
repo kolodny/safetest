@@ -3,6 +3,7 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import cp from 'child_process';
 import { state } from './state';
+import { RenderOptions } from './render';
 
 const DOCKER_DEBUG_PORT = 9222;
 const DOCKER_SERVER_PORT = 2222;
@@ -69,9 +70,18 @@ export const buildDocker = async () => {
     join(dir, 'index.mjs'),
     `
     import { chromium } from 'playwright';
+
+    const options = JSON.parse(process.argv[2]);
+    const launchArgs = {
+      args: ['--remote-debugging-port=${DOCKER_DEBUG_PORT}', '--remote-debugging-address=0.0.0.0', '--remote-allow-origins=*'],
+    }
+
+    if (options.args) launchArgs.args.push(...options.args);
+    if (options.ignoreDefaultArgs) launchArgs.ignoreDefaultArgs = options.ignoreDefaultArgs;
+
     const server = await chromium.launchServer({
       port: ${DOCKER_SERVER_PORT},
-      args: ['--remote-debugging-port=${DOCKER_DEBUG_PORT}', '--remote-debugging-address=0.0.0.0', '--remote-allow-origins=*'],
+      ...launchArgs,
     });
 
     // Exit the docker container if no pages are open for 1 hour (perhaps zombie server).
@@ -92,11 +102,21 @@ export const buildDocker = async () => {
   await spawn('docker', ['build', '--progress=plain', '-t', imageName, dir]);
 };
 
-export const startDocker = async () => {
+export const startDocker = async (options: RenderOptions) => {
   await buildDocker();
   await spawn(
     'docker',
-    ['run', '--rm', '--name', containerName, '--publish-all=true', imageName],
+    [
+      'run',
+      '--rm',
+      '--name',
+      containerName,
+      '--publish-all=true',
+      imageName,
+      'node',
+      'index.mjs',
+      JSON.stringify(options),
+    ],
     true
   );
   const ports = await getPorts();

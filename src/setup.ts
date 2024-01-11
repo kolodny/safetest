@@ -68,7 +68,7 @@ export const setup = (options: Options) => {
     const dockerSafeUrl = new URL(url);
     if (localUrl) dockerSafeUrl.hostname = 'host.docker.internal';
     beforeAll(async () => {
-      const docker = await startDocker();
+      const docker = await startDocker(state.options);
       await startServer(opts);
 
       const browserServer = `http://localhost:${docker?.ports.SERVER_PORT}/`;

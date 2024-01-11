@@ -1,6 +1,12 @@
 import React from 'react';
 import { render } from 'safetest/react';
+import { setup } from 'safetest/setup';
 import { describe, it, expect } from 'safetest/vitest';
+
+setup({
+  bootstrappedAt: require.resolve('./src/main.tsx'),
+  args: ['--show-layer-animation-bounds', '--show-layout-shift-regions']
+})
 
 describe('Main2', () => {
   it('hey loads a simple div', async () => {
