@@ -74,7 +74,7 @@ export const Test: React.FunctionComponent<
             });
           }
           tabs.push({
-            title: upperFirst(type),
+            title: <span style={{ padding: 8 }}>{upperFirst(type)}</span>,
             content: <Tabs tabs={subTabs} />,
           });
         }
