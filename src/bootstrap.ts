@@ -67,6 +67,7 @@ export const bootstrap = async (args: BootstrapArgs): Promise<any> => {
         for (const k of known) {
           state.tests = {};
           await importer(k);
+          await (window as any).waitForSafetestReady;
           const tests = Object.keys(state.tests);
           console.group(`Tests for ${k} (${tests.length} total)`);
           for (const test of tests) {
@@ -86,6 +87,7 @@ export const bootstrap = async (args: BootstrapArgs): Promise<any> => {
   } else if (testPath && !testName) {
     try {
       await importer(testPath);
+      await (window as any).waitForSafetestReady;
     } catch {
       console.log(`Test "${testPath}" not found, known tests are:`, known);
     }
@@ -110,6 +112,7 @@ export const bootstrap = async (args: BootstrapArgs): Promise<any> => {
   if (testName && testPath) {
     try {
       await importer(testPath);
+      await (window as any).waitForSafetestReady;
     } catch (error) {
       console.log(
         `file "${testPath}" could not be imported, known files are:`,

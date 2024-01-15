@@ -4,6 +4,7 @@ import { join } from 'path';
 import cp from 'child_process';
 import { state } from './state';
 import { RenderOptions } from './render';
+import { pick } from 'lodash';
 
 const DOCKER_DEBUG_PORT = 9222;
 const DOCKER_SERVER_PORT = 2222;
@@ -115,7 +116,7 @@ export const startDocker = async (options: RenderOptions) => {
       imageName,
       'node',
       'index.mjs',
-      JSON.stringify(options),
+      JSON.stringify(pick(options, ['args', 'ignoreDefaultArgs'])),
     ],
     true
   );
