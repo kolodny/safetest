@@ -44,7 +44,7 @@ export async function getPage(
     const server = options.browserServer;
     const browserType = playwright[options.browser ?? 'chromium'];
     const browser = server
-      ? await browserType.connect(server)
+      ? await browserType.connect(server, { timeout: options.timeout ?? 30000 })
       : await browserType.launch(options);
     state.nextIndex = 0;
     const started = Date.now();
