@@ -54,7 +54,10 @@ export type Props = Partial<Components> &
     useState: typeof myUseHashState;
     useFetching: typeof myUseFetching;
     getTestUrl: (filename: string, test: string) => string | undefined;
-    renderArtifact: (type: ArtifactType, artifact: string) => React.ReactNode;
+    renderArtifact: (
+      type: ArtifactType,
+      artifact: string
+    ) => { element: React.ReactNode; url: string } | null;
   }>;
 
 export const Report: React.FunctionComponent<Props> = ({
@@ -94,8 +97,8 @@ export const Report: React.FunctionComponent<Props> = ({
       <>
         <p>No results URL provided.</p>
         <input
-          type="text"
-          placeholder="Results URL"
+          type='text'
+          placeholder='Results URL'
           onKeyUp={(e) => {
             if (e.key === 'Enter') {
               setResultsLocation((e.target as HTMLInputElement).value);
@@ -127,40 +130,48 @@ export const Report: React.FunctionComponent<Props> = ({
         const traceUrl = aElement.href;
         const viewerUrl = traceUrl.split('/traces/')[0];
         const fullUrl = `${viewerUrl}/?trace=${traceUrl}`;
-        return (
-          <iframe
-            style={{
-              width: '100%',
-              minHeight: 700,
-              height: 'calc(100vh - 150px)',
-              border: '1px solid #e2e2e2',
-            }}
-            src={fullUrl}
-            loading="lazy"
-          />
-        );
+        return {
+          url: fullUrl,
+          element: (
+            <iframe
+              style={{
+                width: '100%',
+                minHeight: 700,
+                height: 'calc(100vh - 150px)',
+                border: '1px solid #e2e2e2',
+              }}
+              src={fullUrl}
+              loading='lazy'
+            />
+          ),
+        };
       }
       if (type === 'video') {
-        return <SmartVideo src={`${url}${artifact}`} />;
+        return {
+          url: `${url}${artifact}`,
+          element: <SmartVideo src={`${url}${artifact}`} />,
+        };
       }
       if (type === 'snapshot') return null;
-      return (
-        <div
-          style={{
-            display: 'flex',
-            width: 'fit-content',
-          }}
-        >
-          <Link href={`${url}${artifact}`}>
-            <img
-              style={{ maxWidth: '80vw', border: '1px solid #e2e2e2' }}
-              alt=""
-              src={`${url}${artifact}`}
-            />
-          </Link>
-        </div>
-      );
-      return `${url}${artifact}`;
+      return {
+        url: `${url}${artifact}`,
+        element: (
+          <div
+            style={{
+              display: 'flex',
+              width: 'fit-content',
+            }}
+          >
+            <Link href={`${url}${artifact}`}>
+              <img
+                style={{ maxWidth: '80vw', border: '1px solid #e2e2e2' }}
+                alt=''
+                src={`${url}${artifact}`}
+              />
+            </Link>
+          </div>
+        ),
+      };
     });
 
   return (
@@ -197,8 +208,9 @@ export const Report: React.FunctionComponent<Props> = ({
             <Radio
               options={statusFilters.map((s) => {
                 const label = upperFirst(s);
-                const withLabel = `${statusIcons[s as 'passed'] ?? ''} ${label} (${statusCounts[s] ?? 0
-                  })`;
+                const withLabel = `${
+                  statusIcons[s as 'passed'] ?? ''
+                } ${label} (${statusCounts[s] ?? 0})`;
                 return <div style={{ padding: 8 }}>{withLabel}</div>;
               })}
               defaultIndex={statusFilters.indexOf(showing!)}

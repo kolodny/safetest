@@ -30,8 +30,8 @@ export const Radio: React.FunctionComponent<Props> = (props) => {
                   background: hover
                     ? '#ddd'
                     : index === selectedValue
-                      ? '#eee'
-                      : '#fff',
+                    ? '#eee'
+                    : '#fff',
                   transition: 'background 0.2s ease',
                   borderRadius: 4,
                   border: 'none',

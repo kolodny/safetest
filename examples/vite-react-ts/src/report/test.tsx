@@ -13,6 +13,25 @@ const getAttemptText = (artifacts: string[], index: number) => {
   return `Attempt #${+attempt! + 1}`;
 };
 
+const TabLink: React.FunctionComponent<
+  React.PropsWithChildren<{ href?: string }>
+> = ({ href, children }) => {
+  return (
+    <span
+      onClick={(e) => {
+        const mac = navigator.platform.match('Mac');
+        const open = e.shiftKey || (mac && e.metaKey) || (!mac && e.ctrlKey);
+        if (!open) return;
+        e.preventDefault();
+        window.open(href, '_blank');
+      }}
+      style={{ padding: 8, color: 'inherit', textDecoration: 'none' }}
+    >
+      {children}
+    </span>
+  );
+};
+
 export const Test: React.FunctionComponent<
   React.PropsWithChildren<{ test: TestType }>
 > = ({ test }) => {
@@ -30,21 +49,27 @@ export const Test: React.FunctionComponent<
           if (!item) return null;
           const title =
             getAttemptText(artifacts[type]!, index) || `${type} #${+index + 1}`;
-          return { title, item };
+          return { title, item: item.element, url: item.url };
         })
         .filter(Boolean);
 
       if (rendered.length) {
         if (rendered.length === 1) {
           tabs.push({
-            title: <div style={{ padding: 8 }}>{upperFirst(type)}</div>,
+            title: (
+              <TabLink href={rendered[0]?.url}>{upperFirst(type)}</TabLink>
+            ),
             content: rendered[0]?.item,
           });
         } else if (rendered?.length) {
           const subTabs: Tab[] = [];
           for (const render of rendered) {
             subTabs.push({
-              title: <div style={{ padding: 8 }}>{upperFirst(render?.title)}</div>,
+              title: (
+                <TabLink href={render?.url}>
+                  {upperFirst(render?.title)}
+                </TabLink>
+              ),
               content: render?.item,
             });
           }
@@ -65,9 +90,13 @@ export const Test: React.FunctionComponent<
 
         if (content?.length) {
           tabs.push({
-            title: <div style={{ padding: 8 }}>{title}</div>,
+            title: <TabLink href={content[0]?.url}>{title}</TabLink>,
             content: content.map((child, i) => (
-              <div key={i} style={{ marginBottom: 8 }} children={child} />
+              <div
+                key={i}
+                style={{ marginBottom: 8 }}
+                children={child?.element}
+              />
             )),
           });
         }
@@ -79,26 +108,8 @@ export const Test: React.FunctionComponent<
 
   if (testUrl) {
     tabs.push({
-      title: (
-        <span
-          style={{ padding: 8 }}
-          onClick={(e) => {
-            e.preventDefault();
-            window.open(testUrl, '_blank');
-          }}
-        >
-          View Component
-          <svg
-            style={{ paddingLeft: 6, zoom: 0.7 }}
-            viewBox="0 0 1024 1024"
-            height="1em"
-            width="1em"
-          >
-            <path d="M 345.6 172.7985 L 345.6 287.9994 L 115.2 288 L 115.2 864 L 691.2 864 L 691.2 633.5994 L 806.3982 633.5994 L 806.4 979.2 L 0 979.2 L 0 172.8 L 345.6 172.7985 Z M 979.2 0 L 979.2 460.8 L 864 460.8 L 864 196.6545 L 386.3294 674.3293 L 304.8706 592.8706 L 782.541 115.1982 L 518.4 115.2 L 518.4 0 L 979.2 0 Z" />
-          </svg>
-        </span>
-      ),
-      content: null,
+      title: <TabLink href={testUrl}>View Component</TabLink>,
+      content: <iframe src={testUrl} style={{ width: '100%', height: 500 }} />,
     });
   }
 
