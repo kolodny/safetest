@@ -109,7 +109,18 @@ export const Test: React.FunctionComponent<
   if (testUrl) {
     tabs.push({
       title: <TabLink href={testUrl}>View Component</TabLink>,
-      content: <iframe src={testUrl} style={{ width: '100%', height: 500 }} />,
+      content: (
+        <iframe
+          src={testUrl}
+          style={{
+            width: '100%',
+            minHeight: 700,
+            height: 'calc(100vh - 150px)',
+            border: '1px solid #e2e2e2',
+          }}
+          loading='lazy'
+        />
+      ),
     });
   }
 
