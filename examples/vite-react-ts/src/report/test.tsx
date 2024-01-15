@@ -37,14 +37,14 @@ export const Test: React.FunctionComponent<
       if (rendered.length) {
         if (rendered.length === 1) {
           tabs.push({
-            title: upperFirst(type),
+            title: <div style={{ padding: 8 }}>{upperFirst(type)}</div>,
             content: rendered[0]?.item,
           });
         } else if (rendered?.length) {
           const subTabs: Tab[] = [];
           for (const render of rendered) {
             subTabs.push({
-              title: upperFirst(render?.title),
+              title: <div style={{ padding: 8 }}>{upperFirst(render?.title)}</div>,
               content: render?.item,
             });
           }
@@ -65,7 +65,7 @@ export const Test: React.FunctionComponent<
 
         if (content?.length) {
           tabs.push({
-            title,
+            title: <div style={{ padding: 8 }}>{title}</div>,
             content: content.map((child, i) => (
               <div key={i} style={{ marginBottom: 8 }} children={child} />
             )),
@@ -81,7 +81,7 @@ export const Test: React.FunctionComponent<
     tabs.push({
       title: (
         <span
-          style={{ padding: '8px 0' }}
+          style={{ padding: 8 }}
           onClick={(e) => {
             e.preventDefault();
             window.open(testUrl, '_blank');

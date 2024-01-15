@@ -18,38 +18,34 @@ export const Radio: React.FunctionComponent<Props> = (props) => {
   const selectedValue = controls ? controls.index : uncontrolled;
   return (
     <>
-      <div className="radio" style={{ display: 'inline-flex' }}>
+      <div className='radio'>
         {options.map((option, index) => (
-          <Hover key={index}>
+          <Hover key={index} style={{ marginRight: 4 }}>
             {(hover) => (
-              <div
-                key={index}
+              <label
                 style={{
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  // padding: 8,
                   background: hover
                     ? '#ddd'
                     : index === selectedValue
-                    ? '#eee'
-                    : '#fff',
+                      ? '#eee'
+                      : '#fff',
                   transition: 'background 0.2s ease',
                   borderRadius: 4,
-                  paddingRight: 8,
-                  marginRight: 4,
                   border: 'none',
-                  padding: 8,
-                  cursor: 'pointer',
                 }}
               >
-                <label style={{ cursor: 'pointer' }}>
-                  <input
-                    style={{ display: 'none' }}
-                    type="radio"
-                    value={index}
-                    checked={index === selectedValue}
-                    onChange={() => changeHandler(index)}
-                  />
-                  {option}
-                </label>
-              </div>
+                <input
+                  style={{ display: 'none' }}
+                  type='radio'
+                  value={index}
+                  checked={index === selectedValue}
+                  onChange={() => changeHandler(index)}
+                />
+                {option}
+              </label>
             )}
           </Hover>
         ))}

@@ -197,9 +197,9 @@ export const Report: React.FunctionComponent<Props> = ({
             <Radio
               options={statusFilters.map((s) => {
                 const label = upperFirst(s);
-                return `${statusIcons[s as 'passed'] ?? ''} ${label} (${
-                  statusCounts[s] ?? 0
-                })`;
+                const withLabel = `${statusIcons[s as 'passed'] ?? ''} ${label} (${statusCounts[s] ?? 0
+                  })`;
+                return <div style={{ padding: 8 }}>{withLabel}</div>;
               })}
               defaultIndex={statusFilters.indexOf(showing!)}
               onChange={(e) => {

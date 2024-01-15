@@ -11,7 +11,7 @@ export const Tabs: React.FunctionComponent<{ tabs: Tab[] }> = ({ tabs }) => {
   const { Radio } = React.useContext(ComponentsContext);
   return (
     <>
-      <div style={{ padding: '0 8px' }}>
+      <div>
         <Radio
           defaultIndex={0}
           options={tabs.map((t) => t.title)}
