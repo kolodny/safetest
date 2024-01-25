@@ -66,6 +66,7 @@ export const bootstrap = async (args: BootstrapArgs): Promise<any> => {
       Promise.resolve().then(async () => {
         for (const k of known) {
           state.tests = {};
+          state.seen.clear();
           await importer(k);
           await (window as any).waitForSafetestReady;
           const tests = Object.keys(state.tests);

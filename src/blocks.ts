@@ -2,7 +2,7 @@
 import { state } from './state';
 import { isInNode } from './is-in-node';
 
-const seen = new Set<string>();
+const seen = state.seen;
 const createId = (name: string, parent: string) => {
   const separator = parent ? ' ' : '';
   const concat = `${parent}${separator}${name}`;

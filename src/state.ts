@@ -9,6 +9,7 @@ export interface State {
   __filename?: string;
   activeTest?: string;
   pendingExpects: Record<string, number>;
+  seen: Set<string>;
   options: RenderOptions;
   isGlobalSetupTeardownRegistered: boolean;
   debugging: Set<string>;
@@ -55,6 +56,7 @@ export const state: State = {
   tests: {},
   retryMap: {},
   options: {},
+  seen: new Set(),
   currentSuite: '',
   currentTest: '',
   isGlobalSetupTeardownRegistered: false,
