@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { uniqBy } from 'lodash';
 import { safeRequire } from './safe-require';
 import { state } from './state';
 
@@ -54,7 +54,7 @@ export const collectArtifacts = async () => {
     const grouped: Grouped = {};
     for (const [test, artifacts] of Object.entries(byTest)) {
       const group: Group = (grouped[test] = {});
-      const unique = _.uniqBy(artifacts, 'path');
+      const unique = uniqBy(artifacts, 'path');
       for (const artifact of unique) {
         if (!group[artifact.type]) group[artifact.type] = [];
         group[artifact.type]!.push(artifact.path);
