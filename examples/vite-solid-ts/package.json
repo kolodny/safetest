@@ -1,0 +1,33 @@
+{
+  "name": "vite-template-solid",
+  "version": "0.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
+    "test": "vitest",
+    "safetest": "cross-env OPT_URL=http://localhost:3000/ vitest --config vite.safetest.config",
+    "safetest:ci": "rm -f artifacts.json && cross-env OPT_URL=${DEPLOYED_URL} OPT_CI=1 OPT_DOCKER=1 OPT_ARTIFACTS=artifacts.json npm run safetest -- --run --bail=5",
+    "safetest:regenerate-screenshots": "cross-env OPT_DOCKER=1 npm run safetest -- --run --update"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@solidjs/testing-library": "^0.8.6",
+    "@testing-library/jest-dom": "^6.2.0",
+    "@types/testing-library__jest-dom": "^6.0.0",
+    "jsdom": "^24.0.0",
+    "solid-devtools": "^0.29.3",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.11",
+    "vite-plugin-solid": "^2.8.2",
+    "vitest": "^1.2.1"
+  },
+  "dependencies": {
+    "cross-env": "^7.0.3",
+    "safetest": "file:../..",
+    "solid-js": "^1.8.11"
+  }
+}
