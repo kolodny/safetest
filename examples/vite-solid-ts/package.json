@@ -28,6 +28,6 @@
   "dependencies": {
     "cross-env": "^7.0.3",
     "safetest": "file:../..",
-    "solid-js": "^1.8.11"
+    "solid-js": "^1.8.14"
   }
 }

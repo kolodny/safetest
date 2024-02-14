@@ -1,4 +1,4 @@
-import { For } from 'solid-js';
+import { For, Component } from 'solid-js';
 import { createStore } from 'solid-js/store';
 
 type Todo = { id: number; text: string; completed: boolean };
@@ -16,7 +16,7 @@ export const TodoList = () => {
   return (
     <>
       <div>
-        <input placeholder="new todo here" ref={input} />
+        <input placeholder='new todo here' ref={input} />
         <button
           onClick={() => {
             if (!input.value.trim()) return;
@@ -34,7 +34,7 @@ export const TodoList = () => {
             return (
               <div>
                 <input
-                  type="checkbox"
+                  type='checkbox'
                   checked={todo.completed}
                   onchange={[toggleTodo, id]}
                 />

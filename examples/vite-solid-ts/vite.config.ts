@@ -1,37 +1,49 @@
 /// <reference types="vitest" />
-/// <reference types="vite/client" />
 
-import { defineConfig } from "vite";
-import solidPlugin from "vite-plugin-solid";
-// import devtools from 'solid-devtools/vite';
+import { defineConfig } from 'vite';
+import solidPlugin from 'vite-plugin-solid';
+import path from 'path';
+// import { exec } from 'child_process';
+// import { rmdir, mkdir } from 'fs/promises';
 
+const root = path.resolve(__dirname, '../..');
+const lib = `node_modules/safetest`;
+// const link = async () => {
+//   if (env === 'test') return;
+//   try {
+//     await rmdir(lib, { recursive: true });
+//   } catch {
+//     // ignore
+//   }
+//   await mkdir(`${lib}/lib`, { recursive: true });
+//   await new Promise((res) => exec(`cp ${root}/* ${lib}/`, res));
+//   await new Promise((res) => exec(`cp ${root}/lib/* ${lib}/lib/`, res));
+// };
+
+const env = process.env.NODE_ENV || 'development';
+
+// https://vitejs.dev/config/
 export default defineConfig({
+  base: '/vite-solid-ts/',
+  server: {
+    port: env === 'test' ? 3001 : 3000,
+  },
   plugins: [
-    /* 
-    Uncomment the following line to enable solid-devtools.
-    For more info see https://github.com/thetarnav/solid-devtools/tree/main/packages/extension#readme
-    */
-    // devtools(),
+    // {
+    //   name: 'safetest linker',
+    //   buildStart: link,
+    //   handleHotUpdate: link,
+    // },
     solidPlugin(),
   ],
   optimizeDeps: {
-    include: ["safetest", "safetest/solid", "safetest/vitest"],
-  },
-  server: {
-    port: 3000,
+    include: ['safetest', 'safetest/solid', 'safetest/vitest'],
   },
   test: {
-    environment: "jsdom",
     globals: true,
-    setupFiles: ["node_modules/@testing-library/jest-dom/vitest"],
-    // if you have few tests, try commenting this
-    // out to improve performance:
-    isolate: false,
-  },
-  build: {
-    target: "esnext",
-  },
-  resolve: {
-    conditions: ["development", "browser"],
+    reporters: ['basic', 'json'],
+    outputFile: 'results.json',
+    setupFiles: ['setup-safetest'],
+    include: ['**/*.safetest.?(c|m)[jt]s?(x)'],
   },
 });
