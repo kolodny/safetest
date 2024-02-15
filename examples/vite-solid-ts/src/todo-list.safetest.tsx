@@ -10,7 +10,7 @@ describe('a test', () => {
   });
 
   test('works2', async () => {
-    const { page } = await render(() => <TodoList />);
+    const { page } = await render((app) => <div>{app()}</div>);
     expect(page).toBeTruthy();
   });
 });
@@ -35,8 +35,7 @@ describe('<TodoList />', () => {
   });
 
   test('it will mark a todo as completed', async () => {
-    // const { page } = await render(() => <TodoList />);
-    const { page } = await render(() => <div>test</div>);
+    const { page } = await render(() => <TodoList />);
     const input = page.getByPlaceholder('new todo here');
     const button = page.getByText('Add Todo');
     await input.evaluate(

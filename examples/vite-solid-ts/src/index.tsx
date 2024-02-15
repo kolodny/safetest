@@ -1,6 +1,6 @@
 import { render } from 'solid-js/web';
-import { Bootstrap, bootstrap } from 'safetest/solid';
-import * as Solid from 'solid-js';
+import { bootstrap } from 'safetest/solid';
+// import * as Solid from 'solid-js';
 // import { Bootstrap } from "safetest/solid";
 
 import { TodoList as App } from './todo-list';
@@ -12,12 +12,6 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
     'Root element not found. Did you forget to add it to your index.html? Or maybe the id attribute got misspelled?'
   );
 }
-
-// const app = <App />;
-
-let component: Solid.Component = () => <App />;
-component = () => '';
-component = () => <div></div>;
 
 bootstrap({
   element: () => <App />,

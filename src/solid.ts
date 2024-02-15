@@ -16,19 +16,20 @@ const assertAndRender = (element: () => JSXElement) => {
 };
 
 export async function render(
-  elementToRender: (app: JSXElement) => JSXElement = state.browserState
+  elementToRender: (app: () => JSXElement) => JSXElement = state.browserState
     ?.renderElement.value,
   options: RenderOptions = {}
 ) {
-  if (!isInNode && typeof elementToRender === 'function') {
-    const rendered = elementToRender(
-      state.browserState?.renderElement.value ?? ({} as any)
-    );
-    elementToRender = rendered as any;
+  let functionToRender: () => JSXElement = () => null;
+  if (!isInNode) {
+    functionToRender = () =>
+      elementToRender(
+        () => state.browserState?.renderElement.value ?? ({} as any)
+      );
   }
 
   return renderCommon(
-    { __isRenderable: true, thing: elementToRender },
+    { __isRenderable: true, thing: functionToRender },
     options,
     async (e) => {
       console.log(1);
@@ -64,23 +65,26 @@ export const bootstrap = async (args: BootstrapArgs): Promise<void> => {
 export const Bootstrap: Component<
   {
     children: JSXElement;
-    Solid: typeof Solid;
+    Solid: Pick<
+      typeof Solid,
+      'createRenderEffect' | 'createSignal' | 'createMemo'
+    >;
     /** Note that using this in SSR mode this will cause the page to start with the loading component before the page is ready. */
     loading?: JSXElement;
   } & Importer
 > = (props) => {
   const Solid = props.Solid;
-  const initial = props.loading ?? props.children;
-  const [child, setChild] = Solid.createSignal<JSXElement>(initial);
+  const initial = () => props.loading ?? props.children;
+  const [child, setChild] = Solid.createSignal<Component>(initial);
   Solid.createRenderEffect(() => {
     bootstrap({
       ...props,
       element: () => props.children,
-      render: (element) => setChild(element),
+      render: (element) => setChild(() => element),
     });
   });
 
   return Solid.createMemo(
-    () => child() ?? props.children
+    () => child()({}) ?? props.children
   ) as unknown as JSXElement;
 };
