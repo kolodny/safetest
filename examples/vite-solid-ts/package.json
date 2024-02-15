@@ -6,7 +6,7 @@
   "scripts": {
     "start": "vite",
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm i ../../ && (rm -rf ../../build/vite-solid-ts || true) && vite build && mv dist ../../build/vite-solid-ts",
     "serve": "vite preview",
     "test": "vitest",
     "safetest": "cross-env OPT_URL=${OPT_URL:-http://localhost:3000/vite-solid-ts/} vitest --config vite.safetest.config",

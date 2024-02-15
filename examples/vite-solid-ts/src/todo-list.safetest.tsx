@@ -3,20 +3,20 @@ import { describe, test, expect } from 'safetest/vitest';
 
 import { TodoList } from './todo-list';
 
-describe('a test', () => {
-  test('works', async () => {
+describe('different test types', () => {
+  test('can test a regular div', async () => {
     const { page } = await render(() => <div>test</div>);
     expect(page).toBeTruthy();
   });
 
-  test('works2', async () => {
+  test('can wrap the app', async () => {
     const { page } = await render((app) => (
       <div style={{ padding: '20px', border: '1px solid green' }}>{app}</div>
     ));
     expect(page).toBeTruthy();
   });
 
-  test('works3', async () => {
+  test('works as a regular playwright test', async () => {
     const { page } = await render();
     expect(page).toBeTruthy();
   });
