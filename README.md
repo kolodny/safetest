@@ -27,9 +27,9 @@ Safetest provides a seamless testing experience by integrating with your existin
 
 Fundamentally UI tests come in two flavors: **Integration** test and **E2E** test.
 
-Integration tests are usually run via react-testing-library or similar. They are fast, easy to write, and test the components within an application. However they are limited in that they don't actually run the application or render actual items to a screen so regressions like having a bad z-index that caused the submit button to be un-clickable won't be caught by these tests. Another common issue is that while it's easy to write the setup for the test, it's hard to write the events needed to cause things on the page to happen, a common example is to display a fancy `<Dropdown />` isn't as simple as just calling `fireEvent.click('select')` since the js-dom doesn't perfectly match the real browser so you end up needing to mouseover the label and then click the select, etc. Along the same lines figuring out how to enter text on a smart `<Input />` has a similar battle. Figuring out the exact incantation to make this happen is hard and brittle. Debugging why something stopped working is also hard since you can't just open the browser and see what's going on.
+Integration tests are usually ran via react-testing-library or similar. They are fast, easy to write, and test the components within an application. However they are limited in that they don't actually run the application or render actual items to a screen so regressions like having a bad z-index that causes the submit button to be un-clickable won't be caught by these tests. Another common issue is that while it's easy to write the setup for the test, it's hard to write the events needed to cause things on the page to happen. For example, displaying a fancy `<Dropdown />` isn't as simple as just calling `fireEvent.click('select')` since the js-dom doesn't perfectly match the real browser, so you end up needing to mouseover the label and then click the `select`. Along the same lines figuring out how to enter text on a smart `<Input />` has a similar battle. Figuring out the exact incantation to make this happen is hard and brittle. Debugging why something stopped working is also hard since you can't just open the browser and see what's going on.
 
-E2E tests like Cypress and Playwright are great for testing the actual application. The use a real browser and run against the actual application. They're able to test things like z-index issues, etc. However they lack the ability to test components in isolation, which is why some teams will end up having a Storybook adjacent build to point the E2E test at. Another issue is that it's hard to setup the different test fixtures, for example if you want to test that an admin user has an edit button on the page while a regular doesn't you'll some way to override the auth service to return different results, similarly component testing isn't possible when we have external service dependencies like OAuth since Cypress and Playwright component testing doesn't run against an actual instance of the app so any auth gating can make rendering components impossible.
+E2E tests like Cypress and Playwright are great for testing the actual application. They use a real browser and run against the actual application. They're able to test things like z-index issues, etc. However they lack the ability to test components in isolation, which is why some teams will end up having a Storybook adjacent build to point the E2E test at. Another issue is that it's hard to setup the different test fixtures. For example, if you want to test that an admin user has an edit button on the page while a regular user doesn't, you'll find some ways to override the auth service to return different results. Similarly, component testing isn't possible when we have external service dependencies like OAuth since Cypress and Playwright component testing do not run against an actual instance of the app, so any auth gating can make rendering components impossible.
 
 Essentially we end up with this breakdown:
 
@@ -38,7 +38,7 @@ Essentially we end up with this breakdown:
 | Easy setup                  | Hard to drive                         | Easy to drive                     | Hard to setup                 |
 | Fast                        | Hard to debug                         | Easy to debug                     | Slow                          |
 | Mock services               | Hard to override network              | Easy to override network          | No service mocking            |
-|                             | Can't test click-ability of element   | Can test click-ability of element |                               |
+|                             | Can't test clickability of element    | Can test clickability of element  |                               |
 |                             | Can't test z-index                    | Can test z-index                  |                               |
 |                             | Can't easily set value on `<Input />` | Easy to set value on `<Input />`  |                               |
 |                             | No screenshot testing                 | Screenshot testing                |                               |
@@ -46,9 +46,9 @@ Essentially we end up with this breakdown:
 |                             | No trace viewer                       | Trace viewer                      |                               |
 | No confidence app works E2E | Confidence components work            | Confidence app works E2E          | No confidence components work |
 
-It's almost like the two are complementary. If only there was a way to combine the two...
+It's almost like the two are complementary, if only there was a way to combine the two...
 
-This is essentially what Safetest is trying to solve. It's a way to combine the best of both worlds. It allows us to write tests that are easy to setup, easy to drive, and can test the components in isolation, while also being able to test the application as a whole, test click-ability of elements, do screenshot testing, video recording, trace viewer, etc.
+This is essentially what Safetest is trying to solve. It's a way to combine the best of both worlds. It allows us to write tests that are easy to setup, easy to drive, and can test the components in isolation, while also being able to test the application as a whole, test clickability of elements, and do screenshot testing, video recording, trace viewer, etc..
 
 Consider this example:
 
@@ -121,7 +121,7 @@ To get started with Safetest, follow these steps:
    }
    ```
 
-   The preceding script runs the default runner (`react-scripts`) with a couple of flags and environment variables to make sure Safetest is loaded and run with jest, and that all `.safetest.tsx` test files are tested. You may need to adjust based on your specific setup for example using `craco` or `react-app-rewired` instead.
+   The preceding script runs the default runner (`react-scripts`) with a couple of flags and environment variables to make sure Safetest is loaded and run with jest and that all `.safetest.tsx` test files are tested. You may need to adjust based on your specific setup, e.g., using `craco` or `react-app-rewired` instead.
 
    ***
 
@@ -222,7 +222,7 @@ To get started with Safetest, follow these steps:
    +});
    ```
 
-   The above magic import makes use of [Webpack Context](https://webpack.js.org/api/module-variables/#importmetawebpackcontext) Or [Vite Glob import](https://vitejs.dev/guide/features.html#glob-import) (or [whatever flavor dynamic import is available](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import)), to bundle the `.safetest.tsx` files in your project separately. This allows you to write tests for your application in the same project as your application, without having to worry about setting up a separate test project or about the tests being loaded when loading your application in a non test context. The `isDev` check is only really needed if you don't want to leak your tests into production, but it's not strictly necessary. In this project it's turned off for the examples since I want to test against the final deployed app to keep things simple.
+   The above magic import makes use of [Webpack Context](https://webpack.js.org/api/module-variables/#importmetawebpackcontext) Or [Vite Glob import](https://vitejs.dev/guide/features.html#glob-import) (or [whatever flavor dynamic import is available](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import)) to bundle the `.safetest.tsx` files in your project separately. This allows you to write tests for your application in the same project as your application, without having to worry about setting up a separate test project or about the tests being loaded when loading your application in a non-test context. The `isDev` check is only really needed if you don't want to leak your tests into production, but it's not strictly necessary. In this project it's turned off for the examples since I want to test against the final deployed app to keep things simple.
 
 1. ### Creating your first tests
 
@@ -270,7 +270,7 @@ To get started with Safetest, follow these steps:
 
 1. ### Integrating into CI
 
-   Assuming part of your CI pipeline deploys the app to some url `https://my-app.com` you can add a step to the CI pipeline by either adding a script to manually invoking the following:
+   Assuming part of your CI pipeline deploys the app to some url `https://my-app.com`, you can add a step to the CI pipeline by either adding a script to manually invoke the following:
 
    ```bash
    OPT_CI=1 OPT_DOCKER=1 OPT_URL=https://my-app.com npm run safetest -- --watchAll=false --ci=1 --json --outputFile=results.json
@@ -286,7 +286,7 @@ See the [Reporting](#reporting) section about how to get an HTML report of the r
 
 ## Writing Tests
 
-Since Safetest is bootstrapped within the application, essentially every test is a component test. If you don't specify a component in `render` then it will just render the default component (for example `<App />` in the getting started section). `render` also allows passing a function which will be called with the default component as an argument, this is useful for overriding props or wrapping the component in a provider.
+Since Safetest is bootstrapped within the application, essentially every test is a component test. If you don't specify a component in `render`, then it will just render the default component (for example `<App />` in the getting started section). `render` also allows passing a function which will be called with the default component as an argument. This is useful for overriding props or wrapping the component in a provider.
 
 If you just want to test your application as a whole, you can use this syntax
 
@@ -324,7 +324,7 @@ describe('Header', () => {
 
 #### Snapshot testing
 
-Safetest comes out of the box with snapshot testing enabled via [`jest-image-snapshot`](https://github.com/americanexpress/jest-image-snapshot). A simple example of this is shown above. You can also mask over or remove DOM elements before the snapshot to have deterministic tests. A common scenario for this is to remove a date field from the UI before taking a snapshot since, since the value will be different every time and cause the screenshots not to match.
+Safetest comes out of the box with snapshot testing enabled via [`jest-image-snapshot`](https://github.com/americanexpress/jest-image-snapshot). A simple example of this is shown above. You can also mask over or remove DOM elements before the snapshot to have deterministic tests. A common scenario for this is to remove a date field from the UI before taking a snapshot, since the value will be different every time and will cause the screenshots not to match.
 
 ```ts
 import { describe, it, expect } from 'safetest/jest';
@@ -339,7 +339,7 @@ describe('Snapshot', () => {
 });
 ```
 
-There is also a `mask` option you can pass to `page.screenshot({ mask: ... })`, however that only covers over the element, if the elements width changes over tests, the snapshot diffs will still fail.
+There is also a `mask` option you can pass to `page.screenshot({ mask: ... })`; however that only covers over the element. If the element's width changes across tests, the snapshot diffs will still fail.
 
 #### Deterministic snapshots
 
@@ -416,7 +416,7 @@ describe('MoreLoader', () => {
 
 #### Overrides
 
-Sometimes the `bridge` function doesn't cover all your use cases. For example if you want to test that a component can recover from an error, you'll need to be able to override some logic within the component to simulate an error. For this use case, Safetest provides the `createOverride` function. This function allows you to override any value within the component. For example let's pretend we have this existing component:
+Sometimes the `bridge` function doesn't cover all your use cases. For example, if you want to test that a component can recover from an error, you'll need to be able to override some logic within the component to simulate an error. For this use case, Safetest provides the `createOverride` function. This function allows you to override any value within the component. For example let's pretend we have this existing component:
 
 ```tsx
 // Records.tsx
@@ -491,7 +491,7 @@ This isn't limited to overriding a hook or a service, we can override anything w
 Since Safetest is bootstrapped within the application, we can test anything into the application. This ensures that even seemingly complex use cases can be tested.
 Here are some examples of this:
 
-- Our app makes a bunch of GPRC calls and we want to test that if one of them fails the page doesn't crash. This isn't feasible using attempting to override the network calls unless we can understand binary.
+- Our app makes a bunch of GPRC calls and we want to test that if one of them fails the page doesn't crash. This isn't feasible using attempts to override the network calls, unless we can understand binary.
     <details>
     <summary>Solution</summary>
 
@@ -602,7 +602,7 @@ With the tools above we can test pretty much any scenario we can think of. The g
 
 ### Providers and Contexts
 
-An issue that `React Testing Library` and component testing libraries need to contend with is rewrapping the component in required providers and contexts. This is due to `react-query`, `react-redux`, `react-router`, etc. all requiring a provider to be present in the tree. However since Safetest is bootstrapped with the application, we can just shuffle around some code to make this work for all use cases. All that's required is to move the Providers/Contexts to a separate file (for example `src/Providers.tsx`) and use it when bootstrapping the application:
+An issue that `React Testing Library` and component testing libraries need to contend with is rewrapping the component in required providers and contexts. This is due to `react-query`, `react-redux`, `react-router`, etc., all requiring a provider to be present in the tree. However, since Safetest is bootstrapped with the application, we can just shuffle around some code to make this works for all use cases. All that's required is to move the Providers/Contexts to a separate file (for example `src/Providers.tsx`) and use it when bootstrapping the application:
 
 #### `src/Provider.tsx`
 
@@ -793,9 +793,9 @@ Safetest will build a tree of the tests and their structure:
 }
 ```
 
-The test runner also continues running so for example the `"renders the app"` test will run, it will hit the `render()` function, this will resolve once Safetest opens a browser and navigates to the page. Safetest controls the browser instance and will expose a "magic" function get info about the currently executing test `"App renders the app"`. There's also a magic function exposed that will be called when the browser page is "ready"
+The test runner continues running, i.e., the `"renders the app"` test runs and hits the `render()` function, resulting in Safetest opening a browser and navigating to the page. Safetest controls the browser instance, exposes a "magic" function, gets info about the currently executing test `"App renders the app"`. There's also an exposed, magic function that will be called when the browser page is "ready".
 
-On the browser side of things, when the call to bootstrap is called the following happens:
+On the browser side of things, when the call to bootstrap is called, the following happens:
 
 - Safetest will check if there's a a "magic" function available that will give us information about the current executing test.
   - If there is no test info available Safetest will render the page as normal and the bootstrapping process is done.
