@@ -8,7 +8,7 @@
     "build": "npm i ../../ && (rm -rf ../../build/vite-react-ts-swc || true) && vite build && mv dist ../../build/vite-react-ts-swc",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "safetest": "OPT_URL=${OPT_URL:-http://localhost:3000/vite-react-ts-swc/} vitest --config vite.safetest.config",
+    "safetest": "cross-env OPT_URL=${OPT_URL:-http://localhost:3000/vite-react-ts-swc/} vitest --config vite.safetest.config",
     "safetest:ci:test": "rm -f artifacts.json && OPT_URL=https://safetest-two.vercel.app/vite-react-ts-swc OPT_CI=1 OPT_DOCKER=1 OPT_ARTIFACTS=artifacts.json npm run safetest -- --run --bail=5",
     "safetest:ci": "(npm run safetest:ci:test || true)",
     "process:ci": "npx safetest add-artifact-info artifacts.json results.json && cp results.json ../../build/vite-react-ts-swc/results.json"

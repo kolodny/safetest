@@ -1,0 +1,34 @@
+{
+  "name": "vite-template-solid",
+  "version": "0.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "npm i ../../ && (rm -rf ../../build/vite-solid-ts || true) && vite build && mv dist ../../build/vite-solid-ts",
+    "serve": "vite preview",
+    "test": "vitest",
+    "safetest": "cross-env OPT_URL=${OPT_URL:-http://localhost:3000/vite-solid-ts/} vitest --config vite.safetest.config",
+    "safetest:ci:test": "rm -f artifacts.json && OPT_URL=${OPT_URL:-https://safetest-two.vercel.app/vite-solid-ts} OPT_CI=1 OPT_DOCKER=1 OPT_ARTIFACTS=artifacts.json npm run safetest -- --run --bail=5",
+    "safetest:ci": "(npm run safetest:ci:test || true)",
+    "safetest:regenerate-screenshots": "OPT_DOCKER=1 npm run safetest -- --run --update",
+    "process:ci": "npx safetest add-artifact-info artifacts.json results.json && cp results.json ../../build/vite-solid-ts/results.json"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@solidjs/testing-library": "^0.8.6",
+    "@testing-library/jest-dom": "^6.2.0",
+    "@types/testing-library__jest-dom": "^6.0.0",
+    "jsdom": "^24.0.0",
+    "solid-devtools": "^0.29.3",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.11",
+    "vite-plugin-solid": "^2.8.2",
+    "vitest": "^1.2.1"
+  },
+  "dependencies": {
+    "safetest": "file:../..",
+    "solid-js": "^1.8.14"
+  }
+}

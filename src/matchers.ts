@@ -141,7 +141,20 @@ async function toMatchText(
   } = await query(!!this.isNot, timeout);
   const stringSubstring = options.matchSubstring ? 'substring' : 'string';
   const receivedString = received || '';
-  const message = () => '';
+  const message = () => {
+    const labelExpected = `Expected ${
+      typeof expected === 'string' ? stringSubstring : 'pattern'
+    }`;
+    const labelReceived = 'Received string';
+
+    const maxPad = Math.max(labelExpected.length, labelReceived.length);
+
+    return (
+      `\n` +
+      `${labelExpected.padEnd(maxPad)} : ${expected}\n` +
+      `${labelReceived.padEnd(maxPad)} : ${receivedString}\n`
+    );
+  };
 
   return { message, pass };
 }

@@ -1,4 +1,5 @@
 {
   "editor.formatOnSave": true,
-  "eslint.workingDirectories": ["./examples/cra"]
+  "eslint.workingDirectories": ["./examples/cra"],
+  "prettier.singleQuote": true
 }

@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "npm i ../../ && (rm -rf ../../build/vite-vue-ts || true) && tsc && vite build && mv dist ../../build/vite-vue-ts",
     "preview": "vite preview",
-    "safetest": "OPT_URL=${OPT_URL:-http://localhost:3000/vite-vue-ts/} vitest --config vite.safetest.config",
+    "safetest": "cross-env OPT_URL=${OPT_URL:-http://localhost:3000/vite-vue-ts/} vitest --config vite.safetest.config",
     "safetest:ci:test": "rm -f artifacts.json && OPT_URL=https://safetest-two.vercel.app/vite-vue-ts OPT_CI=1 OPT_DOCKER=1 OPT_ARTIFACTS=artifacts.json npm run safetest -- --run --bail=5",
     "safetest:ci": "(npm run safetest:ci:test || true)",
     "process:ci": "npx safetest add-artifact-info artifacts.json results.json && cp results.json ../../build/vite-vue-ts/results.json"
