@@ -39,8 +39,6 @@ export const bootstrap = async (args: BootstrapArgs): Promise<any> => {
   } else if ('importGlob' in args) {
     if (args.importGlob === false) return args.defaultRender();
     const entries = Object.entries(args.importGlob);
-    console.log(22);
-    console.log(args);
     const entriesMapped = entries.map(([k, v]) => [mapper(k), v] as const);
     const fixedImports = Object.fromEntries(entriesMapped);
     known = entriesMapped.map(([k]) => k);

@@ -32,7 +32,6 @@ export async function render(
     { __isRenderable: true, thing: functionToRender },
     options,
     async (e) => {
-      console.log(1);
       const rendered = assertAndRender(e.thing);
       await new Promise((r) => setTimeout(r, 0));
       return rendered;
@@ -52,11 +51,9 @@ export const bootstrap = async (args: BootstrapArgs): Promise<void> => {
     renderElement: { __type: 'renderElement', value: args.element },
   };
 
-  console.log(2);
   return bootstrapCommon({
     ...args,
     defaultRender: () => {
-      console.log('in 2');
       return assertAndRender(args.element);
     },
   });
