@@ -1,7 +1,7 @@
 import { render } from 'solid-js/web';
 import { bootstrap } from 'safetest/solid';
 // import * as Solid from 'solid-js';
-// import { Bootstrap } from "safetest/solid";
+// import { Bootstrap } from 'safetest/solid';
 
 import { TodoList as App } from './todo-list';
 

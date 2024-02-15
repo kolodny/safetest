@@ -35,7 +35,7 @@
         "start": "react-scripts start",
         "build": "(rm -rf ../../build/cra || true) && react-scripts build && mv build ../../build/cra",
         "test": "react-scripts test",
-        "safetest": "OPT_URL=${OPT_URL:-http://localhost:3000/cra/} react-scripts --inspect test --runInBand --testMatch '**/*.safetest.{j,t}s{,x}' --setupFilesAfterEnv ./setup-safetest.js --testTimeout=30000",
+        "safetest": "cross-env OPT_URL=${OPT_URL:-http://localhost:3000/cra/} react-scripts --inspect test --runInBand --testMatch '**/*.safetest.{j,t}s{,x}' --setupFilesAfterEnv ./setup-safetest.js --testTimeout=30000",
         "safetest:ci:test": "OPT_URL=https://safetest-two.vercel.app/cra OPT_ARTIFACTS=artifacts.json OPT_DOCKER=1 OPT_CI=1 npm run safetest -- --watchAll=false --json --outputFile=results.json --bail=5 --ci=1",
         "safetest:ci": "(npm run safetest:ci:test || true)",
         "safetest:regenerate-screenshots": "npm run safetest -- --watchAll=false --docker=1 --update-snapshot",

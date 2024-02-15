@@ -9,9 +9,11 @@
     "build": "vite build",
     "serve": "vite preview",
     "test": "vitest",
-    "safetest": "cross-env OPT_URL=http://localhost:3000/ vitest --config vite.safetest.config",
-    "safetest:ci": "rm -f artifacts.json && cross-env OPT_URL=${DEPLOYED_URL} OPT_CI=1 OPT_DOCKER=1 OPT_ARTIFACTS=artifacts.json npm run safetest -- --run --bail=5",
-    "safetest:regenerate-screenshots": "cross-env OPT_DOCKER=1 npm run safetest -- --run --update"
+    "safetest": "cross-env OPT_URL=${OPT_URL:-http://localhost:3000/vite-solid-ts/} vitest --config vite.safetest.config",
+    "safetest:ci:test": "rm -f artifacts.json && OPT_URL=${OPT_URL:-https://safetest-two.vercel.app/vite-solid-ts} OPT_CI=1 OPT_DOCKER=1 OPT_ARTIFACTS=artifacts.json npm run safetest -- --run --bail=5",
+    "safetest:ci": "(npm run safetest:ci:test || true)",
+    "safetest:regenerate-screenshots": "OPT_DOCKER=1 npm run safetest -- --run --update",
+    "process:ci": "npx safetest add-artifact-info artifacts.json results.json && cp results.json ../../build/vite-solid-ts/results.json"
   },
   "license": "MIT",
   "devDependencies": {
@@ -26,7 +28,6 @@
     "vitest": "^1.2.1"
   },
   "dependencies": {
-    "cross-env": "^7.0.3",
     "safetest": "file:../..",
     "solid-js": "^1.8.14"
   }

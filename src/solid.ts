@@ -16,16 +16,14 @@ const assertAndRender = (element: () => JSXElement) => {
 };
 
 export async function render(
-  elementToRender: (app: () => JSXElement) => JSXElement = state.browserState
+  elementToRender: (app: JSXElement) => JSXElement = state.browserState
     ?.renderElement.value,
   options: RenderOptions = {}
 ) {
   let functionToRender: () => JSXElement = () => null;
   if (!isInNode) {
     functionToRender = () =>
-      elementToRender(
-        () => state.browserState?.renderElement.value ?? ({} as any)
-      );
+      elementToRender(state.browserState?.renderElement.value);
   }
 
   return renderCommon(
@@ -62,6 +60,37 @@ export const bootstrap = async (args: BootstrapArgs): Promise<void> => {
 export const Bootstrap: Component<
   {
     children: JSXElement;
+    /**
+     * Due to Solid singleton expectations, we need to pass the Solid namespace to Bootstrap
+     *
+     * ```tsx
+     * import {
+     *   createSignal,
+     *   createMemo,
+     *   createRenderEffect
+     * } from 'solid-js';
+     *
+     * // ...
+     *
+     * <Bootstrap Solid={{
+     *   createSignal,
+     *   createMemo,
+     *   createRenderEffect
+     * }}
+     * // ...
+     * ```
+     *
+     * OR
+     *
+     * ```tsx
+     * import * as Solid from 'solid-js';
+     *
+     * // ...
+     *
+     * <Bootstrap Solid={Solid} // ...
+     * ```
+     *
+     */
     Solid: Pick<
       typeof Solid,
       'createRenderEffect' | 'createSignal' | 'createMemo'
@@ -82,6 +111,6 @@ export const Bootstrap: Component<
   });
 
   return Solid.createMemo(
-    () => child()({}) ?? props.children
+    () => child() ?? props.children
   ) as unknown as JSXElement;
 };

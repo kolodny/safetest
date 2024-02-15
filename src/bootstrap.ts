@@ -32,7 +32,6 @@ export const bootstrap = async (args: BootstrapArgs): Promise<any> => {
   let known: string[] = [];
   let importer: (s: string) => unknown;
   if ('webpackContext' in args) {
-    console.log(11);
     if (args.webpackContext === false) return args.defaultRender();
     known = [...new Set(args.webpackContext.keys().map(mapper))];
     importer = args.webpackContext;
@@ -50,7 +49,6 @@ export const bootstrap = async (args: BootstrapArgs): Promise<any> => {
     known = entriesMapped.map(([k]) => k);
     importer = (s) => fixedImports[mapper(s)]();
   } else {
-    console.log(33);
     if (args.import === false) return args.defaultRender();
     importer = args.import;
   }
@@ -135,7 +133,6 @@ export const bootstrap = async (args: BootstrapArgs): Promise<any> => {
       state.tests[testName]!();
     }
   } else {
-    console.log(44);
     return args.defaultRender();
   }
 };

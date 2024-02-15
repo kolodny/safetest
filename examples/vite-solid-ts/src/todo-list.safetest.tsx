@@ -10,7 +10,14 @@ describe('a test', () => {
   });
 
   test('works2', async () => {
-    const { page } = await render((app) => <div>{app()}</div>);
+    const { page } = await render((app) => (
+      <div style={{ padding: '20px', border: '1px solid green' }}>{app}</div>
+    ));
+    expect(page).toBeTruthy();
+  });
+
+  test('works3', async () => {
+    const { page } = await render();
     expect(page).toBeTruthy();
   });
 });
@@ -51,6 +58,6 @@ describe('<TodoList />', () => {
       await completed?.evaluate((el) => (el as HTMLInputElement).checked)
     ).toBe(true);
     const text = page.getByText('mark new todo as completed');
-    await expect(text).toHaveCSS('text-decoration', 'line-through');
+    await expect(text).toHaveCSS('text-decoration', /^line-through/);
   });
 });
