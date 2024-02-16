@@ -1,6 +1,9 @@
-import "@testing-library/jest-dom";
-import { setup } from "safetest/setup";
+import '@testing-library/jest-dom';
+import { setup } from 'safetest/setup';
 
 setup({
-  bootstrappedAt: require.resolve("./src/index.tsx"),
+  bootstrappedAt: require.resolve('./src/index.tsx'),
+  ciOptions: {
+    usingArtifactsDir: 'artifacts',
+  },
 });
