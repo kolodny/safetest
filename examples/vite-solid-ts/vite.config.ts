@@ -3,22 +3,22 @@
 import { defineConfig } from 'vite';
 import solidPlugin from 'vite-plugin-solid';
 import path from 'path';
-// import { exec } from 'child_process';
-// import { rmdir, mkdir } from 'fs/promises';
+import { exec } from 'child_process';
+import { rmdir, mkdir } from 'fs/promises';
 
 const root = path.resolve(__dirname, '../..');
 const lib = `node_modules/safetest`;
-// const link = async () => {
-//   if (env === 'test') return;
-//   try {
-//     await rmdir(lib, { recursive: true });
-//   } catch {
-//     // ignore
-//   }
-//   await mkdir(`${lib}/lib`, { recursive: true });
-//   await new Promise((res) => exec(`cp ${root}/* ${lib}/`, res));
-//   await new Promise((res) => exec(`cp ${root}/lib/* ${lib}/lib/`, res));
-// };
+const link = async () => {
+  if (env === 'test') return;
+  try {
+    await rmdir(lib, { recursive: true });
+  } catch {
+    // ignore
+  }
+  await mkdir(`${lib}/lib`, { recursive: true });
+  await new Promise((res) => exec(`cp ${root}/* ${lib}/`, res));
+  await new Promise((res) => exec(`cp ${root}/lib/* ${lib}/lib/`, res));
+};
 
 const env = process.env.NODE_ENV || 'development';
 
@@ -29,16 +29,13 @@ export default defineConfig({
     port: env === 'test' ? 3001 : 3000,
   },
   plugins: [
-    // {
-    //   name: 'safetest linker',
-    //   buildStart: link,
-    //   handleHotUpdate: link,
-    // },
+    {
+      name: 'safetest linker',
+      buildStart: link,
+      handleHotUpdate: link,
+    },
     solidPlugin(),
   ],
-  optimizeDeps: {
-    include: ['safetest', 'safetest/solid', 'safetest/vitest'],
-  },
   test: {
     globals: true,
     reporters: ['basic', 'json'],
