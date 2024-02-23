@@ -30,6 +30,8 @@ export default defineConfig({
     port: env === 'test' ? 3001 : 3000,
   },
   plugins: [
+    // This plugin is only meant to be used in the SafeTest repository.
+    // DO NOT USE IT IN YOUR OWN PROJECTS.
     {
       name: 'safetest linker',
       buildStart: link,
