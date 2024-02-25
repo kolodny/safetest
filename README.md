@@ -33,18 +33,18 @@ E2E tests like Cypress and Playwright are great for testing the actual applicati
 
 Essentially we end up with this breakdown:
 
-| Integration Tests Pros      | Integration Test Cons                 | E2E Test Pros                     | E2E Test Cons                 |
-| --------------------------- | ------------------------------------- | --------------------------------- | ----------------------------- |
-| Easy setup                  | Hard to drive                         | Easy to drive                     | Hard to setup                 |
-| Fast                        | Hard to debug                         | Easy to debug                     | Slow                          |
-| Mock services               | Hard to override network              | Easy to override network          | No service mocking            |
-|                             | Can't test clickability of element    | Can test clickability of element  |                               |
-|                             | Can't test z-index                    | Can test z-index                  |                               |
-|                             | Can't easily set value on `<Input />` | Easy to set value on `<Input />`  |                               |
-|                             | No screenshot testing                 | Screenshot testing                |                               |
-|                             | No video recording                    | Video recording                   |                               |
-|                             | No trace viewer                       | Trace viewer                      |                               |
-| No confidence app works E2E | Confidence components work            | Confidence app works E2E          | No confidence components work |
+| Integration Tests Pros      | Integration Test Cons                 | E2E Test Pros                    | E2E Test Cons                 |
+| --------------------------- | ------------------------------------- | -------------------------------- | ----------------------------- |
+| Easy setup                  | Hard to drive                         | Easy to drive                    | Hard to setup                 |
+| Fast                        | Hard to debug                         | Easy to debug                    | Slow                          |
+| Mock services               | Hard to override network              | Easy to override network         | No service mocking            |
+|                             | Can't test clickability of element    | Can test clickability of element |                               |
+|                             | Can't test z-index                    | Can test z-index                 |                               |
+|                             | Can't easily set value on `<Input />` | Easy to set value on `<Input />` |                               |
+|                             | No screenshot testing                 | Screenshot testing               |                               |
+|                             | No video recording                    | Video recording                  |                               |
+|                             | No trace viewer                       | Trace viewer                     |                               |
+| No confidence app works E2E | Confidence components work            | Confidence app works E2E         | No confidence components work |
 
 It's almost like the two are complementary, if only there was a way to combine the two...
 
@@ -54,13 +54,13 @@ Consider this example:
 
 ```tsx
 // Header.tsx
-export const Header = ({ admin }: { admin: boolean }) => (
-  <div className="header">
-    <div className="header-title">The App</div>
-    <div className="header-user">
-      <div className="header-user-name">admin</div>
-      {admin && <div className="header-user-admin">admin</div>}
-      <div className="header-user-logout">Logout</div>
+export const Header = ({ admin }: { admin?: boolean }) => (
+  <div className='header'>
+    <div className='header-title'>The App</div>
+    <div className='header-user'>
+      <div className='header-user-name'>admin</div>
+      {admin && <div className='header-user-admin'>admin</div>}
+      <div className='header-user-logout'>Logout</div>
     </div>
   </div>
 );
@@ -89,7 +89,17 @@ describe('Header', () => {
 });
 ```
 
+### SafeTest artifacts and reports
+
+SafeTest can output a report of the tests that were run, including a trace viewer of each test, a video of the test execution, and a link to open the tested component in the deployed environment. **SafeTest tests SafeTest with SafeTest**.
+
+#### [See the reports that is generated](https://safetest-two.vercel.app/).
+
+See the [Reporting](#reporting) section for more details.
+
 ## Getting Started
+
+<sub>Note: To quickly try the one of the example app in the project, follow the [SafeTest Development section](#safetest-development) below.</sub>
 
 To get started with Safetest, follow these steps:
 
@@ -109,7 +119,7 @@ To get started with Safetest, follow these steps:
 
 1. ### Add run command to `package.json` scripts:
 
-   Add the following line to your `package.json` scripts:
+   Add the following line to your `package.json` scripts section:
 
    ```json
    {
@@ -125,7 +135,7 @@ To get started with Safetest, follow these steps:
 
    ***
 
-   If you're using Vitest you'd use these scripts instead:
+   If you're using Vitest you'd use these instead:
 
    ```json
    {
@@ -808,6 +818,34 @@ On the browser side of things, when the call to bootstrap is called, the followi
   Back in node...
 
 - The await `render(...)` call now resolves and we can continue with the test.
+
+## SafeTest Development
+
+To develop Safetest, you can use the `examples` folder to test your changes. The `examples` folder is a monorepo that contains a few different examples of how to use Safetest. To get started you'll need to follow these steps
+
+```bash
+git clone https://github.com/kolodny/safetest # or your fork
+cd safetest
+npm install --legacy-peer-deps # legacy-peer-deps is needed due to how the repo can't load all the peer deps
+
+cd examples/vite-react-ts
+npm install # We'll use this app as our main example
+```
+
+Now you'll need three different terminal sessions
+
+```bash
+# Session 1 is used to build the library (this is run in the root of the project)
+npm run build -- --watch
+
+# Session 2 is used to run the example app (this is run in the examples/vite-react-ts folder)
+npm run dev -- --force # Force vite to not use the cache
+
+# Session 3 is used to run the tests (this is run in the examples/vite-react-ts folder)
+npx cross-env OPT_HEADED=1 npm run safetest
+```
+
+You should now see the tests running in the browser and the results in the terminal.
 
 [npm-image]: https://img.shields.io/npm/v/safetest.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/safetest
