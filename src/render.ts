@@ -153,7 +153,7 @@ export async function render(
       const filenameWithoutExt = filename.split('.').slice(0, -1).join('.');
       let relative = path.relative(bootstrapDir, filenameWithoutExt);
       if (!relative.startsWith('.')) relative = `./${relative}`;
-      return relative;
+      return relative.replace(/\\/g, '/');
     };
 
     const attempt = getRetryAttempt();

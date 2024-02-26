@@ -4,17 +4,6 @@ import { AppModule, HelloWorldModule } from './app/app.module';
 
 import { bootstrap } from 'safetest/ng';
 
-const importer = (s: string) => import(`./${s}.module`);
-const importer2 = (s: string) => import(`./${s}.safetest`);
-
-// (window as any).render = render;
-(window as any).importer = importer;
-(window as any).importer2 = importer2;
-
-// TestBed.configureTestingModule({
-//   declarations: [],
-// });
-
 const webpackContext = import.meta.webpackContext('.', {
   recursive: true,
   regExp: /\.safetest$/,
@@ -22,7 +11,7 @@ const webpackContext = import.meta.webpackContext('.', {
 });
 
 const keys = webpackContext.keys();
-webpackContext.keys = () => keys.filter((k) => k.startsWith('./'));
+webpackContext.keys = () => keys.filter((k) => k.startsWith('.'));
 
 bootstrap({
   platformBrowserDynamic,
