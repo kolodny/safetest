@@ -15,11 +15,18 @@ const importer2 = (s: string) => import(`./${s}.safetest`);
 //   declarations: [],
 // });
 
+const webpackContext = import.meta.webpackContext('.', {
+  recursive: true,
+  regExp: /\.safetest$/,
+  mode: 'lazy',
+});
+
+const keys = webpackContext.keys();
+webpackContext.keys = () => keys.filter((k) => k.startsWith('./'));
+
 bootstrap({
   platformBrowserDynamic,
-  import: (s) =>
-    import(`${s.replace(/.*src/, '.').replace(/\.safetest$/, '')}.safetest`),
-  // Module: AppModule,
+  webpackContext,
   Module: AppModule,
 });
 

@@ -55,10 +55,14 @@ export const makeSafetestBed = (
     actualNg = ng;
     const { TestBed } = await renderArgsValue.TestBed;
     const DynamicTesting = await renderArgsValue.DynamicTesting;
-    TestBed.initTestEnvironment(
-      DynamicTesting.BrowserDynamicTestingModule,
-      DynamicTesting.platformBrowserDynamicTesting()
-    );
+    const safetestHash = window.location.hash.includes('safetest');
+    // When #safetest is used we want to import all the test files but not run them.
+    if (!safetestHash) {
+      TestBed.initTestEnvironment(
+        DynamicTesting.BrowserDynamicTestingModule,
+        DynamicTesting.platformBrowserDynamicTesting()
+      );
+    }
   });
 
   let renderMeta: undefined | TestModuleMetadata = undefined;
