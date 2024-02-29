@@ -416,12 +416,18 @@ export async function render(
 
     const debugUrl = await page.evaluate(
       ({ testName, testPath }) => {
-        const url = new URL(window.location.href);
-        url.searchParams.set('test_name', testName!);
-        url.searchParams.set('test_path', testPath!);
-        const debugUrl = url.toString().replace(/%2F/g, '/');
-        console.log(`Go to ${debugUrl} to debug this test`);
-        return debugUrl;
+        try {
+          const url = new URL(window.location.href);
+          url.searchParams.set('test_name', testName!);
+          url.searchParams.set('test_path', testPath!);
+          const debugUrl = url.toString().replace(/%2F/g, '/');
+          // Don't use `console.` since that shadowed by the page's console and won't
+          // cross the serializer layer successfully!
+          window.console.log(`Go to ${debugUrl} to debug this test`);
+          return debugUrl;
+        } catch {
+          return 'ERROR GETTING DEBUG URL';
+        }
       },
       { testName: state.activeTest, testPath: getFilePath() }
     );
