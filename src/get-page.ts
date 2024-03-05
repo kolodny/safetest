@@ -41,16 +41,8 @@ export async function getPage(
   }
 
   if (!state.browserContextInstance) {
-    const server = options.browserServer;
-    const browserType = playwright[options.browser ?? 'chromium'];
-    const browser = server
-      ? await browserType.connect(server, { timeout: options.timeout ?? 30000 })
-      : await browserType.launch(options);
-    state.nextIndex = 0;
     const started = Date.now();
-    state.browserContextInstance = await browser.newContext(options);
-
-    state.browserContextInstance.on('page', (page) => {
+    const addMeta = (page: SafePage) => {
       if ((page as SafePage)._safetest_internal) return;
       (page as SafePage)._safetest_internal = {
         pageIndex: state.nextIndex++,
@@ -75,7 +67,30 @@ export async function getPage(
       if (options.enableScreenCasting) {
         overrideEvents(page);
       }
-    });
+    };
+
+    const server = options.browserServer;
+    const browserType = playwright[options.browser ?? 'chromium'];
+    const persistent = options.persistentContext;
+    if (persistent && server) {
+      throw new Error(`Cannot use persistent context with browser server`);
+    }
+    if (persistent) {
+      const context = browserType.launchPersistentContext(persistent, options);
+      state.browserContextInstance = await context;
+      addMeta(state.browserContextInstance.pages()[0] as any);
+    } else {
+      const timeout = options.timeout ?? 30000;
+      const browser = server
+        ? await browserType.connect(server, { timeout })
+        : await browserType.launch(options);
+      state.nextIndex = 0;
+      state.browserContextInstance = await browser.newContext(options);
+    }
+    state.nextIndex = 0;
+
+    state.browserContextInstance.on('page', addMeta as any);
+
     if (typeof options.headless !== 'undefined' && !server) {
       state.browserContextInstance.headless = options.headless;
     }

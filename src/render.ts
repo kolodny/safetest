@@ -29,6 +29,8 @@ export interface Bridge {
 
 export interface RenderOptions extends LaunchOptions, BrowserContextOptions {
   browser?: 'chromium' | 'firefox' | 'webkit';
+  /** Open the browser in [persistent context](https://playwright.dev/docs/api/class-browsertype#browser-type-launch-persistent-context). */
+  persistentContext?: string;
   /** The base URL of the running app. Defaults to `localhost:3000` per CRA. */
   url?: string;
   /** Remote server to connect to. See https://playwright.dev/docs/api/class-browsertype#browser-type-launch-server */
