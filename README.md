@@ -124,9 +124,9 @@ To get started with Safetest, follow these steps:
    ```json
    {
      "scripts": {
-       "safetest": "OPT_URL=${TARGET_URL:-http://localhost:3000} react-scripts --inspect test --runInBand --testMatch '**/*.safetest.{j,t}s{,x}' --setupFilesAfterEnv ./setup-safetest.tsx",
+       "safetest": "cross-env OPT_URL=${TARGET_URL:-http://localhost:3000} react-scripts --inspect test --runInBand --testMatch '**/*.safetest.{j,t}s{,x}' --setupFilesAfterEnv ./setup-safetest.tsx",
        "safetest:ci": "rm -f artifacts.json && OPT_URL=${DEPLOYED_URL} OPT_CI=1 OPT_DOCKER=1 npm run safetest -- --watchAll=false --ci=1 --json --outputFile=results.json",
-       "safetest:regenerate-screenshots": "OPT_DOCKER=1 npm run safetest -- --watchAll=false --update-snapshot"
+       "safetest:regenerate-screenshots": "cross-env OPT_DOCKER=1 npm run safetest -- --watchAll=false --update-snapshot"
      }
    }
    ```
