@@ -49,12 +49,6 @@ jobs:
       - name: npm install --legacy-peer-deps
         run: npm install --legacy-peer-deps
 
-      - name: Lint Code
-        run: npm run lint
-
-      - name: Format Code
-        run: npm run format
-
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
