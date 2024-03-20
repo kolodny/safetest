@@ -2,46 +2,87 @@ name: Safetest
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-run-name: Safetest
+
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
+
 jobs:
   Safetest-Action:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [12.x, 14.x, 16.x]
     steps:
       - name: Set random environment variables
         uses: joellefkowitz/random-env@v1.0.0
         with:
           names: |
             VERCEL_UUID
+
       - run: echo "VERCEL_UUID is ${{ env.VERCEL_UUID }}."
+
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+
       - name: Check out repository code
         uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: npm install --legacy-peer-deps
         run: npm install --legacy-peer-deps
+
+      - name: Lint Code
+        run: npm run lint
+
+      - name: Format Code
+        run: npm run format
+
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
+
       - name: Build
         run: npm run build
+
       - name: Build deploy artifacts
         run: node build.js
+
       - name: Build test reporter
         run: cd examples/vite-react-ts && npm run report:build && cp dist/report.html ../../build/
+
       - name: Deploy Project deploy artifacts to Vercel
         run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
+
       - name: 'Cache docker build for Safetest'
         run: node -e 'require("safetest/docker").buildDocker()'
+
       - name: 'Create test artifacts folder'
         run: (rm -rf artifacts|| true) && mkdir artifacts
+
       - name: 'Run Safetest tests'
         run: node test.js
+
       - name: 'Process artifacts'
         run: node process.js
+
       - name: Deploy test artifacts to Vercel
         run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --meta UUID=${{ env.VERCEL_UUID }}
+
       - run: echo "🍏 This job's status is ${{ job.status }}."
