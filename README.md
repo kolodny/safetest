@@ -193,6 +193,8 @@ To get started with Safetest, follow these steps:
 
    ```diff
     import ReactDOM from "react-dom";
+   +// If using React 18:
+   +// import { createRoot } from "react-dom/client";
    +import { bootstrap } from 'safetest/react';
     import App from "./App";
 
@@ -209,7 +211,7 @@ To get started with Safetest, follow these steps:
    +  element,
    +  render: (element) => ReactDOM.render(element, container),
    +  // If using React 18:
-   +  // render: (element) => ReactDOM.createRoot(container).render(element),
+   +  // render: (element) => createRoot(container).render(element),
    +
    +  // Add one of the following depending on your bundler...
    +
