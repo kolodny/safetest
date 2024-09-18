@@ -44,7 +44,7 @@ Essentially we end up with this breakdown:
 |                             | No screenshot testing                 | Screenshot testing               |                               |
 |                             | No video recording                    | Video recording                  |                               |
 |                             | No trace viewer                       | Trace viewer                     |                               |
-| No confidence app works E2E | Confidence components work            | Confidence app works E2E         | No confidence components work |
+| Confidence components work  | No confidence app works E2E           | Confidence app works E2E         | No confidence components work |
 
 It's almost like the two are complementary, if only there was a way to combine the two...
 
