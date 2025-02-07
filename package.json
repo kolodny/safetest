@@ -16,7 +16,8 @@
     "./vitest": "./lib/vitest.js",
     "./svelte": "./lib/svelte.js",
     "./vue": "./lib/vue.js",
-    "./docker": "./lib/docker.js"
+    "./docker": "./lib/docker.js",
+    "./playwright": "./lib/playwright.js"
   },
   "scripts": {
     "build": "tsc",
@@ -48,14 +49,14 @@
     "vue": "^3.3.4"
   },
   "dependencies": {
-    "@playwright/test": "^1.34.0",
+    "@playwright/test": "^1.50.1",
     "@types/jest-image-snapshot": "^6.1.0",
     "commander": "^11.0.0",
     "deepmerge": "^4.3.1",
     "jest-image-snapshot": "^6.1.0",
     "lodash": "^4.17.21",
     "node-fetch": "^2.7.0",
-    "playwright": "^1.34.0",
+    "playwright": "^1.50.1",
     "react-override": "^0.0.13",
     "setimmediate": "^1.0.5",
     "ws": "^8.13.0"
