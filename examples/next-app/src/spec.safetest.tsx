@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'safetest/vitest';
+import { expect as playwrightExpect } from 'safetest/playwright'
 import { render } from 'safetest/react';
 import { MainPageFileOverride } from '@/app/Overrides';
 
@@ -20,7 +21,7 @@ describe('app test', () => {
 describe('simple', () => {
   it('s', async () => {
     const { page } = await render(<div>Test1</div>);
-    await expect(page.locator('text=Test1')).toBeVisible();
+    await playwrightExpect(page.locator('text=Test1')).toBeVisible();
     expect(await page.screenshot()).toMatchImageSnapshot();
   });
 });
@@ -30,7 +31,7 @@ describe('complex', () => {
     describe('deeply', () => {
       it('c.n.d', async () => {
         const { page } = await render(<div>Test2</div>);
-        await expect(page.locator('text=Test2')).toBeVisible();
+        await playwrightExpect(page.locator('text=Test2')).toBeVisible();
         expect(await page.screenshot()).toMatchImageSnapshot();
       });
     });
@@ -38,7 +39,7 @@ describe('complex', () => {
   describe('sibling', () => {
     it('c.s', async () => {
       const { page } = await render(<div>Test3</div>);
-      await expect(page.locator('text=Test3')).toBeVisible();
+      await playwrightExpect(page.locator('text=Test3')).toBeVisible();
       expect(await page.screenshot()).toMatchImageSnapshot();
     });
   });
@@ -49,7 +50,7 @@ describe('another complex', () => {
     describe('deeply', () => {
       it('c.n.d', async () => {
         const { page } = await render(<div>Test4</div>);
-        await expect(page.locator('text=Test4')).toBeVisible();
+        await playwrightExpect(page.locator('text=Test4')).toBeInViewport();
         expect(await page.screenshot()).toMatchImageSnapshot();
       });
     });
@@ -57,7 +58,7 @@ describe('another complex', () => {
   describe('sibling', () => {
     it('c.s', async () => {
       const { page } = await render(<div>Test3</div>);
-      await expect(page.locator('text=Test3')).toBeVisible();
+      await playwrightExpect(page.locator('text=Test3')).toBeInViewport();
     });
   });
 });

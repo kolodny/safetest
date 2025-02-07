@@ -45,6 +45,8 @@ interface APIResponseEx extends APIResponse {
 
 type ExpectMatcherContext = any;
 
+const DEFAULT_EXPECT_TIMEOUT = 10000;
+
 async function toBeTruthy(
   this: ExpectMatcherContext,
   matcherName: string,
@@ -61,7 +63,7 @@ async function toBeTruthy(
   }>,
   options: { timeout?: number } = {}
 ) {
-  const { matches, log, timedOut } = await query(!!this.isNot, options.timeout);
+  const { matches, log, timedOut } = await query(!!this.isNot, options.timeout ?? DEFAULT_EXPECT_TIMEOUT);
 
   const message = () => '';
 
@@ -85,14 +87,12 @@ async function toEqual<T>(
   expected: T,
   options: { timeout?: number; contains?: boolean } = {}
 ) {
-  const timeout = undefined;
-
   const {
     matches: pass,
     received,
     log,
     timedOut,
-  } = await query(!!this.isNot, timeout);
+  } = await query(!!this.isNot, options.timeout ?? DEFAULT_EXPECT_TIMEOUT);
 
   const message = () => '';
 
@@ -131,14 +131,12 @@ async function toMatchText(
     throw new Error('value must be a string or regular expression');
   }
 
-  const timeout = undefined;
-
   const {
     matches: pass,
     received,
     log,
     timedOut,
-  } = await query(!!this.isNot, timeout);
+  } = await query(!!this.isNot, options.timeout ?? DEFAULT_EXPECT_TIMEOUT);
   const stringSubstring = options.matchSubstring ? 'substring' : 'string';
   const receivedString = received || '';
   const message = () => {
